@@ -5,7 +5,7 @@
 {% endif %}
 
 {% block title %}
-  {{ _("Third Party") }} {{ name }}{% if guild %} - {{ guild.name }}{% endif %}{% if page %} / {{ page|replace("_", " ")|replace("-", " ")|title }}{% endif %}
+  {{ _("Module") }} {{ name }}{% if guild %} - {{ guild.name }}{% endif %}{% if page %} / {{ page|replace("_", " ")|replace("-", " ")|title }}{% endif %}
 {% endblock %}
 
 {% block stylesheets %}{% endblock %}
@@ -33,7 +33,7 @@
                         </li>
                         <li class="nav-item">
                             <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id, page="third-parties") }}" class="nav-link show active" id="third-parties-tab">
-                                <i class="ni ni-bullet-list-67 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Third Parties") }}
+                                <i class="ni ni-bullet-list-67 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
                             </a>
                         </li>
                     </ul>

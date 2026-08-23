@@ -410,7 +410,7 @@ def add_constants(app: Flask) -> None:
             elif item["name"] == "builtin-dashboard":
                 item["name"] = _("Dashboard")
             elif item["name"] == "builtin-third_parties":
-                item["name"] = _("Third Parties")
+                item["name"] = _("Modules")
             elif item["name"] == "builtin-credits":
                 item["name"] = _("Credits")
             elif item["name"] == "builtin-login":

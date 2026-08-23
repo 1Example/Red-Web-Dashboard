@@ -12,7 +12,7 @@
         <div class="row">
             {% include "pages/guild_profile.html" %}
 
-            <div id="guild-content" class="col-md-8 mt-4">
+            <div id="guild-content" class="col-12 mt-4">
                 <ul class="nav nav-pills position-relative end-0" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link {% if not page or page == "overview" %}show active{% endif %}" id="overview-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true">
@@ -26,7 +26,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if page and page == "third-parties" %}show active{% endif %}" id="third-parties-tab" data-toggle="pill" href="#third-parties" role="tab" aria-controls="third-parties" aria-selected="true">
-                            <i class="ni ni-diamond opacity-10" style="vertical-align: -1.5px;"></i> {{ number_to_text_with_suffix(third_parties|length) }} {% if third_parties|length != 1 %}{{ _("Third Parties") }}{% else %}{{ _("Third Party") }}{% endif %}
+                            <i class="ni ni-diamond opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
                         </a>
                     </li>
                 </ul>
