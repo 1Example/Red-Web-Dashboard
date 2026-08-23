@@ -402,6 +402,9 @@ def add_constants(app: Flask) -> None:
                 continue
             if item["owner"] and not (current_user.is_authenticated and current_user.is_owner):
                 continue
+            # Modules are reached per-guild from the Dashboard page, so the global entry is hidden.
+            if item["name"] == "builtin-third_parties":
+                continue
             # I have to localize here opposed to storing it because... well... then it's not localized.
             if item["name"] == "builtin-home":
                 item["name"] = _("Home")

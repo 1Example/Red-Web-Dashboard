@@ -1,0 +1,296 @@
+/* ==========================================================================
+   Custom shell theme: slim horizontal topbar + dark surface palette.
+   Loaded after argon-dashboard.css so these rules win.
+   ========================================================================== */
+
+:root {
+  --cx-bg:            #0e1014;
+  --cx-bg-elev:       #161a21;
+  --cx-surface:       #1a1f27;
+  --cx-surface-2:     #212733;
+  --cx-border:        rgba(255, 255, 255, 0.07);
+  --cx-border-strong: rgba(255, 255, 255, 0.14);
+  --cx-text:          #e6e9ef;
+  --cx-text-dim:      #9aa4b2;
+  --cx-topbar-h:      56px;
+  --cx-radius:        12px;
+}
+
+/* ---------- base surface ---------- */
+
+body.g-sidenav-show,
+body {
+  background: var(--cx-bg) !important;
+  color: var(--cx-text);
+}
+
+/* Kill the tall coloured banner the old layout painted behind everything. */
+body > .min-height-300 {
+  display: none !important;
+}
+
+/* No left sidenav any more: reclaim the horizontal space at every breakpoint. */
+.main-content {
+  margin-left: 0 !important;
+  padding-top: calc(var(--cx-topbar-h) + 16px);
+}
+@media (min-width: 1200px) {
+  .main-content { margin-left: 0 !important; }
+}
+body.g-sidenav-pinned .main-content { margin-left: 0 !important; }
+
+/* ---------- slim topbar ---------- */
+
+.cx-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--cx-topbar-h);
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  background: rgba(18, 21, 27, 0.85);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--cx-border);
+}
+
+.cx-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  color: var(--cx-text);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  padding-right: 6px;
+}
+.cx-brand img {
+  height: 28px;
+  width: 28px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.cx-brand:hover { color: var(--cx-text); }
+
+/* nav links */
+.cx-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0 0 8px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cx-nav::-webkit-scrollbar { display: none; }
+
+.cx-nav a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 8px;
+  color: var(--cx-text-dim);
+  font-size: 0.83rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cx-nav a i { font-size: 0.9rem; opacity: 0.85; }
+.cx-nav a:hover {
+  background: var(--cx-surface-2);
+  color: var(--cx-text);
+}
+.cx-nav a.active {
+  background: var(--cx-surface-2);
+  color: #fff;
+  box-shadow: inset 0 -2px 0 0 currentColor;
+}
+
+.cx-spacer { flex: 1 1 auto; }
+
+/* right cluster: search + user + gear, merged in from the old top-right bar */
+.cx-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cx-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.cx-search i {
+  position: absolute;
+  left: 10px;
+  font-size: 0.78rem;
+  color: var(--cx-text-dim);
+  pointer-events: none;
+}
+.cx-search input {
+  height: 34px;
+  width: 190px;
+  padding: 0 10px 0 29px;
+  border-radius: 8px;
+  border: 1px solid var(--cx-border);
+  background: var(--cx-bg-elev);
+  color: var(--cx-text);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.15s ease, width 0.15s ease;
+}
+.cx-search input::placeholder { color: var(--cx-text-dim); }
+.cx-search input:focus {
+  border-color: var(--cx-border-strong);
+  width: 230px;
+}
+
+.cx-user {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 9px 4px 4px;
+  border-radius: 999px;
+  background: var(--cx-bg-elev);
+  border: 1px solid var(--cx-border);
+  color: var(--cx-text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.cx-user:hover { background: var(--cx-surface-2); color: var(--cx-text); }
+.cx-user img {
+  height: 26px;
+  width: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.cx-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  width: 34px;
+  border-radius: 8px;
+  background: var(--cx-bg-elev);
+  border: 1px solid var(--cx-border);
+  color: var(--cx-text-dim);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.cx-icon-btn:hover { background: var(--cx-surface-2); color: var(--cx-text); }
+
+/* mobile: collapse the nav into a scroll strip, shrink search */
+@media (max-width: 991px) {
+  .cx-search input { width: 130px; }
+  .cx-search input:focus { width: 160px; }
+  .cx-brand span { display: none; }
+}
+@media (max-width: 767px) {
+  .cx-search { display: none; }
+  .cx-nav a span { display: none; }
+  .cx-nav a { padding: 6px 9px; }
+}
+
+/* ---------- cards & surfaces ---------- */
+
+.card {
+  background: var(--cx-surface) !important;
+  border: 1px solid var(--cx-border) !important;
+  border-radius: var(--cx-radius) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+.card .card {
+  background: var(--cx-surface-2) !important;
+}
+.card-header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--cx-border) !important;
+}
+
+h1, h2, h3, h4, h5, h6, .card-title { color: var(--cx-text); }
+.text-secondary, .text-muted { color: var(--cx-text-dim) !important; }
+hr.horizontal.dark { background-color: var(--cx-border); }
+
+/* ---------- form controls ---------- */
+
+.form-control,
+.form-select,
+textarea.form-control {
+  background-color: var(--cx-bg-elev) !important;
+  border: 1px solid var(--cx-border) !important;
+  color: var(--cx-text) !important;
+}
+.form-control::placeholder { color: var(--cx-text-dim) !important; }
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--cx-border-strong) !important;
+  background-color: var(--cx-bg-elev) !important;
+  color: var(--cx-text) !important;
+}
+.form-control option,
+.form-select option {
+  background-color: var(--cx-surface);
+  color: var(--cx-text);
+}
+label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
+
+/* ---------- pill tabs (guild page, cog management) ---------- */
+
+.nav-pills {
+  background: transparent !important;
+  gap: 4px;
+}
+.nav-pills .nav-link {
+  background: var(--cx-surface) !important;
+  border: 1px solid var(--cx-border) !important;
+  border-radius: 8px !important;
+  color: var(--cx-text-dim) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 14px;
+}
+.nav-pills .nav-link:hover { color: var(--cx-text) !important; }
+.nav-pills .nav-link.active {
+  background: var(--cx-surface-2) !important;
+  border-color: var(--cx-border-strong) !important;
+  color: #fff !important;
+}
+
+/* ---------- tables ---------- */
+
+.table { color: var(--cx-text); }
+.table thead th {
+  border-bottom: 1px solid var(--cx-border) !important;
+  color: var(--cx-text-dim);
+}
+.table td, .table th { border-color: var(--cx-border) !important; }
+
+/* ---------- dropdowns ---------- */
+
+.dropdown-menu {
+  background: var(--cx-surface) !important;
+  border: 1px solid var(--cx-border-strong) !important;
+  border-radius: 10px !important;
+}
+.dropdown-item { color: var(--cx-text) !important; }
+.dropdown-item:hover { background: var(--cx-surface-2) !important; }
+
+/* ---------- footer ---------- */
+
+.footer {
+  border-top: 1px solid var(--cx-border);
+  margin-top: 32px;
+  padding-top: 14px !important;
+}
+.footer .nav-link { font-size: 0.78rem; }
