@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 
 {% block title %}
-  {{ _("Cog Management") }}
+  {{ _("Settings") }}
 {% endblock %}
 
 {% block stylesheets %}{% endblock %}
@@ -41,17 +41,26 @@
                                 </div>
                             </div>
                             <div class="mt-4">
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" id="cogSearchInput" placeholder="{{ _('Search cogs...') }}" oninput="filterCogCards()">
+                                </div>
                                 <form action="" method="POST" role="form" enctype="multipart/form-data">
                                     {{ cogs_form.hidden_tag() }}
-                                    {% for cog_form in cogs_form.cogs.default %}
-                                        <div>
-                                            {{ cog_form.hidden_tag() }}
-                                            <div class="form-check form-switch ps-0">
-                                                {{ cog_form.loaded(class="form-check-input ms-0", type="checkbox") }}
-                                                <label class="form-check-label">{{ cog_form.cog_name.data }}</label>
+                                    <div class="row" id="cogsCardGrid">
+                                        {% for cog_form in cogs_form.cogs.default %}
+                                            <div class="col-md-4 col-sm-6 mb-3 cog-card-wrapper" data-cog-name="{{ cog_form.cog_name.data|lower }}">
+                                                <div class="card h-100 {{ 'border border-2' if cog_form.loaded.data }}">
+                                                    <div class="card-body d-flex justify-content-between align-items-center py-3">
+                                                        {{ cog_form.hidden_tag() }}
+                                                        <span class="font-weight-bold text-sm">{{ cog_form.cog_name.data }}</span>
+                                                        <div class="form-check form-switch ps-0 mb-0">
+                                                            {{ cog_form.loaded(class="form-check-input ms-0", type="checkbox") }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    {% endfor %}
+                                        {% endfor %}
+                                    </div>
                                     <div class="text-center">
                                         {{ cogs_form.submit(class="btn mb-0 bg-gradient-" + variables["meta"]["color"] + " btn-md w-100 my-4") }}
                                     </div>
@@ -268,6 +277,16 @@
                 }
             })
             return false;
+        }
+    </script>
+    <script>
+        function filterCogCards() {
+            var query = document.getElementById("cogSearchInput").value.toLowerCase();
+            var cards = document.querySelectorAll("#cogsCardGrid .cog-card-wrapper");
+            cards.forEach(function(card) {
+                var match = card.getAttribute("data-cog-name").indexOf(query) !== -1;
+                card.style.display = match ? "" : "none";
+            });
         }
     </script>
     <script>
