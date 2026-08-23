@@ -420,7 +420,7 @@ def add_constants(app: Flask) -> None:
             elif item["name"] == "builtin-admin":
                 item["name"] = _("Admin")
             elif item["name"] == "builtin-cog-management":
-                item["name"] = _("Cog Management")
+                item["name"] = _("Settings")
             # if not item["is_http"]:
             try:
                 item["url"] = url_for(item["route"])
