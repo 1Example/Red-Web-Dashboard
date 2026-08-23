@@ -9,103 +9,167 @@
 {% block content %}
   <main class="main-content position-relative border-radius-lg">
     <div class="container-fluid py-4">
-      <div class="col-12">
-        <div class="card card-chart">
-          <div class="card-body">
-            <div class="row">
-              <div class="col-sm-12 text-left">
-                <h5 class="card-category">{{ _("Owned by") }} {{ variables["bot"]["owner"] }}</h5>
-                <h1 class="card-title">{{ variables["bot"]["name"] }}</h1>
-              </div>
+
+      <!-- ===== Hero ===== -->
+      <div class="card cx-hero mb-4">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+
+            <div class="col-lg-auto text-center mb-3 mb-lg-0">
+              <img src="{{ variables["bot"]["avatar"] }}" class="cx-hero-avatar" alt="{{ variables["bot"]["name"] }}" />
             </div>
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-lg-3">
-                <img src="{{ variables["bot"]["avatar"] }}" style="height: 200px; width: 200px; border-radius: 50%; margin: auto; display: block;" />
-              </div>
-              <div class="col-lg-8">
-                {% if variables["meta"]["description"] %}
-                  <h4>{{ variables["meta"]["description"]|markdown }}</h4>
-                  <br />
+
+            <div class="col-lg">
+              <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                <h1 class="mb-0 me-1">{{ variables["bot"]["name"] }}</h1>
+                {% if variables["bot"]["is_verified"] %}
+                  <span class="badge bg-gradient-{{ variables["meta"]["color"] }}"><i class="fa fa-check-circle me-1"></i>{{ _("Verified") }}</span>
                 {% endif %}
+                <span class="badge cx-badge-soft">{{ _("Owned by") }} {{ variables["bot"]["owner"] }}</span>
+              </div>
+
+              {% if variables["meta"]["description"] %}
+                <div class="text-secondary mb-3 cx-hero-desc">{{ variables["meta"]["description"]|markdown }}</div>
+              {% endif %}
+
+              <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                {% if variables["bot"]["prefixes"] %}
+                  <span class="text-xs text-secondary text-uppercase font-weight-bold me-1">{{ _("Prefixes") }}</span>
+                  {% for prefix in variables["bot"]["prefixes"] %}
+                    <code class="cx-prefix" onclick='copyTextToClipboard("{{ prefix }}")' title="{{ _("Copy ID") }}">{{ prefix }}</code>
+                  {% endfor %}
+                {% endif %}
+              </div>
+
+              <div class="d-flex flex-wrap gap-2">
                 {% if variables["bot"]["invite_public"] or (current_user.is_authenticated and current_user.is_owner) %}
-                  <a class="btn btn-m bg-gradient-{{ variables["meta"]["color"] }}" href="{{ variables["bot"]["invite_url"] }}" target="_blank" style="width: 65%;"><i class="fa fa-plus-circle me-2" style="vertical-align: -0.5px;"></i>{{ _("Invite Me!") }}</a>
+                  <a class="btn bg-gradient-{{ variables["meta"]["color"] }} mb-0" href="{{ variables["bot"]["invite_url"] }}" target="_blank">
+                    <i class="fa fa-plus-circle me-2" style="vertical-align: -0.5px;"></i>{{ _("Invite Me!") }}
+                  </a>
                 {% endif %}
-                {% if False %}
-                  <br />
-                  <a class="btn bg-gradient-{{ variables["meta"]["color"] }}" href="{{ variables["meta"]["support_server"] }}" target="_blank">{{ _("Join support server") }}</a>
+                {% if current_user.is_authenticated %}
+                  <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.dashboard") }}">
+                    <i class="ni ni-settings me-2" style="vertical-align: -1.5px;"></i>{{ _("Dashboard") }}
+                  </a>
+                {% endif %}
+                <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.commands") }}">
+                  <i class="ni ni-bullet-list-67 me-2" style="vertical-align: -1.5px;"></i>{{ _("Commands") }}
+                </a>
+                {% if variables["meta"]["support_server"] %}
+                  <a class="btn btn-outline-secondary mb-0" href="{{ variables["meta"]["support_server"] }}" target="_blank">
+                    <i class="fa fa-life-ring me-2" style="vertical-align: -0.5px;"></i>{{ _("Join Support Server") }}
+                  </a>
                 {% endif %}
               </div>
             </div>
+
+          </div>
         </div>
       </div>
-      <br />
+
+      <!-- ===== Primary stats ===== -->
       <div class="row">
-        <div class="col-6 col-md-4">
-          <div class="card">
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-8">
+        {% set stat_cards = [
+          ("Total Servers",  number_to_text_with_suffix(variables["stats"]["guilds"]), "ni ni-map-big",    "danger"),
+          ("Total Users",    number_to_text_with_suffix(variables["stats"]["users"]),  "ni ni-single-02",  "primary"),
+          ("Text Channels",  number_to_text_with_suffix(variables["stats"]["text"]),   "ni ni-chat-round", "info"),
+          ("Voice Channels", number_to_text_with_suffix(variables["stats"]["voice"]),  "ni ni-headphones", "warning")
+        ] %}
+        {% for label, value, icon, color in stat_cards %}
+          <div class="col-6 col-xl-3 mb-4">
+            <div class="card h-100">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">{{ _("Total Servers") }}</p>
-                    <h5 class="font-weight-bolder">
-                      {{ number_to_text_with_suffix(variables["stats"]["guilds"]) }}
-                    </h5>
+                    <p class="text-xs mb-1 text-uppercase font-weight-bold text-secondary">{{ _(label) }}</p>
+                    <h4 class="font-weight-bolder mb-0">{{ value }}</h4>
                   </div>
-                </div>
-                <div class="col-4 text-end">
-                  <div class="icon icon-shape bg-gradient-danger shadow-danger text-center rounded-circle">
-                    <i class="ni ni-map-big text-lg opacity-10" aria-hidden="true"></i>
+                  <div class="icon icon-shape bg-gradient-{{ color }} text-center rounded-circle">
+                    <i class="{{ icon }} text-lg opacity-10" aria-hidden="true"></i>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="col-6 col-md-4">
-          <div class="card">
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-8">
-                  <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">{{ _("Total Users") }}</p>
-                    <h5 class="font-weight-bolder">
-                      {{ number_to_text_with_suffix(variables["stats"]["users"]) }}
-                    </h5>
-                  </div>
-                </div>
-                <div class="col-4 text-end">
-                  <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
-                    <i class="ni ni-single-02 text-lg opacity-10" aria-hidden="true"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-6 col-md-4">
-          <div class="card">
-            <div class="card-body p-3">
-              <div class="row">
-                <div class="col-8">
-                  <div class="numbers">
-                    <p class="text-sm mb-0 text-uppercase font-weight-bold">{{ _("Been up for") }}</p>
-                    <h5 class="font-weight-bolder">
-                      {{ variables["stats"]["uptime_timedelta"] }}
-                    </h5>
-                  </div>
-                </div>
-                <div class="col-4 text-end">
-                  <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
-                    <i class="ni ni-badge text-lg opacity-10" aria-hidden="true"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
+
+      <!-- ===== Secondary details ===== -->
+      <div class="row">
+
+        <div class="col-lg-8 mb-4">
+          <div class="card h-100">
+            <div class="card-header pb-2">
+              <h5 class="mb-0"><i class="ni ni-chart-bar-32 me-2 opacity-8"></i>{{ _("At a glance") }}</h5>
+            </div>
+            <div class="card-body pt-2">
+              <div class="row">
+
+                <div class="col-sm-6 mb-3">
+                  <div class="cx-kv">
+                    <span class="cx-kv-label">{{ _("Been up for") }}</span>
+                    <span class="cx-kv-value">{{ variables["stats"]["uptime_timedelta"] }}</span>
+                  </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <div class="cx-kv">
+                    <span class="cx-kv-label">{{ _("Categories") }}</span>
+                    <span class="cx-kv-value">{{ number_to_text_with_suffix(variables["stats"]["categories"]) }}</span>
+                  </div>
+                </div>
+
+                <div class="col-sm-6 mb-3">
+                  <div class="cx-kv">
+                    <span class="cx-kv-label">{{ _("Total Channels") }}</span>
+                    <span class="cx-kv-value">{{ number_to_text_with_suffix(variables["stats"]["text"] + variables["stats"]["voice"]) }}</span>
+                  </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <div class="cx-kv">
+                    <span class="cx-kv-label">{{ _("Avg. users / server") }}</span>
+                    <span class="cx-kv-value">
+                      {% if variables["stats"]["guilds"] %}
+                        {{ number_to_text_with_suffix((variables["stats"]["users"] / variables["stats"]["guilds"])|round|int) }}
+                      {% else %}0{% endif %}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <hr class="horizontal dark my-2" />
+                  <div class="cx-kv">
+                    <span class="cx-kv-label">{{ _("Bot ID") }}</span>
+                    <span class="cx-kv-value">
+                      <code class="cx-prefix" onclick='copyTextToClipboard("{{ variables["bot"]["id"] }}")' title="{{ _("Copy ID") }}">{{ variables["bot"]["id"] }}</code>
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header pb-2">
+              <h5 class="mb-0"><i class="ni ni-book-bookmark me-2 opacity-8"></i>{{ _("About") }}</h5>
+            </div>
+            <div class="card-body pt-2">
+              {% if variables["bot"]["profile_description"] %}
+                <p class="text-sm text-secondary mb-3">{{ variables["bot"]["profile_description"] }}</p>
+              {% endif %}
+              {% if variables["bot"]["info"] %}
+                <div class="text-sm text-secondary">{{ variables["bot"]["info"]|markdown }}</div>
+              {% elif not variables["bot"]["profile_description"] %}
+                <p class="text-sm text-secondary mb-0">{{ _("No description set.") }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div>
   </main>
 {% endblock %}

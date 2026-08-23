@@ -294,3 +294,84 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
   padding-top: 14px !important;
 }
 .footer .nav-link { font-size: 0.78rem; }
+
+/* ==========================================================================
+   Home page
+   ========================================================================== */
+
+.cx-hero {
+  background:
+    radial-gradient(1200px 300px at 12% -40%, rgba(255, 255, 255, 0.06), transparent 70%),
+    var(--cx-surface) !important;
+}
+.cx-hero-avatar {
+  height: 132px;
+  width: 132px;
+  border-radius: 24px;
+  object-fit: cover;
+  border: 1px solid var(--cx-border-strong);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+.cx-hero h1 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.cx-hero-desc p:last-child { margin-bottom: 0; }
+
+.cx-badge-soft {
+  background: var(--cx-surface-2);
+  border: 1px solid var(--cx-border);
+  color: var(--cx-text-dim);
+  font-weight: 600;
+}
+
+.cx-prefix {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 6px;
+  background: var(--cx-bg-elev);
+  border: 1px solid var(--cx-border);
+  color: var(--cx-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.cx-prefix:hover { border-color: var(--cx-border-strong); }
+
+/* key/value rows */
+.cx-kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--cx-bg-elev);
+  border: 1px solid var(--cx-border);
+}
+.cx-kv-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 700;
+  color: var(--cx-text-dim);
+}
+.cx-kv-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--cx-text);
+  text-align: right;
+}
+
+/* stat card icons keep their accent colour but sit flatter in the dark shell */
+.icon.icon-shape { box-shadow: none !important; }
+
+.btn-outline-secondary {
+  border-color: var(--cx-border-strong) !important;
+  color: var(--cx-text-dim) !important;
+}
+.btn-outline-secondary:hover {
+  background: var(--cx-surface-2) !important;
+  color: var(--cx-text) !important;
+}
