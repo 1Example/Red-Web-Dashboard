@@ -105,6 +105,8 @@
   </head>
 
   <body class="g-sidenav-show bg-gray-100">
+    <canvas id="cx-bg-canvas" aria-hidden="true"></canvas>
+
     {% include "includes/navigation.html" %}
 
     {% include "includes/sidenav.html" %}
@@ -112,12 +114,11 @@
     {% block content %}
     {% endblock %}
 
-    {% include "includes/footer.html" %}
-    <br />
 
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     {% include "includes/scripts.html" %}
     <script src="{{ config.ASSETS_ROOT }}/js/argon-dashboard.js?v=2.0.4"></script>
+    <script src="{{ config.ASSETS_ROOT }}/js/cubix-background.js"></script>
 
     <!-- Specific JS goes HERE -->
     {% block javascripts %}{% endblock %}

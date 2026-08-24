@@ -375,3 +375,72 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
   background: var(--cx-surface-2) !important;
   color: var(--cx-text) !important;
 }
+
+/* ==========================================================================
+   Animated background + colour-scheme corrections
+   ========================================================================== */
+
+#cx-bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+/* Everything real sits above the canvas. */
+.cx-topbar { z-index: 1040; }
+.main-content { position: relative; z-index: 1; }
+
+/* Let the dots show through the page surface. */
+body,
+body.g-sidenav-show {
+  background:
+    radial-gradient(1000px 600px at 80% -10%, rgba(60, 90, 160, 0.10), transparent 60%),
+    var(--cx-bg) !important;
+}
+
+/* Cards get a touch of translucency so the background reads behind them. */
+.card {
+  background: rgba(26, 31, 39, 0.86) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.cx-hero {
+  background:
+    radial-gradient(1200px 300px at 12% -40%, rgba(255, 255, 255, 0.06), transparent 70%),
+    rgba(26, 31, 39, 0.88) !important;
+}
+
+/* --- colour glitch fixes --- */
+
+/* Argon injects a .moving-tab div into every .nav-pills; against the dark
+   shell it rendered as a pale floating block behind the active tab. */
+.nav-pills .moving-tab { display: none !important; }
+
+/* Argon's leftover light-theme surfaces. */
+.bg-gray-100, .bg-white { background-color: transparent !important; }
+.card.card-chart { background: rgba(26, 31, 39, 0.86) !important; }
+
+/* Inputs inside cards were picking up the light default. */
+.input-group-text {
+  background: var(--cx-bg-elev) !important;
+  border: 1px solid var(--cx-border) !important;
+  color: var(--cx-text-dim) !important;
+}
+
+/* Secondary buttons rendered near-white on near-white. */
+.btn-secondary {
+  background: var(--cx-surface-2) !important;
+  border: 1px solid var(--cx-border-strong) !important;
+  color: var(--cx-text) !important;
+}
+
+/* Guild header stat cluster: keep it from colliding on mid widths. */
+#profile .cx-kv-label { white-space: nowrap; }
+
+/* Links inherit the accent rather than Bootstrap's default blue-on-dark. */
+a { color: #6ea8fe; }
+a:hover { color: #9ec5fe; }

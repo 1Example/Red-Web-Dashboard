@@ -402,8 +402,9 @@ def add_constants(app: Flask) -> None:
                 continue
             if item["owner"] and not (current_user.is_authenticated and current_user.is_owner):
                 continue
-            # Modules are reached per-guild from the Dashboard page, so the global entry is hidden.
-            if item["name"] == "builtin-third_parties":
+            # Hidden global nav entries: Modules is reached per-guild from the Dashboard
+            # page, and Credits/attribution now lives only in the repo, not the UI.
+            if item["name"] in ("builtin-third_parties", "builtin-credits"):
                 continue
             # I have to localize here opposed to storing it because... well... then it's not localized.
             if item["name"] == "builtin-home":
