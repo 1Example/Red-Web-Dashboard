@@ -899,3 +899,20 @@ span.flatpickr-weekday {
   .plc-now { padding: 14px; }
   .plc-art { height: 84px; width: 84px; }
 }
+
+/* Module pages: match the hero card's horizontal extent so the header and the
+   content panel line up instead of the panel sitting inset. */
+#third-parties > .card,
+#third-parties > .card.card-chart {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+#third-party-content { width: 100%; }
+
+/* Give the player room to breathe on wide screens rather than leaving a
+   centred column with dead space either side. */
+.plc { max-width: 1500px; margin: 0 auto; }
+.plc-panels { grid-template-columns: 1fr; }
+@media (min-width: 1200px) {
+  .plc-panels { grid-template-columns: 1fr 1fr 1fr; }
+}

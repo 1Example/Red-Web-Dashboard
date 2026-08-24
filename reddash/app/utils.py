@@ -404,7 +404,9 @@ def add_constants(app: Flask) -> None:
                 continue
             # Hidden global nav entries: Modules is reached per-guild from the Dashboard
             # page, and Credits/attribution now lives only in the repo, not the UI.
-            if item["name"] in ("builtin-third_parties", "builtin-credits"):
+            # Logout is reachable from the user dropdown in the topbar, so the
+            # duplicate nav entry is hidden.
+            if item["name"] in ("builtin-third_parties", "builtin-credits", "builtin-logout"):
                 continue
             # I have to localize here opposed to storing it because... well... then it's not localized.
             if item["name"] == "builtin-home":
@@ -446,9 +448,8 @@ def add_constants(app: Flask) -> None:
                     for index, item in enumerate(final)
                     if item["route"] == "base_blueprint.credits"
                 ),
-                len(final),
+                None,
             )
-
             for custom_page in app.data["custom_pages"]:
                 custom_page = {
                     "name": custom_page["title"],
@@ -458,16 +459,10 @@ def add_constants(app: Flask) -> None:
                     "owner": False,
                     "locked": False,
                     "hidden": False,
-                    "url": url_for(
-                        "base_blueprint.custom_page",
-                        page_url=custom_page["url"],
-                    ),
-                    "active": (
-                        request.endpoint == "base_blueprint.custom_page"
-                        and request.view_args.get("page_url") == custom_page["url"]
-                    ),
+                    "url": url_for("base_blueprint.custom_page", page_url=custom_page["url"]),
+                    "active": request.endpoint == "base_blueprint.custom_page"
+                    and request.view_args.get("page_url") == custom_page["url"],
                 }
-
                 final.insert(index, custom_page)
                 index += 1
 

@@ -119,6 +119,21 @@ async def credits():
     return render_template("pages/credits.html")
 
 
+@blueprint.route("/profile")
+@login_required
+async def profile():
+    requeststr = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "DASHBOARDRPC__GET_USER_PROFILE",
+        "params": [current_user.id],
+    }
+    data = await get_result(app, requeststr)
+    if not data or data.get("status") != 0:
+        return abort(404, description=_("Could not load your profile."))
+    return render_template("pages/profile.html", profile=data)
+
+
 # <---------- Base Pages ---------->
 
 
