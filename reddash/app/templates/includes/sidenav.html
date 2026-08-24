@@ -18,6 +18,16 @@
         </a>
       </li>
     {% endfor %}
+    {% if current_user.is_authenticated and "PyLavController" in variables["third_parties"] %}
+      <li>
+        <a class="{{ "active" if request.path.startswith("/third-party/PyLavController") or "/third-party/PyLavController" in request.path else "" }}"
+           href="{{ url_for('third_parties_blueprint.third_party', name='PyLavController') }}"
+           title="{{ _("Audio") }}">
+          <i class="ni ni-headphones"></i>
+          <span>{{ _("Audio") }}</span>
+        </a>
+      </li>
+    {% endif %}
   </ul>
 
   <div class="cx-spacer"></div>
