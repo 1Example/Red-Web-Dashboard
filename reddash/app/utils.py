@@ -442,6 +442,10 @@ def add_constants(app: Flask) -> None:
             final.append(item)
 
         if app.data["custom_pages"]:
+            # Custom pages were anchored to the Credits entry, but that entry is
+            # hidden in this fork, so the lookup returned None and insert() blew
+            # up with "'NoneType' object cannot be interpreted as an integer".
+            # Fall back to appending at the end when the anchor isn't present.
             index = next(
                 (
                     index
@@ -450,6 +454,8 @@ def add_constants(app: Flask) -> None:
                 ),
                 None,
             )
+            if index is None:
+                index = len(final)
             for custom_page in app.data["custom_pages"]:
                 custom_page = {
                     "name": custom_page["title"],
