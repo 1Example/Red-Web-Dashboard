@@ -741,3 +741,29 @@ span.flatpickr-weekday {
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
 }
 .cx-guild-hero.cx-has-banner .card-body { background: transparent !important; }
+
+/* ---------- merged guild hero: header + tabs + content in one card ---------- */
+
+.cx-hero-tabs {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+.cx-hero-tabs .nav-pills { margin: 0; }
+
+/* Panes are no longer individually carded - they're sections of the hero card. */
+.cx-pane-body {
+  padding: 20px 24px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* The Modules pane pulls in third_parties_list.html, which brings its own card.
+   Neutralise it so it doesn't nest a card inside the hero card. */
+#third-parties > .card,
+#third-parties > .card.card-chart {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 0 !important;
+}
