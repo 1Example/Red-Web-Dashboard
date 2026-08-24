@@ -1,32 +1,50 @@
+/* ==========================================================================
+   Dark background theme.
+
+   Rewritten for this fork. The upstream version forced
+
+       body, div.card, div.card-header, div.card-body, .nav { background-color: #333 !important }
+
+   which - because `div.card:not(.sidenav, .sidenav *)` outranks a plain `.card`
+   rule - overrode every custom surface colour and painted the whole UI grey.
+   Backgrounds are now owned entirely by cubix-theme.css; this file only handles
+   the foreground (text/link/heading) colours it actually needs to.
+
+   Also fixed: the upstream file duplicated most of its rules and contained a
+   malformed selector (`h3 *body:not(.sidenav),`) that silently voided the
+   heading-colour rule it belonged to.
+   ========================================================================== */
+
 body:not(.sidenav),
-div.card:not(.sidenav,.sidenav *),
+div.card:not(.sidenav, .sidenav *),
 div.card-header:not(.sidenav),
-div.card-body:not(.sidenav,.sidenav *),
-.nav:not(.sidenav,.nav-item) {
-    background-color: #333 !important;
+div.card-body:not(.sidenav, .sidenav *),
+.nav:not(.sidenav, .nav-item) {
     color: white !important;
+    /* background-color intentionally NOT set - see header comment. */
 }
 
-div.card:not(.sidenav), div.card:not(.sidenav) > * {
+div.card:not(.sidenav),
+div.card:not(.sidenav) > * {
     border-radius: var(--bs-card-border-radius) !important;
 }
 
+/* Card children must stay transparent, otherwise the card's translucency is
+   defeated by an opaque body/header sitting on top of it. */
+div.card:not(.sidenav) > .card-body,
+div.card:not(.sidenav) > .card-header,
+div.card:not(.sidenav) > .card-footer {
+    background-color: transparent !important;
+}
+
 .nav.nav-pills .nav-link {
     color: white !important;
 }
-.moving-tab .nav-link {
-    color: black !important;
-}
-.moving-tab .nav-link.active {
-    color: black !important;
-    box-shadow: 0px 1px 5px 1px black !important;
-    background: black !important;
-}
 
-body:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)),
-div.card:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)),
-div.card-header:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)) {
-    color: var(--bs-indigo);
+body:not(.sidenav) a:not(.btn, .nav-link, .nav-item):not(.sidenav a:not(.btn, .nav-link, .nav-item)),
+div.card:not(.sidenav) a:not(.btn, .nav-link, .nav-item):not(.sidenav a:not(.btn, .nav-link, .nav-item)),
+div.card-header:not(.sidenav) a:not(.btn, .nav-link, .nav-item):not(.sidenav a:not(.btn, .nav-link, .nav-item)) {
+    color: #6ea8fe;
 }
 
 .choices__item--choice,
@@ -34,53 +52,16 @@ div.card-header:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not
     color: black !important;
 }
 
-.editor-toolbar button:not(.active,:hover),
-h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *body:not(.sidenav),
-div.card:not(.sidenav),
-div.card-header:not(.sidenav),
-div.card-body:not(.sidenav),
-.nav:not(.sidenav,.nav-item) {
-    background-color: #333 !important;
-    color: white !important;
-}
-
-.nav.nav-pills .nav-link {
-    color: white !important;
-}
-.moving-tab .nav-link {
-    color: black !important;
-}
-.moving-tab .nav-link.active {
-    color: black !important;
-    box-shadow: 0px 1px 5px 1px black !important;
-    background: black !important;
-}
-
-body:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)),
-div.card:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)),
-div.card-header:not(.sidenav) a:not(.btn,.nav-link,.nav-item):not(.sidenav a:not(.btn,.nav-link,.nav-item)) {
-    color: var(--bs-indigo);
-}
-
-.choices__item--choice,
-.choices[data-type=select-one] .choices__item {
-    color: black !important;
-}
-
-h1, h2, h3, h4, h5, h6, h1 *, h2 *, h3 *:not(.dropdown-item,.dropdown-item *), h4 *, h5 *, h6 *,
-.editor-toolbar button:not(.active,:hover) {
+h1, h2, h3, h4, h5, h6,
+h1 *, h2 *,
+h3 *:not(.dropdown-item, .dropdown-item *),
+h4 *, h5 *, h6 *,
+.editor-toolbar button:not(.active, :hover) {
     color: white !important;
 }
 
 hr {
-    border-color: white !important;
-}
-h3 *, h4 *, h5 *, h6 * {
-    color: white !important;
-}
-
-hr {
-    border-color: white !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 h2.swal2-title, h2.swal2-title * {

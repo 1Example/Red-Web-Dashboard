@@ -468,3 +468,34 @@ textarea.form-control,
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
+
+/* ==========================================================================
+   Specificity guard
+
+   themes/background_theme_dark.css targets cards as `div.card:not(.sidenav, ...)`,
+   which outranks a bare `.card` even when both use !important. These selectors
+   match that specificity so our surface colours reliably win, regardless of
+   which background/sidenav theme the bot has configured.
+   ========================================================================== */
+
+div.card:not(.sidenav, .sidenav *) {
+  background: rgba(22, 42, 92, 0.30) !important;
+  border: 1px solid rgba(130, 175, 255, 0.16) !important;
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+div.card:not(.sidenav, .sidenav *) div.card:not(.sidenav, .sidenav *) {
+  background: rgba(30, 54, 110, 0.26) !important;
+}
+div.card.cx-hero:not(.sidenav, .sidenav *) {
+  background: rgba(22, 42, 92, 0.34) !important;
+}
+/* Card internals stay transparent so the parent's translucency shows through. */
+div.card:not(.sidenav, .sidenav *) > div.card-body,
+div.card:not(.sidenav, .sidenav *) > div.card-header,
+div.card:not(.sidenav, .sidenav *) > div.card-footer {
+  background-color: transparent !important;
+}
+body:not(.sidenav) {
+  background: transparent !important;
+}
