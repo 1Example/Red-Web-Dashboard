@@ -439,30 +439,34 @@ def add_constants(app: Flask) -> None:
             item["active"] = request.endpoint == item["route"]
             final.append(item)
 
-        if app.data["custom_pages"]:
-index = next(
-    (
-        index
-        for index, item in enumerate(final)
-        if item["route"] == "base_blueprint.credits"
-    ),
-    len(final),
-)
-            for custom_page in app.data["custom_pages"]:
-                custom_page = {
-                    "name": custom_page["title"],
-                    "icon": "fa fa-file-text",
-                    "route": "base_blueprint.custom_page",
-                    "session": False,
-                    "owner": False,
-                    "locked": False,
-                    "hidden": False,
-                    "url": url_for("base_blueprint.custom_page", page_url=custom_page["url"]),
-                    "active": request.endpoint == "base_blueprint.custom_page"
-                    and request.view_args.get("page_url") == custom_page["url"],
-                }
-                final.insert(index, custom_page)
-                index += 1
+if app.data["custom_pages"]:
+    index = next(
+        (
+            index
+            for index, item in enumerate(final)
+            if item["route"] == "base_blueprint.credits"
+        ),
+        len(final),
+    )
+
+    for custom_page in app.data["custom_pages"]:
+        custom_page = {
+            "name": custom_page["title"],
+            "icon": "fa fa-file-text",
+            "route": "base_blueprint.custom_page",
+            "session": False,
+            "owner": False,
+            "locked": False,
+            "hidden": False,
+            "url": url_for(
+                "base_blueprint.custom_page",
+                page_url=custom_page["url"],
+            ),
+            "active": request.endpoint == "base_blueprint.custom_page"
+            and request.view_args.get("page_url") == custom_page["url"],
+        }
+        final.insert(index, custom_page)
+        index += 1
 
         return final
 
