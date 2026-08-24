@@ -171,7 +171,9 @@ async def commands(cog: str | None = None):
         len_commands=len_commands,
         tab_name=None if cog is None or cog not in cogs else cog,
         hidden=request.args.get("hidden") in ("True", "true"),
-        filter_param=request.args.get("query"),
+        # commands.html reads this as `query`; it was passed as `filter_param`,
+        # so the template's search branch never triggered and ?query= did nothing.
+        query=request.args.get("query"),
     )
 
 

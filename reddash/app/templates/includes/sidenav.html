@@ -34,10 +34,11 @@
 
   <div class="cx-right">
 
-    <div class="cx-search">
+    <form class="cx-search" action="{{ url_for('base_blueprint.commands') }}" method="GET" role="search">
       <i class="fa fa-search" aria-hidden="true"></i>
-      <input type="search" placeholder="{{ _("Search...") }}" aria-label="{{ _("Search...") }}" />
-    </div>
+      <input type="search" name="query" placeholder="{{ _("Search commands...") }}"
+             aria-label="{{ _("Search commands...") }}" value="{{ request.args.get('query', '') }}" />
+    </form>
 
     {% if current_user.is_authenticated %}
       <div class="dropdown">
