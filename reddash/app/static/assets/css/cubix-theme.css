@@ -634,3 +634,102 @@ span.flatpickr-weekday {
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 .swal2-title, .swal2-html-container { color: var(--cx-text) !important; }
+
+/* ==========================================================================
+   Guild Overview tab
+   ========================================================================== */
+
+.cx-ov-banner {
+  height: 150px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cx-ov-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.cx-ov-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(90, 130, 220, 0.07);
+  border: 1px solid rgba(120, 160, 255, 0.10);
+}
+.cx-ov-ico { font-size: 1.4rem; opacity: 0.95; }
+.cx-ov-num {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--cx-text);
+}
+.cx-ov-cap {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--cx-text-dim);
+}
+
+.cx-ov-panel {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(90, 130, 220, 0.05);
+  border: 1px solid rgba(120, 160, 255, 0.10);
+}
+.cx-ov-panel-head {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+  color: var(--cx-text-dim);
+  margin-bottom: 12px;
+}
+
+.cx-ov-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.cx-ov-row:last-child { border-bottom: none; }
+.cx-ov-row > span:first-child { color: var(--cx-text-dim); }
+.cx-ov-row b { color: var(--cx-text); font-weight: 700; }
+
+/* presence bar */
+.cx-ov-bar {
+  display: flex;
+  height: 9px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+}
+.cx-ov-bar span { display: block; height: 100%; }
+.cx-ov-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+  color: var(--cx-text-dim);
+}
+.cx-ov-legend b { color: var(--cx-text); margin-left: 4px; }
+.cx-dot {
+  display: inline-block;
+  height: 9px;
+  width: 9px;
+  border-radius: 50%;
+  margin-right: 7px;
+  vertical-align: 0px;
+}

@@ -44,72 +44,119 @@
                                     </div>
                                     <div class="mt-4">
 
-                                        <!-- Server summary. Always rendered, so the tab isn't
-                                             blank when Alias/CustomCom aren't loaded. -->
-                                        <div class="row mb-2">
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Humans") }}</span>
-                                              <span class="cx-kv-value">{{ number_to_text_with_suffix(guild.humans_number) }}</span>
+                                        {% if guild.banner_url %}
+                                          <div class="cx-ov-banner mb-4" style="background-image: url('{{ guild.banner_url }}');"></div>
+                                        {% endif %}
+
+                                        {% if guild.description %}
+                                          <p class="text-secondary mb-4">{{ guild.description }}</p>
+                                        {% endif %}
+
+                                        <!-- Headline stats -->
+                                        <div class="cx-ov-grid mb-4">
+                                          <div class="cx-ov-stat">
+                                            <i class="ni ni-single-02 cx-ov-ico" style="color:#5aa9ff;"></i>
+                                            <div>
+                                              <span class="cx-ov-num">{{ number_to_text_with_suffix(guild.humans_number) }}</span>
+                                              <span class="cx-ov-cap">{{ _("Humans") }}</span>
                                             </div>
                                           </div>
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Bots") }}</span>
-                                              <span class="cx-kv-value">{{ number_to_text_with_suffix(guild.bots_number) }}</span>
+                                          <div class="cx-ov-stat">
+                                            <i class="ni ni-atom cx-ov-ico" style="color:#a78bfa;"></i>
+                                            <div>
+                                              <span class="cx-ov-num">{{ number_to_text_with_suffix(guild.bots_number) }}</span>
+                                              <span class="cx-ov-cap">{{ _("Bots") }}</span>
                                             </div>
                                           </div>
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Text / Voice channels") }}</span>
-                                              <span class="cx-kv-value">{{ guild.text_channels_number }} / {{ guild.voice_channels_number }}</span>
+                                          <div class="cx-ov-stat">
+                                            <i class="ni ni-spaceship cx-ov-ico" style="color:#f472b6;"></i>
+                                            <div>
+                                              <span class="cx-ov-num">{{ guild.boosters_number }}</span>
+                                              <span class="cx-ov-cap">{{ _("Boosters") }}{% if guild.boost_tier %} &middot; {{ _("Tier") }} {{ guild.boost_tier }}{% endif %}</span>
                                             </div>
                                           </div>
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Verification level") }}</span>
-                                              <span class="cx-kv-value">{{ guild.verification_level|title }}</span>
+                                          <div class="cx-ov-stat">
+                                            <i class="ni ni-satisfied cx-ov-ico" style="color:#fbbf24;"></i>
+                                            <div>
+                                              <span class="cx-ov-num">{{ guild.emojis_number }}</span>
+                                              <span class="cx-ov-cap">{{ _("Emojis") }}{% if guild.stickers_number %} &middot; {{ guild.stickers_number }} {{ _("stickers") }}{% endif %}</span>
                                             </div>
                                           </div>
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Owner") }}</span>
-                                              <span class="cx-kv-value">{{ guild.owner }}</span>
-                                            </div>
-                                          </div>
-                                          <div class="col-md-6 mb-3">
-                                            <div class="cx-kv">
-                                              <span class="cx-kv-label">{{ _("Server ID") }}</span>
-                                              <span class="cx-kv-value">
-                                                <code class="cx-prefix" onclick='copyTextToClipboard("{{ guild.id }}")' title="{{ _("Copy ID") }}">{{ guild.id }}</code>
-                                              </span>
-                                            </div>
-                                          </div>
-                                          {% if guild.prefixes %}
-                                            <div class="col-12 mb-3">
-                                              <div class="cx-kv">
-                                                <span class="cx-kv-label">{{ _("Prefixes") }}</span>
-                                                <span class="cx-kv-value">
-                                                  {% for prefix in guild.prefixes %}
-                                                    <code class="cx-prefix" onclick='copyTextToClipboard("{{ prefix }}")'>{{ prefix }}</code>
-                                                  {% endfor %}
-                                                </span>
-                                              </div>
-                                            </div>
-                                          {% endif %}
                                         </div>
 
-                                        <!-- Quick access to this guild's module pages. -->
+                                        <!-- Presence -->
+                                        <div class="cx-ov-panel mb-4">
+                                          <div class="cx-ov-panel-head">
+                                            <i class="ni ni-chart-pie-35 me-2 opacity-8"></i>{{ _("Members online") }}
+                                          </div>
+                                          <div class="cx-ov-bar">
+                                            {% set total = guild.members_number if guild.members_number else 1 %}
+                                            <span style="width: {{ (guild.online_number / total * 100)|round(2) }}%; background:#3ba55d;"></span>
+                                            <span style="width: {{ (guild.idle_number / total * 100)|round(2) }}%; background:#faa81a;"></span>
+                                            <span style="width: {{ (guild.dnd_number / total * 100)|round(2) }}%; background:#ed4245;"></span>
+                                            <span style="width: {{ (guild.offline_number / total * 100)|round(2) }}%; background:#5b6371;"></span>
+                                          </div>
+                                          <div class="cx-ov-legend">
+                                            <span><i class="cx-dot" style="background:#3ba55d;"></i>{{ _("Online") }} <b>{{ guild.online_number }}</b></span>
+                                            <span><i class="cx-dot" style="background:#faa81a;"></i>{{ _("Idle") }} <b>{{ guild.idle_number }}</b></span>
+                                            <span><i class="cx-dot" style="background:#ed4245;"></i>{{ _("Do not disturb") }} <b>{{ guild.dnd_number }}</b></span>
+                                            <span><i class="cx-dot" style="background:#5b6371;"></i>{{ _("Offline") }} <b>{{ guild.offline_number }}</b></span>
+                                          </div>
+                                        </div>
+
+                                        <!-- Channels + details -->
+                                        <div class="row">
+                                          <div class="col-lg-6 mb-4">
+                                            <div class="cx-ov-panel h-100">
+                                              <div class="cx-ov-panel-head"><i class="ni ni-collection me-2 opacity-8"></i>{{ _("Channels") }}</div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-hashtag me-2 opacity-6"></i>{{ _("Text") }}</span><b>{{ guild.text_channels_number }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-volume-up me-2 opacity-6"></i>{{ _("Voice") }}</span><b>{{ guild.voice_channels_number }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-folder-o me-2 opacity-6"></i>{{ _("Categories") }}</span><b>{{ guild.categories_number }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-users me-2 opacity-6"></i>{{ _("Roles") }}</span><b>{{ guild.roles_number }}</b></div>
+                                            </div>
+                                          </div>
+                                          <div class="col-lg-6 mb-4">
+                                            <div class="cx-ov-panel h-100">
+                                              <div class="cx-ov-panel-head"><i class="ni ni-badge me-2 opacity-8"></i>{{ _("Server details") }}</div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-star-o me-2 opacity-6"></i>{{ _("Owner") }}</span><b>{{ guild.owner }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-shield me-2 opacity-6"></i>{{ _("Verification") }}</span><b>{{ guild.verification_level|title }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-clock-o me-2 opacity-6"></i>{{ _("Created") }}</span><b>{{ moment(guild.created_at).format("Do MMM YYYY") }}</b></div>
+                                              <div class="cx-ov-row"><span><i class="fa fa-sign-in me-2 opacity-6"></i>{{ _("Bot joined") }}</span><b>{{ moment(guild.joined_at).format("Do MMM YYYY") }}</b></div>
+                                              <div class="cx-ov-row">
+                                                <span><i class="fa fa-key me-2 opacity-6"></i>{{ _("Server ID") }}</span>
+                                                <code class="cx-prefix" onclick='copyTextToClipboard("{{ guild.id }}")' title="{{ _("Copy ID") }}">{{ guild.id }}</code>
+                                              </div>
+                                              {% if guild.vanity_url_code %}
+                                                <div class="cx-ov-row">
+                                                  <span><i class="fa fa-link me-2 opacity-6"></i>{{ _("Invite") }}</span>
+                                                  <a href="https://discord.gg/{{ guild.vanity_url_code }}" target="_blank">discord.gg/{{ guild.vanity_url_code }}</a>
+                                                </div>
+                                              {% endif %}
+                                              {% if guild.prefixes %}
+                                                <div class="cx-ov-row">
+                                                  <span><i class="fa fa-terminal me-2 opacity-6"></i>{{ _("Prefixes") }}</span>
+                                                  <span>
+                                                    {% for prefix in guild.prefixes %}
+                                                      <code class="cx-prefix" onclick='copyTextToClipboard("{{ prefix }}")'>{{ prefix }}</code>
+                                                    {% endfor %}
+                                                  </span>
+                                                </div>
+                                              {% endif %}
+                                            </div>
+                                          </div>
+                                        </div>
+
                                         {% if third_parties %}
-                                          <hr class="horizontal dark" />
-                                          <h5 class="mt-3 mb-2">{{ _("Modules") }}</h5>
-                                          <div class="d-flex flex-wrap gap-2 mb-3">
-                                            {% for third_party in third_parties %}
-                                              <a class="btn btn-sm btn-outline-secondary mb-0"
-                                                 href="{{ url_for('base_blueprint.dashboard_guild', guild_id=guild.id, page='third-parties', third_party=third_party) }}">
-                                                {{ third_party }}
-                                              </a>
-                                            {% endfor %}
+                                          <div class="cx-ov-panel mb-4">
+                                            <div class="cx-ov-panel-head"><i class="ni ni-diamond me-2 opacity-8"></i>{{ _("Modules") }}</div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                              {% for third_party in third_parties %}
+                                                <a class="btn btn-sm btn-outline-secondary mb-0"
+                                                   href="{{ url_for('base_blueprint.dashboard_guild', guild_id=guild.id, page='third-parties', third_party=third_party) }}">
+                                                  {{ third_party }}
+                                                </a>
+                                              {% endfor %}
+                                            </div>
                                           </div>
                                         {% endif %}
 
