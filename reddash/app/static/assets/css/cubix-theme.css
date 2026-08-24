@@ -4,10 +4,10 @@
    ========================================================================== */
 
 :root {
-  --cx-bg:            #0e1014;
-  --cx-bg-elev:       #161a21;
-  --cx-surface:       #1a1f27;
-  --cx-surface-2:     #212733;
+  --cx-bg:            #05070b;
+  --cx-bg-elev:       #0c1017;
+  --cx-surface:       #0e131c;
+  --cx-surface-2:     #141b26;
   --cx-border:        rgba(255, 255, 255, 0.07);
   --cx-border-strong: rgba(255, 255, 255, 0.14);
   --cx-text:          #e6e9ef;
@@ -52,7 +52,7 @@ body.g-sidenav-pinned .main-content { margin-left: 0 !important; }
   align-items: center;
   gap: 8px;
   padding: 0 16px;
-  background: rgba(18, 21, 27, 0.85);
+  background: rgba(6, 9, 14, 0.82);
   backdrop-filter: saturate(160%) blur(12px);
   -webkit-backdrop-filter: saturate(160%) blur(12px);
   border-bottom: 1px solid var(--cx-border);
@@ -380,16 +380,6 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
    Animated background + colour-scheme corrections
    ========================================================================== */
 
-#cx-bg-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  display: block;
-}
-
 /* Everything real sits above the canvas. */
 .cx-topbar { z-index: 1040; }
 .main-content { position: relative; z-index: 1; }
@@ -397,21 +387,23 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
 /* Let the dots show through the page surface. */
 body,
 body.g-sidenav-show {
-  background:
-    radial-gradient(1000px 600px at 80% -10%, rgba(60, 90, 160, 0.10), transparent 60%),
-    var(--cx-bg) !important;
+  /* Transparent so the fixed .cx-stars layer underneath stays visible. */
+  background: transparent !important;
 }
 
-/* Cards get a touch of translucency so the background reads behind them. */
+/* Cards: same colour family as the backdrop, translucent, but noticeably more
+   opaque than the star layer so text stays readable over moving stars. */
 .card {
-  background: rgba(26, 31, 39, 0.86) !important;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  background: rgba(10, 14, 21, 0.80) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
 }
+.card .card { background: rgba(18, 24, 34, 0.72) !important; }
 .cx-hero {
   background:
-    radial-gradient(1200px 300px at 12% -40%, rgba(255, 255, 255, 0.06), transparent 70%),
-    rgba(26, 31, 39, 0.88) !important;
+    radial-gradient(1200px 300px at 12% -40%, rgba(90, 130, 210, 0.10), transparent 70%),
+    rgba(10, 14, 21, 0.84) !important;
 }
 
 /* --- colour glitch fixes --- */
@@ -422,7 +414,7 @@ body.g-sidenav-show {
 
 /* Argon's leftover light-theme surfaces. */
 .bg-gray-100, .bg-white { background-color: transparent !important; }
-.card.card-chart { background: rgba(26, 31, 39, 0.86) !important; }
+.card.card-chart { background: rgba(10, 14, 21, 0.80) !important; }
 
 /* Inputs inside cards were picking up the light default. */
 .input-group-text {
@@ -444,3 +436,37 @@ body.g-sidenav-show {
 /* Links inherit the accent rather than Bootstrap's default blue-on-dark. */
 a { color: #6ea8fe; }
 a:hover { color: #9ec5fe; }
+
+
+/* ---------- surface corrections against the star backdrop ---------- */
+
+.cx-kv {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+.cx-prefix,
+.cx-badge-soft {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.form-control,
+.form-select,
+textarea.form-control,
+.input-group-text {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+.nav-pills .nav-link {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+.nav-pills .nav-link.active {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+.cx-user,
+.cx-icon-btn,
+.cx-search input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
