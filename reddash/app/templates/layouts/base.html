@@ -49,11 +49,11 @@
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet" />
     <link href="{{ config.ASSETS_ROOT }}/css/nucleo-svg.css" rel="stylesheet" />
     <!-- CSS Files -->
-    <link id="pagestyle" href="{{ config.ASSETS_ROOT }}/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+    <link id="pagestyle" href="{{ config.ASSETS_ROOT }}/css/argon-dashboard.css?v={{ variables['stats']['uptime'] }}" rel="stylesheet" />
     <link id="background_theme" href="{{ config.ASSETS_ROOT }}/css/themes/background_theme_{{ variables["meta"]["background_theme"] }}.css" rel="stylesheet" />
     <link id="sidenav_theme" href="{{ config.ASSETS_ROOT }}/css/themes/sidenav_theme_{{ variables["meta"]["sidenav_theme"] }}.css" rel="stylesheet" />
-    <link id="cubix_stars" href="{{ config.ASSETS_ROOT }}/css/cubix-stars.css" rel="stylesheet" />
-    <link id="cubix_theme" href="{{ config.ASSETS_ROOT }}/css/cubix-theme.css" rel="stylesheet" />
+    <link id="cubix_stars" href="{{ config.ASSETS_ROOT }}/css/cubix-stars.css?v={{ variables['stats']['uptime'] }}" rel="stylesheet" />
+    <link id="cubix_theme" href="{{ config.ASSETS_ROOT }}/css/cubix-theme.css?v={{ variables['stats']['uptime'] }}" rel="stylesheet" />
   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <style>
@@ -123,7 +123,7 @@
 
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     {% include "includes/scripts.html" %}
-    <script src="{{ config.ASSETS_ROOT }}/js/argon-dashboard.js?v=2.0.4"></script>
+    <script src="{{ config.ASSETS_ROOT }}/js/argon-dashboard.js?v={{ variables['stats']['uptime'] }}"></script>
 
     <!-- Specific JS goes HERE -->
     {% block javascripts %}{% endblock %}

@@ -52,7 +52,7 @@ body.g-sidenav-pinned .main-content { margin-left: 0 !important; }
   align-items: center;
   gap: 8px;
   padding: 0 16px;
-  background: rgba(6, 9, 14, 0.82);
+  background: rgba(10, 18, 40, 0.55);
   backdrop-filter: saturate(160%) blur(12px);
   -webkit-backdrop-filter: saturate(160%) blur(12px);
   border-bottom: 1px solid var(--cx-border);
@@ -394,16 +394,14 @@ body.g-sidenav-show {
 /* Cards: same colour family as the backdrop, translucent, but noticeably more
    opaque than the star layer so text stays readable over moving stars. */
 .card {
-  background: rgba(10, 14, 21, 0.80) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(10px) saturate(120%);
-  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  background: rgba(14, 24, 51, 0.42) !important;
+  border: 1px solid rgba(120, 160, 255, 0.10) !important;
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
 }
-.card .card { background: rgba(18, 24, 34, 0.72) !important; }
+.card .card { background: rgba(20, 32, 64, 0.38) !important; }
 .cx-hero {
-  background:
-    radial-gradient(1200px 300px at 12% -40%, rgba(90, 130, 210, 0.10), transparent 70%),
-    rgba(10, 14, 21, 0.84) !important;
+  background: rgba(14, 24, 51, 0.46) !important;
 }
 
 /* --- colour glitch fixes --- */
@@ -414,7 +412,7 @@ body.g-sidenav-show {
 
 /* Argon's leftover light-theme surfaces. */
 .bg-gray-100, .bg-white { background-color: transparent !important; }
-.card.card-chart { background: rgba(10, 14, 21, 0.80) !important; }
+.card.card-chart { background: rgba(14, 24, 51, 0.42) !important; }
 
 /* Inputs inside cards were picking up the light default. */
 .input-group-text {
@@ -441,8 +439,8 @@ a:hover { color: #9ec5fe; }
 /* ---------- surface corrections against the star backdrop ---------- */
 
 .cx-kv {
-  background: rgba(255, 255, 255, 0.035) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(90, 130, 220, 0.07) !important;
+  border: 1px solid rgba(120, 160, 255, 0.09) !important;
 }
 .cx-prefix,
 .cx-badge-soft {
