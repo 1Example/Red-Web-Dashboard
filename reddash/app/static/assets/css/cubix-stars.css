@@ -20,6 +20,15 @@
   pointer-events: none;
   overflow: hidden;
   background: #000000;
+  /* Isolate the animated field so overlapping translucent cards don't force
+     it to be re-rasterised together with page content each frame. */
+  contain: strict;
+}
+
+#stars, #stars2, #stars3, #stars4 {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 
