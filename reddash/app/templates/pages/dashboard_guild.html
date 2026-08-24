@@ -10,9 +10,82 @@
   <main class="main-content position-relative border-radius-lg">
     <div class="container-fluid">
         <div class="row">
-            {% include "pages/guild_profile.html" %}
+            <div class="col-12 mt-4">
+              <div class="card cx-guild-hero{% if guild.banner_url %} cx-has-banner{% endif %}"
+                   {% if guild.banner_url %}style="background-image: linear-gradient(to right, rgba(5,7,11,0.94) 0%, rgba(5,7,11,0.72) 45%, rgba(5,7,11,0.35) 100%), url('{{ guild.banner_url }}');"{% endif %}>
+                <div class="card-body py-3">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
 
-            <div id="guild-content" class="col-12 mt-4">
+                    <div class="d-flex align-items-center" style="min-width: 240px;">
+                      <div class="avatar avatar-lg me-3">
+                        <img src={% if guild.icon_animated %}"{{ guild.icon_url[:-3] + "png" }}" onmouseover='this.src = this.src.slice(0, -3) + "gif";' onmouseout='this.src = this.src.slice(0, -3) + "png";'{% else %}"{{ guild.icon_url }}"{% endif %} class="shadow-sm border-radius-lg" style="height: 100%; width: 100%; object-fit: cover;" />
+                      </div>
+                      <div>
+                        <h4 class="mb-0 font-weight-bolder d-flex align-items-center">
+                          {{ guild.name }}
+                          <div class="dropdown" style="display: unset;">
+                            <a class="nav-link text-lg py-0" role="button" id="guild_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="display: unset; vertical-align: 1px; margin-left: 4px;">
+                              <i class="fa fa-ellipsis-v"></i>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="guild_dropdown">
+                              <li class="nav-link"><a class="nav-item dropdown-item" onclick='copyTextToClipboard("{{ guild.id }}")'><i class="fa fa-copy" style="width: 1.3em;"></i> {{ _("Copy ID") }}</a></li>
+                              {% if leave_guild_form %}
+                                <form action="" method="POST" role="form" enctype="multipart/form-data">
+                                  {{ leave_guild_form.hidden_tag() }}
+                                  {{ leave_guild_form.submit(class="nav-item dropdown-item text-danger", onclick="return confirmLeaveGuild(event);", style="display: none;") }}
+                                  <li class="nav-link"><a class="nav-item dropdown-item text-danger" onclick='this.parentElement.parentElement.querySelector("#{{ leave_guild_form.submit.id }}").click();'><i class="fa fa-trash-o" style="width: 1.3em;"></i> {{ leave_guild_form.submit.label.text }}</a></li>
+                                </form>
+                              {% endif %}
+                            </ul>
+                          </div>
+                        </h4>
+                        <span class="text-sm text-secondary">{{ _("Owned by") }} {{ guild.owner }}</span>
+                        {% if guild.description %}
+                          <div class="text-xs text-secondary mt-1">{{ guild.description }}</div>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.members_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Members") }}</span>
+                      </div>
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.channels_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Channels") }}</span>
+                      </div>
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.roles_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Roles") }}</span>
+                      </div>
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ guild.boosters_number }}</span>
+                        <span class="text-xs text-secondary">{{ _("Boosts") }}{% if guild.boost_tier %} &middot; T{{ guild.boost_tier }}{% endif %}</span>
+                      </div>
+
+                      <div class="text-sm px-2" style="border-left: 1px solid rgba(255,255,255,0.1);">
+                        <span class="me-2"><i class="fa fa-circle" style="color:#3ba55d; font-size:0.55rem; vertical-align:2px;"></i> {{ guild.online_number }}</span>
+                        <span class="me-2"><i class="fa fa-circle" style="color:#faa81a; font-size:0.55rem; vertical-align:2px;"></i> {{ guild.idle_number }}</span>
+                        <span class="me-2"><i class="fa fa-circle" style="color:#ed4245; font-size:0.55rem; vertical-align:2px;"></i> {{ guild.dnd_number }}</span>
+                        <span><i class="fa fa-circle" style="color:#5b6371; font-size:0.55rem; vertical-align:2px;"></i> {{ guild.offline_number }}</span>
+                        <br />
+                        <span class="me-2"><i class="fa fa-hashtag text-secondary"></i> {{ guild.text_channels_number }}</span>
+                        <span><i class="fa fa-volume-up text-secondary"></i> {{ guild.voice_channels_number }}</span>
+                      </div>
+
+                      <div class="text-xs text-secondary px-2" style="border-left: 1px solid rgba(255,255,255,0.1);">
+                        {{ _("Created at:") }} {{ moment(guild.created_at).format("Do MMM YYYY") }}
+                        {% if guild.joined_at %}<br />{{ _("Bot joined at:") }} {{ moment(guild.joined_at).format("Do MMM YYYY") }}{% endif %}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="guild-content" class="col-12 mt-3">
                 <ul class="nav nav-pills position-relative end-0" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link {% if not page or page == "overview" %}show active{% endif %}" id="overview-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true">
@@ -43,14 +116,6 @@
                                         </div>
                                     </div>
                                     <div class="mt-4">
-
-                                        {% if guild.banner_url %}
-                                          <div class="cx-ov-banner mb-4" style="background-image: url('{{ guild.banner_url }}');"></div>
-                                        {% endif %}
-
-                                        {% if guild.description %}
-                                          <p class="text-secondary mb-4">{{ guild.description }}</p>
-                                        {% endif %}
 
                                         <!-- Headline stats -->
                                         <div class="cx-ov-grid mb-4">
@@ -145,20 +210,6 @@
                                             </div>
                                           </div>
                                         </div>
-
-                                        {% if third_parties %}
-                                          <div class="cx-ov-panel mb-4">
-                                            <div class="cx-ov-panel-head"><i class="ni ni-diamond me-2 opacity-8"></i>{{ _("Modules") }}</div>
-                                            <div class="d-flex flex-wrap gap-2">
-                                              {% for third_party in third_parties %}
-                                                <a class="btn btn-sm btn-outline-secondary mb-0"
-                                                   href="{{ url_for('base_blueprint.dashboard_guild', guild_id=guild.id, page='third-parties', third_party=third_party) }}">
-                                                  {{ third_party }}
-                                                </a>
-                                              {% endfor %}
-                                            </div>
-                                          </div>
-                                        {% endif %}
 
                                         {% if aliases_form %}
                                             <div id="Alias" class="card">
@@ -377,6 +428,29 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script>
+        // Moved here from guild_profile.html, which is no longer included now that
+        // the guild header is merged into the hero card on this page.
+        async function confirmLeaveGuild(event) {
+            if (confirmationDone) {
+                return true;
+            }
+            let target_button = event.target;
+            event.preventDefault();
+            SwalAlert.fire({
+                title: '{{ _("Are you sure you want me to leave this guild?") }}',
+                text: '{{ _("You will always be able to invite me back to this server later, but you risk losing some settings.") }}',
+                confirmButtonText: '{{ _("Yes, leave!") }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    confirmationDone = true;
+                    target_button.click();
+                }
+            })
+            return false;
+        }
+    </script>
+
     <script>
         function changePage(page) {
             var tab_nav_link = document.querySelector("#" + page + "-tab");

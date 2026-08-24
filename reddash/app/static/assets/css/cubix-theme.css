@@ -733,3 +733,11 @@ span.flatpickr-weekday {
   margin-right: 7px;
   vertical-align: 0px;
 }
+
+/* Merged guild hero: banner behind the identity/stats strip. */
+.cx-guild-hero.cx-has-banner {
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(130, 175, 255, 0.16) !important;
+}
+.cx-guild-hero.cx-has-banner .card-body { background: transparent !important; }
