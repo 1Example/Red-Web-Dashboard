@@ -734,22 +734,50 @@ span.flatpickr-weekday {
   vertical-align: 0px;
 }
 
-/* Merged guild hero: banner behind the identity/stats strip. */
+/* Merged guild hero.
+   The banner can't be set as the card's own background: our own
+   `div.card:not(...) { background: ... !important }` rule outranks an inline
+   background-image. So the image is passed in as a custom property (--cx-banner)
+   and painted on a ::before layer, which nothing overrides. */
+.cx-guild-hero { position: relative; overflow: hidden; }
 .cx-guild-hero.cx-has-banner {
-  background-size: cover;
-  background-position: center;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
 }
-.cx-guild-hero.cx-has-banner .card-body { background: transparent !important; }
+.cx-guild-hero.cx-has-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--cx-banner);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  z-index: 0;
+}
+/* Readability wash over the banner, strongest on the left where the name sits. */
+.cx-guild-hero.cx-has-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right,
+    rgba(5, 7, 11, 0.94) 0%,
+    rgba(5, 7, 11, 0.78) 45%,
+    rgba(5, 7, 11, 0.55) 100%);
+  z-index: 0;
+}
+.cx-guild-hero > * { position: relative; z-index: 1; }
+.cx-guild-hero .card-body { background: transparent !important; }
 
 /* ---------- merged guild hero: header + tabs + content in one card ---------- */
 
-.cx-hero-tabs {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+.cx-hero-tabs { flex: 0 0 auto; }
+.cx-hero-tabs .nav-pills {
+  margin: 0;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
-.cx-hero-tabs .nav-pills { margin: 0; }
+@media (max-width: 1400px) {
+  .cx-hero-tabs { order: 3; width: 100%; margin-top: 10px; }
+}
 
 /* Panes are no longer individually carded - they're sections of the hero card. */
 .cx-pane-body {

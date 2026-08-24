@@ -12,7 +12,7 @@
         <div class="row">
             <div class="col-12 mt-4">
               <div class="card cx-guild-hero{% if guild.banner_url %} cx-has-banner{% endif %}"
-                   {% if guild.banner_url %}style="background-image: linear-gradient(to right, rgba(5,7,11,0.94) 0%, rgba(5,7,11,0.72) 45%, rgba(5,7,11,0.35) 100%), url('{{ guild.banner_url }}');"{% endif %}>
+                   {% if guild.banner_url %}style="--cx-banner: url('{{ guild.banner_url }}');"{% endif %}>
                 <div class="card-body py-3">
                   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
 
@@ -44,6 +44,26 @@
                           <div class="text-xs text-secondary mt-1">{{ guild.description }}</div>
                         {% endif %}
                       </div>
+                    </div>
+
+                    <div class="cx-hero-tabs">
+                      <ul class="nav nav-pills position-relative end-0" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link {% if not page or page == "overview" %}show active{% endif %}" id="overview-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true">
+                            <i class="fa fa-map opacity-10" style="vertical-align: -1px;"></i> {{ _("Overview") }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if page and page == "settings" %}show active{% endif %}" id="settings-tab" data-toggle="pill" href="#settings" role="tab" aria-controls="settings" aria-selected="true">
+                            <i class="ni ni-settings-gear-65 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Bot Settings") }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if page and page == "third-parties" %}show active{% endif %}" id="third-parties-tab" data-toggle="pill" href="#third-parties" role="tab" aria-controls="third-parties" aria-selected="true">
+                            <i class="ni ni-diamond opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
+                        </a>
+                    </li>
+                </ul>
                     </div>
 
                     <div class="d-flex align-items-center gap-4 flex-wrap">
@@ -82,26 +102,6 @@
 
                   </div>
 
-                  <!-- Tabs live inside the hero card so header + content form one panel. -->
-                  <div class="cx-hero-tabs" id="guild-content">
-                <ul class="nav nav-pills position-relative end-0" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link {% if not page or page == "overview" %}show active{% endif %}" id="overview-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true">
-                            <i class="fa fa-map opacity-10" style="vertical-align: -1px;"></i> {{ _("Overview") }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if page and page == "settings" %}show active{% endif %}" id="settings-tab" data-toggle="pill" href="#settings" role="tab" aria-controls="settings" aria-selected="true">
-                            <i class="ni ni-settings-gear-65 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Bot Settings") }}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if page and page == "third-parties" %}show active{% endif %}" id="third-parties-tab" data-toggle="pill" href="#third-parties" role="tab" aria-controls="third-parties" aria-selected="true">
-                            <i class="ni ni-diamond opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
-                        </a>
-                    </li>
-                </ul>
-                  </div>
                 </div>
 
                 <div class="tab-content" id="guild-tabContent">
