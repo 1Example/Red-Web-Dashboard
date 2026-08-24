@@ -131,6 +131,12 @@ async def profile():
     data = await get_result(app, requeststr)
     if not data or data.get("status") != 0:
         return abort(404, description=_("Could not load your profile."))
+    # The RPC sends epoch floats; flask-moment needs real datetimes (get_guild
+    # does the same conversion for guild timestamps).
+    if data.get("created_at"):
+        data["created_at"] = datetime.datetime.fromtimestamp(
+            data["created_at"], tz=datetime.UTC
+        )
     return render_template("pages/profile.html", profile=data)
 
 
