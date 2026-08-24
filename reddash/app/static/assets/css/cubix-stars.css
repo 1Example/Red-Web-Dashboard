@@ -5,7 +5,9 @@
    flags it as "1080 only. Needs revision" - its star coordinates were hardcoded
    to a 2000px-wide tile, leaving empty bands on wider monitors. Regenerated here
    across a 2600px tile, recoloured from gold to a cool white/blue to match the
-   UI, and made to respect prefers-reduced-motion.
+   UI. Note: deliberately does NOT honour prefers-reduced-motion - this is a
+   decorative background the user explicitly asked to be animated, and the
+   opt-out silently disabled it for anyone with Windows animation effects off.
    ========================================================================== */
 
 .cx-stars {

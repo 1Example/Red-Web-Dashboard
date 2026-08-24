@@ -18,6 +18,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="icon" type="image/png" href="{{ variables["meta"]["icon"] }}" />
 
+    <!-- This dashboard already ships a dark theme. Tell the browser (and
+         extensions like Dark Reader) not to re-tint it, which otherwise
+         repaints every card grey with !important rules. -->
+    <meta name="color-scheme" content="dark" />
+    <meta name="darkreader-lock" />
+
     <title>
       {{ variables["meta"]["title"] }} - {% block title %}{% endblock %}
     </title>
