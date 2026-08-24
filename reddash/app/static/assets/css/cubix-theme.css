@@ -495,3 +495,142 @@ div.card:not(.sidenav, .sidenav *) > div.card-footer {
 body:not(.sidenav) {
   background: transparent !important;
 }
+
+/* ==========================================================================
+   Third-party widget theming
+
+   choices.min.css, easymde.min.css, flatpickr and dropzone are all loaded AFTER
+   our stylesheet in base.html and ship light-theme defaults, which is why these
+   controls rendered as white boxes. Choices and EasyMDE both expose CSS custom
+   properties, so we retint them at the variable level where possible instead of
+   fighting every internal selector.
+   ========================================================================== */
+
+/* ---------- Choices.js (multi-selects: prefixes, roles, disabled commands) ---------- */
+
+.choices {
+  --choices-bg-color: rgba(255, 255, 255, 0.04);
+  --choices-bg-color-disabled: rgba(255, 255, 255, 0.02);
+  --choices-bg-color-dropdown: #0d1420;
+  --choices-text-color: var(--cx-text);
+  --choices-keyline-color: rgba(255, 255, 255, 0.10);
+  --choices-primary-color: rgba(90, 130, 220, 0.35);
+  --choices-disabled-color: var(--cx-text-dim);
+  margin-bottom: 0;
+}
+
+.choices__inner {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: var(--cx-text) !important;
+  border-radius: 8px !important;
+}
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+  border-color: rgba(130, 175, 255, 0.35) !important;
+}
+.choices__input,
+.choices__input.choices__input--cloned {
+  background-color: transparent !important;
+  color: var(--cx-text) !important;
+}
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+  background-color: #0d1420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: var(--cx-text) !important;
+}
+.choices__list--dropdown .choices__item,
+.choices__list[aria-expanded] .choices__item {
+  color: var(--cx-text) !important;
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+  background-color: rgba(90, 130, 220, 0.22) !important;
+}
+/* Selected chips */
+.choices__list--multiple .choices__item {
+  background-color: rgba(90, 130, 220, 0.30) !important;
+  border: 1px solid rgba(130, 175, 255, 0.30) !important;
+  color: #fff !important;
+}
+.choices[data-type*="select-one"]::after {
+  border-color: var(--cx-text-dim) transparent transparent !important;
+}
+.choices__placeholder { color: var(--cx-text-dim) !important; opacity: 1; }
+
+/* The dark background theme forces .choices items to black text; undo that so
+   options stay readable on the dark dropdown. */
+.choices__item--choice,
+.choices[data-type=select-one] .choices__item {
+  color: var(--cx-text) !important;
+}
+
+/* ---------- EasyMDE / CodeMirror (Description, Custom Info) ---------- */
+
+.EasyMDEContainer .CodeMirror {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  color: var(--cx-text) !important;
+  border-radius: 0 0 8px 8px !important;
+}
+.EasyMDEContainer .CodeMirror-cursor { border-left-color: var(--cx-text) !important; }
+.EasyMDEContainer .CodeMirror-selected { background: rgba(90, 130, 220, 0.30) !important; }
+.EasyMDEContainer .editor-toolbar {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-bottom: none !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+.EasyMDEContainer .editor-toolbar button {
+  color: var(--cx-text) !important;
+}
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+.EasyMDEContainer .editor-toolbar i.separator { border-color: rgba(255, 255, 255, 0.12) !important; }
+.EasyMDEContainer .editor-statusbar { color: var(--cx-text-dim) !important; }
+.EasyMDEContainer .editor-preview,
+.EasyMDEContainer .editor-preview-side {
+  background: #0d1420 !important;
+  color: var(--cx-text) !important;
+}
+
+/* ---------- flatpickr (date pickers) ---------- */
+
+.flatpickr-calendar {
+  background: #0d1420 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5) !important;
+  color: var(--cx-text) !important;
+}
+.flatpickr-months .flatpickr-month,
+.flatpickr-weekdays,
+span.flatpickr-weekday {
+  background: transparent !important;
+  color: var(--cx-text-dim) !important;
+  fill: var(--cx-text-dim) !important;
+}
+.flatpickr-day { color: var(--cx-text) !important; }
+.flatpickr-day:hover { background: rgba(255, 255, 255, 0.08) !important; }
+.flatpickr-day.selected { background: rgba(90, 130, 220, 0.45) !important; border-color: transparent !important; }
+.flatpickr-day.flatpickr-disabled { color: rgba(255, 255, 255, 0.25) !important; }
+
+/* ---------- dropzone ---------- */
+
+.dropzone {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.18) !important;
+  color: var(--cx-text-dim) !important;
+}
+
+/* ---------- SweetAlert2 modals ---------- */
+
+.swal2-popup {
+  background: #0d1420 !important;
+  color: var(--cx-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.swal2-title, .swal2-html-container { color: var(--cx-text) !important; }
