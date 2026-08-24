@@ -34,6 +34,7 @@
                       <a class="dropdown-item" href="{{ url_for_query(filter="owner") }}">{% if filter == "owner" %}<i class="ni ni-check-bold me-2" style="vertical-align: -1.5px;"></i>{% endif %}{{ _("Owner") }}</a>
                       <a class="dropdown-item" href="{{ url_for_query(filter="admin") }}">{% if filter == "admin" %}<i class="ni ni-check-bold me-2" style="vertical-align: -1.5px;"></i>{% endif %}{{ _("Administrator") }}</a>
                       <a class="dropdown-item" href="{{ url_for_query(filter="mod") }}">{% if filter == "mod" %}<i class="ni ni-check-bold me-2" style="vertical-align: -1.5px;"></i>{% endif %}{{ _("Moderator") }}</a>
+                      <a class="dropdown-item" href="{{ url_for_query(filter="member") }}">{% if filter == "member" %}<i class="ni ni-check-bold me-2" style="vertical-align: -1.5px;"></i>{% endif %}{{ _("Member") }}</a>
                   </div>
               </div>
               <div class="ms-md-auto">

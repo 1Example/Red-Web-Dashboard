@@ -15,30 +15,70 @@
     <div class="container-fluid">
         <div class="row">
             {% if guild and not expanded and not fullscreen %}
-                {% include "pages/guild_profile.html" %}
+            <div class="col-12 mt-4">
+              <div class="card cx-guild-hero{% if guild.banner_url %} cx-has-banner{% endif %}"
+                   {% if guild.banner_url %}style="--cx-banner: url('{{ guild.banner_url }}');"{% endif %}>
+                <div class="card-body py-3">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+                    <div class="d-flex align-items-center" style="min-width: 240px;">
+                      <div class="avatar avatar-lg me-3">
+                        <img src="{{ guild.icon_url }}" class="shadow-sm border-radius-lg" style="height:100%; width:100%; object-fit:cover;" />
+                      </div>
+                      <div>
+                        <h4 class="mb-0 font-weight-bolder">{{ guild.name }}</h4>
+                        <span class="text-sm text-secondary">{{ _("Owned by") }} {{ guild.owner }}</span>
+                      </div>
+                    </div>
+
+                    <div class="cx-hero-tabs">
+                      <ul class="nav nav-pills position-relative end-0" role="tablist">
+                        <li class="nav-item">
+                          <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id) }}" class="nav-link">
+                            <i class="fa fa-map opacity-10" style="vertical-align: -1px;"></i> {{ _("Overview") }}
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id, page="settings") }}" class="nav-link">
+                            <i class="ni ni-settings-gear-65 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Bot Settings") }}
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id, page="third-parties") }}" class="nav-link show active" id="third-parties-tab">
+                            <i class="ni ni-diamond opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-4 flex-wrap">
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.members_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Members") }}</span>
+                      </div>
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.channels_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Channels") }}</span>
+                      </div>
+                      <div class="text-center px-2">
+                        <span class="d-block h5 mb-0 font-weight-bolder">{{ number_to_text_with_suffix(guild.roles_number) }}</span>
+                        <span class="text-xs text-secondary">{{ _("Roles") }}</span>
+                      </div>
+                      <div class="text-sm px-2" style="border-left:1px solid rgba(255,255,255,0.1);">
+                        <span class="me-2"><i class="fa fa-circle" style="color:#3ba55d;font-size:.55rem;vertical-align:2px;"></i> {{ guild.online_number }}</span>
+                        <span class="me-2"><i class="fa fa-circle" style="color:#faa81a;font-size:.55rem;vertical-align:2px;"></i> {{ guild.idle_number }}</span>
+                        <span class="me-2"><i class="fa fa-circle" style="color:#ed4245;font-size:.55rem;vertical-align:2px;"></i> {{ guild.dnd_number }}</span>
+                        <span><i class="fa fa-circle" style="color:#5b6371;font-size:.55rem;vertical-align:2px;"></i> {{ guild.offline_number }}</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
             {% endif %}
 
-            <div id="guild-content"{% if guild and not expanded and not fullscreen %} class="col-md-8 mt-4"{% endif %}>
-                {% if guild and not fullscreen %}
-                    <ul class="nav nav-pills position-relative end-0" role="tablist">
-                        <li class="nav-item">
-                            <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id) }}" class="nav-link">
-                                <i class="fa fa-map opacity-10" style="vertical-align: -1px;"></i> {{ _("Overview") }}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id, page="settings") }}" class="nav-link">
-                                <i class="ni ni-settings-gear-65 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Settings") }}
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ url_for("base_blueprint.dashboard_guild", guild_id=guild.id, page="third-parties") }}" class="nav-link show active" id="third-parties-tab">
-                                <i class="ni ni-bullet-list-67 opacity-10" style="vertical-align: -1.5px;"></i> {{ _("Modules") }}
-                            </a>
-                        </li>
-                    </ul>
-                    <br />
-                {% endif %}
+            <div id="guild-content"{% if guild and not expanded and not fullscreen %} class="col-12"{% endif %}>
                 <div class="tab-content" id="creator-tabContent">
                     <div class="tab-pane fade show active" id="third-parties" role="tabpanel" aria-labelledby="third-parties-tab">
                         <div class="card card-chart">

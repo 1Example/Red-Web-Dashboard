@@ -848,3 +848,54 @@ span.flatpickr-weekday {
   color: var(--cx-text) !important;
 }
 .cx-back i { font-size: 1.1rem; opacity: 0.8; }
+
+/* ==========================================================================
+   Mobile fixes
+   ========================================================================== */
+
+@media (max-width: 991px) {
+  /* Wide tables (commands, queue, search results) must scroll rather than
+     force the page wider than the viewport, which caused the overlapping
+     columns and the cog sidebar bleeding over the content. */
+  .table-responsive,
+  .card-body > .table,
+  .plc-q,
+  #commands-container table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* The commands page puts the cog list in a fixed-width column that overlapped
+     the table on narrow screens; stack it instead. */
+  #commands-container .col-md-3,
+  #commands-container .col-md-9,
+  #commands-container .col-lg-2,
+  #commands-container .col-lg-10 {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+  }
+
+  /* Long command names / descriptions should wrap instead of stretching a cell. */
+  td, th { word-break: break-word; }
+
+  /* Guild hero: stack cleanly instead of squeezing four clusters onto one line. */
+  .cx-guild-hero .card-body > .d-flex { gap: 12px !important; }
+  .cx-guild-hero .d-flex.align-items-center.gap-4 { gap: 14px !important; }
+
+  /* Player: full-width controls, no horizontal overflow. */
+  .plc-controls .plc-btn { flex: 0 0 auto; }
+  .plc-seek { flex-wrap: wrap; }
+  .plc-seek input[type=range] { flex: 1 1 100%; order: 3; }
+}
+
+@media (max-width: 575px) {
+  .cx-topbar { padding: 0 10px; gap: 4px; }
+  .main-content { padding-left: 4px; padding-right: 4px; }
+  .container-fluid { padding-left: 10px; padding-right: 10px; }
+  .cx-ov-grid { grid-template-columns: 1fr 1fr; }
+  .plc-now { padding: 14px; }
+  .plc-art { height: 84px; width: 84px; }
+}
