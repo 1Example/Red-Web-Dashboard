@@ -4,7 +4,7 @@
    ========================================================================== */
 
 :root {
-  --cx-bg:            #05070b;
+  --cx-bg:            #000000;
   --cx-bg-elev:       #0c1017;
   --cx-surface:       #0e131c;
   --cx-surface-2:     #141b26;
@@ -394,14 +394,14 @@ body.g-sidenav-show {
 /* Cards: same colour family as the backdrop, translucent, but noticeably more
    opaque than the star layer so text stays readable over moving stars. */
 .card {
-  background: rgba(22, 42, 92, 0.30) !important;
+  background: rgba(24, 48, 105, 0.16) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
   backdrop-filter: blur(14px) saturate(130%);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
 }
-.card .card { background: rgba(30, 54, 110, 0.26) !important; }
+.card .card { background: rgba(34, 62, 125, 0.14) !important; }
 .cx-hero {
-  background: rgba(22, 42, 92, 0.34) !important;
+  background: rgba(24, 48, 105, 0.20) !important;
 }
 
 /* --- colour glitch fixes --- */
@@ -412,7 +412,7 @@ body.g-sidenav-show {
 
 /* Argon's leftover light-theme surfaces. */
 .bg-gray-100, .bg-white { background-color: transparent !important; }
-.card.card-chart { background: rgba(22, 42, 92, 0.30) !important; }
+.card.card-chart { background: rgba(24, 48, 105, 0.16) !important; }
 
 /* Inputs inside cards were picking up the light default. */
 .input-group-text {
@@ -479,16 +479,16 @@ textarea.form-control,
    ========================================================================== */
 
 div.card:not(.sidenav, .sidenav *) {
-  background: rgba(22, 42, 92, 0.30) !important;
+  background: rgba(24, 48, 105, 0.16) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
   backdrop-filter: blur(14px) saturate(130%);
   -webkit-backdrop-filter: blur(14px) saturate(130%);
 }
 div.card:not(.sidenav, .sidenav *) div.card:not(.sidenav, .sidenav *) {
-  background: rgba(30, 54, 110, 0.26) !important;
+  background: rgba(34, 62, 125, 0.14) !important;
 }
 div.card.cx-hero:not(.sidenav, .sidenav *) {
-  background: rgba(22, 42, 92, 0.34) !important;
+  background: rgba(24, 48, 105, 0.20) !important;
 }
 /* Card internals stay transparent so the parent's translucency shows through. */
 div.card:not(.sidenav, .sidenav *) > div.card-body,
