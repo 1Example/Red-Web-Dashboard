@@ -440,14 +440,14 @@ def add_constants(app: Flask) -> None:
             final.append(item)
 
         if app.data["custom_pages"]:
-            index = next(
-                (
-                    index
-                    for index, item in enumerate(final)
-                    if item["route"] == "base_blueprint.credits"
-                ),
-                None,
-            )
+index = next(
+    (
+        index
+        for index, item in enumerate(final)
+        if item["route"] == "base_blueprint.credits"
+    ),
+    len(final),
+)
             for custom_page in app.data["custom_pages"]:
                 custom_page = {
                     "name": custom_page["title"],
