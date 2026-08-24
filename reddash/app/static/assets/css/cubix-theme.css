@@ -795,3 +795,33 @@ span.flatpickr-weekday {
   border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
   border-radius: 0 !important;
 }
+
+/* Hero tabs sit next to the stat cluster, separated by a hairline rule. */
+.cx-hero-tabs {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-right: 18px;
+  margin-right: 4px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+@media (max-width: 1500px) {
+  .cx-hero-tabs {
+    order: 3;
+    width: 100%;
+    margin: 10px 0 0;
+    padding: 10px 0 0;
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+  }
+}
+
+/* The Modules pane hosts third-party content; give it back a card surface so it
+   reads as a panel rather than floating loose on the page. */
+#third-parties > .card,
+#third-parties > .card.card-chart {
+  background: rgba(24, 48, 105, 0.10) !important;
+  border: 1px solid rgba(130, 175, 255, 0.16) !important;
+  border-radius: 14px !important;
+  box-shadow: none !important;
+  margin: 20px 24px 24px;
+}
