@@ -28,7 +28,7 @@
                       {% if switch_guilds and switch_guilds|length > 1 %}
                         <div class="dropdown">
                           <a href="#" class="cx-guild-switch-toggle" role="button"
-                             id="cxGuildSwitch" data-bs-toggle="dropdown" aria-expanded="false"
+                             id="cxGuildSwitch" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                              title="{{ _("Switch server") }}">
                             <h4 class="mb-0 font-weight-bolder">
                               {{ guild.name }}
@@ -36,7 +36,7 @@
                             </h4>
                             <span class="text-sm text-secondary">{{ _("Owned by") }} {{ guild.owner }}</span>
                           </a>
-                          <div class="dropdown-menu dropdown-menu-start cx-guild-switch-menu"
+                          <div class="dropdown-menu cx-guild-switch-menu"
                                aria-labelledby="cxGuildSwitch">
                             {% if switch_guilds|length > 8 %}
                               <div class="px-3 pt-2 pb-1">

@@ -25,11 +25,11 @@
                           {% if switch_guilds and switch_guilds|length > 1 %}
                             <div class="dropdown cx-guild-switch" style="display: unset;">
                               <a href="#" class="cx-guild-switch-toggle" role="button"
-                                 id="cxGuildSwitch" data-bs-toggle="dropdown" aria-expanded="false"
+                                 id="cxGuildSwitch" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                  title="{{ _("Switch server") }}">
                                 {{ guild.name }}<i class="fa fa-angle-down cx-guild-switch-caret"></i>
                               </a>
-                              <div class="dropdown-menu dropdown-menu-start cx-guild-switch-menu"
+                              <div class="dropdown-menu cx-guild-switch-menu"
                                    aria-labelledby="cxGuildSwitch">
                                 {% if switch_guilds|length > 8 %}
                                   <div class="px-3 pt-2 pb-1">
