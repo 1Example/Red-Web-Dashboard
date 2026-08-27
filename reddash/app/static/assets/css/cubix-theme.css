@@ -924,7 +924,13 @@ span.flatpickr-weekday {
   .plc-panels { grid-template-columns: 1fr 1fr 1fr; }
 }
 
-/* ---------- server switcher in the guild header ---------- */
+/* ---------- server switcher in the guild header ----------
+   Deliberately owns none of Bootstrap's dropdown classes. The theme puts
+   `will-change: animation, box-shadow` and `backface-visibility: hidden` on
+   every `.dropdown-menu`, which promotes it to its own GPU layer; on this menu
+   that composited layer rendered see-through even though its computed opacity
+   was 1 and its background fully opaque. Own markup, own classes, own toggle. */
+.cx-gs { position: relative; display: inline-block; }
 .cx-guild-switch-toggle {
   color: inherit;
   text-decoration: none;
@@ -940,76 +946,52 @@ span.flatpickr-weekday {
   vertical-align: 1px;
   transition: opacity .15s ease;
 }
-/* Selector matches the theme's `.dropdown:not(.dropdown-hover) .dropdown-menu`
-   for specificity (0,3,0) and comes later in the cascade, so its
-   `margin-top: 40px !important` no longer wins. A bare
-   `.cx-guild-switch-menu` is only (0,1,0) and lost. */
-.dropdown .dropdown-menu.cx-guild-switch-menu {
+
+.cx-gs-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
   min-width: 260px;
   max-width: 320px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  /* The theme forces `margin-top: 40px !important` on every non-hover
-     dropdown menu, which drops this one well clear of its toggle. */
-  /* The theme also pins `top: 0`, which puts the menu over its own
-     toggle - the 40px margin above was compensating for that. Position
-     it properly instead: directly under the toggle, with a small gap. */
-  top: 100% !important;
-  margin-top: 8px !important;
-  /* Stand on our own rather than inheriting whatever the theme does to
-     dropdowns: opaque, unclipped, and tall enough for the whole list plus the
-     divider and the "All servers" row underneath it. */
-  background: var(--cx-surface) !important;
-  border: 1px solid var(--cx-border-strong) !important;
-  border-radius: 10px !important;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, .55) !important;
-  overflow: visible !important;
-  max-height: none !important;
-  height: auto !important;
+  padding: 5px 0;
+  z-index: 1080;
+  background: #0e131c;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 10px;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .6);
+  text-align: left;
+  font-size: .875rem;
+  font-weight: 400;
 }
-/* The theme draws a FontAwesome caret on every .dropdown-menu via ::before,
-   pinned at left:28px. On this menu it lands on top of the first entry, so it
-   is suppressed and the menu stands on its own. */
-.cx-guild-switch-menu::before {
-  display: none !important;
-  content: none !important;
-}
-/* Above the hero's own banner layers and anything painted after the card. */
-.cx-guild-switch-menu { z-index: 1050; }
+.cx-gs.open > .cx-gs-menu { display: block; }
 
-/* The theme shows and hides every dropdown by running an animation
-   (`hide-navbar-dropdown` / `show-navbar-dropdown`, both `forwards`) rather
-   than by toggling display. If the shown state is ever read mid-animation, or
-   the hide animation wins the cascade, the menu is left part-way through its
-   fade and the page shows through it. Pin both states outright so no animation
-   decides whether this menu is readable. */
-.cx-guild-switch-menu.show {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  animation: none !important;
-  transform: none !important;
-  transition: none !important;
-}
-.cx-guild-switch-menu:not(.show) {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  animation: none !important;
-}
-/* Long server lists scroll inside the list, so the divider and "All servers"
-   below it always stay reachable instead of being pushed out of the menu. */
-.cx-guild-switch-list {
-  max-height: 320px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.cx-guild-switch-item {
-  padding-top: 7px;
-  padding-bottom: 7px;
+.cx-guild-switch-list { max-height: 320px; overflow-y: auto; overflow-x: hidden; }
+
+.cx-gs-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px;
+  color: var(--cx-text, #e6ebf5);
+  text-decoration: none;
   white-space: nowrap;
+  line-height: 1.3;
 }
-.cx-guild-switch-item.active {
-  background: rgba(90, 169, 255, .14);
-  font-weight: 600;
+.cx-gs-item:hover { background: rgba(255, 255, 255, .07); color: inherit; }
+.cx-gs-item.active { background: rgba(90, 169, 255, .16); font-weight: 600; }
+.cx-gs-item .text-truncate { max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+.cx-gs-all { font-size: .82rem; opacity: .85; }
+.cx-gs-sep { height: 1px; margin: 5px 0; background: rgba(255, 255, 255, .10); }
+
+.cx-gs-search {
+  width: calc(100% - 24px);
+  margin: 2px 12px 6px;
+  padding: 5px 9px;
+  font-size: .8rem;
+  color: var(--cx-text, #e6ebf5);
+  background: rgba(0, 0, 0, .35);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 7px;
 }
-.cx-guild-switch-item .text-truncate { max-width: 200px; }
+.cx-gs-search:focus { outline: none; border-color: rgba(130, 175, 255, .5); }

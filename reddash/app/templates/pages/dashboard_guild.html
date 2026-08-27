@@ -23,23 +23,23 @@
                       <div>
                         <h4 class="mb-0 font-weight-bolder d-flex align-items-center">
                           {% if switch_guilds and switch_guilds|length > 1 %}
-                            <div class="dropdown cx-guild-switch" style="display: unset;">
+                            <span class="cx-gs" style="display:inline-block;position:relative;">
                               <a href="#" class="cx-guild-switch-toggle" role="button"
-                                 id="cxGuildSwitch" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                 id="cxGuildSwitch" aria-haspopup="true" aria-expanded="false"
                                  title="{{ _("Switch server") }}">
                                 {{ guild.name }}<i class="fa fa-angle-down cx-guild-switch-caret"></i>
                               </a>
-                              <div class="dropdown-menu cx-guild-switch-menu"
+                              <div class="cx-gs-menu"
                                    aria-labelledby="cxGuildSwitch">
                                 {% if switch_guilds|length > 8 %}
                                   <div class="px-3 pt-2 pb-1">
-                                    <input type="text" class="form-control form-control-sm cx-guild-switch-search"
+                                    <input type="text" class="cx-gs-search"
                                            placeholder="{{ _("Search servers...") }}" autocomplete="off" />
                                   </div>
                                 {% endif %}
                                 <div class="cx-guild-switch-list">
                                   {% for other in switch_guilds %}
-                                    <a class="dropdown-item d-flex align-items-center gap-2 cx-guild-switch-item{% if other.current %} active{% endif %}"
+                                    <a class="cx-gs-item{% if other.current %} active{% endif %}"
                                        data-name="{{ other.name|lower }}"
                                        href="{{ url_for(request.endpoint, **dict(request.view_args, guild_id=other.id)) }}">
                                       <img src="{{ other.icon_url }}" alt=""
@@ -49,12 +49,12 @@
                                     </a>
                                   {% endfor %}
                                 </div>
-                                <div class="dropdown-divider my-1"></div>
-                                <a class="dropdown-item text-sm" href="{{ url_for("base_blueprint.dashboard") }}">
+                                <div class="cx-gs-sep"></div>
+                                <a class="cx-gs-item cx-gs-all" href="{{ url_for("base_blueprint.dashboard") }}">
                                   <i class="fa fa-list me-2 opacity-7"></i>{{ _("All servers") }}
                                 </a>
                               </div>
-                            </div>
+                            </span>
                           {% else %}
                             {{ guild.name }}
                           {% endif %}
