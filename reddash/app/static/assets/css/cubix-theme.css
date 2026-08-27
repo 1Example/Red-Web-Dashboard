@@ -938,6 +938,14 @@ span.flatpickr-weekday {
   max-width: 320px;
   padding-top: 4px;
   padding-bottom: 4px;
+  margin-top: 10px;
+}
+/* The theme draws a FontAwesome caret on every .dropdown-menu via ::before,
+   pinned at left:28px. On this menu it lands on top of the first entry, so it
+   is suppressed and the menu stands on its own. */
+.cx-guild-switch-menu::before {
+  display: none !important;
+  content: none !important;
 }
 /* Long server lists scroll inside the menu rather than off the screen. */
 .cx-guild-switch-list {
