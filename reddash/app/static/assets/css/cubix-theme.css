@@ -968,6 +968,26 @@ span.flatpickr-weekday {
 }
 /* Above the hero's own banner layers and anything painted after the card. */
 .cx-guild-switch-menu { z-index: 1050; }
+
+/* The theme shows and hides every dropdown by running an animation
+   (`hide-navbar-dropdown` / `show-navbar-dropdown`, both `forwards`) rather
+   than by toggling display. If the shown state is ever read mid-animation, or
+   the hide animation wins the cascade, the menu is left part-way through its
+   fade and the page shows through it. Pin both states outright so no animation
+   decides whether this menu is readable. */
+.cx-guild-switch-menu.show {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+.cx-guild-switch-menu:not(.show) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  animation: none !important;
+}
 /* Long server lists scroll inside the list, so the divider and "All servers"
    below it always stay reachable instead of being pushed out of the menu. */
 .cx-guild-switch-list {
