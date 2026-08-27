@@ -739,7 +739,12 @@ span.flatpickr-weekday {
    `div.card:not(...) { background: ... !important }` rule outranks an inline
    background-image. So the image is passed in as a custom property (--cx-banner)
    and painted on a ::before layer, which nothing overrides. */
-.cx-guild-hero { position: relative; overflow: hidden; }
+/* No `overflow: hidden` here: it kept the banner inside the rounded corners,
+   but it also clipped the server-switcher dropdown to the height of the card,
+   which on a module page is a single row. The banner layers below round
+   themselves off instead, so nothing needs clipping. z-index lifts the card
+   above the ones that follow it, or an open menu paints underneath them. */
+.cx-guild-hero { position: relative; z-index: 5; }
 .cx-guild-hero.cx-has-banner {
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
 }
@@ -747,6 +752,7 @@ span.flatpickr-weekday {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   background-image: var(--cx-banner);
   background-size: cover;
   background-position: center;
@@ -758,6 +764,7 @@ span.flatpickr-weekday {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   background: linear-gradient(to right,
     rgba(5, 7, 11, 0.94) 0%,
     rgba(5, 7, 11, 0.78) 45%,
@@ -938,7 +945,19 @@ span.flatpickr-weekday {
   max-width: 320px;
   padding-top: 4px;
   padding-bottom: 4px;
-  margin-top: 10px;
+  /* The theme forces `margin-top: 40px !important` on every non-hover
+     dropdown menu, which drops this one well clear of its toggle. */
+  margin-top: 8px !important;
+  /* Stand on our own rather than inheriting whatever the theme does to
+     dropdowns: opaque, unclipped, and tall enough for the whole list plus the
+     divider and the "All servers" row underneath it. */
+  background: var(--cx-surface) !important;
+  border: 1px solid var(--cx-border-strong) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .55) !important;
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
 }
 /* The theme draws a FontAwesome caret on every .dropdown-menu via ::before,
    pinned at left:28px. On this menu it lands on top of the first entry, so it
@@ -947,12 +966,20 @@ span.flatpickr-weekday {
   display: none !important;
   content: none !important;
 }
-/* Long server lists scroll inside the menu rather than off the screen. */
+/* Above the hero's own banner layers and anything painted after the card. */
+.cx-guild-switch-menu { z-index: 1050; }
+/* Long server lists scroll inside the list, so the divider and "All servers"
+   below it always stay reachable instead of being pushed out of the menu. */
 .cx-guild-switch-list {
   max-height: 320px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
-.cx-guild-switch-item { padding-top: 6px; padding-bottom: 6px; }
+.cx-guild-switch-item {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  white-space: nowrap;
+}
 .cx-guild-switch-item.active {
   background: rgba(90, 169, 255, .14);
   font-weight: 600;
