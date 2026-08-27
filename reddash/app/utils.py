@@ -570,6 +570,7 @@ def add_constants(app: Flask) -> None:
             else url_for(app.login_manager.login_view),
             "url_for_query": url_for_query,
             "number_to_text_with_suffix": number_to_text_with_suffix,
+            "asset_version": make_asset_version(app),
         }
 
 
@@ -789,6 +790,25 @@ def humanize_timedelta(
             strings.append(f"{period_value} {unit}")
 
     return ", ".join(strings)
+
+
+def make_asset_version(app):
+    """Version a static asset by its own mtime.
+
+    The templates used to cache-bust with the *bot's* uptime, which only
+    changes when the bot restarts. Deploying the dashboard rewrote the CSS but
+    left the URL byte-identical, so browsers kept serving a stale copy - new
+    markup against old stylesheets, which is far more confusing than no update
+    at all. Keying on the file means the URL changes exactly when the file does.
+    """
+
+    def asset_version(filename: str) -> int:
+        try:
+            return int(os.path.getmtime(os.path.join(app.static_folder, filename.lstrip("/"))))
+        except OSError:
+            return 0
+
+    return asset_version
 
 
 async def get_switchable_guilds(app, user_id: int, current_id: int = None) -> list:
