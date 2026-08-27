@@ -916,3 +916,37 @@ span.flatpickr-weekday {
 @media (min-width: 1200px) {
   .plc-panels { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* ---------- server switcher in the guild header ---------- */
+.cx-guild-switch-toggle {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+}
+.cx-guild-switch-toggle:hover { color: inherit; }
+.cx-guild-switch-toggle:hover .cx-guild-switch-caret { opacity: 1; }
+.cx-guild-switch-caret {
+  font-size: .8em;
+  margin-left: 6px;
+  opacity: .45;
+  vertical-align: 1px;
+  transition: opacity .15s ease;
+}
+.cx-guild-switch-menu {
+  min-width: 260px;
+  max-width: 320px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+/* Long server lists scroll inside the menu rather than off the screen. */
+.cx-guild-switch-list {
+  max-height: 320px;
+  overflow-y: auto;
+}
+.cx-guild-switch-item { padding-top: 6px; padding-bottom: 6px; }
+.cx-guild-switch-item.active {
+  background: rgba(90, 169, 255, .14);
+  font-weight: 600;
+}
+.cx-guild-switch-item .text-truncate { max-width: 200px; }

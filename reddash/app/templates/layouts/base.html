@@ -130,6 +130,29 @@
     <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
     {% include "includes/scripts.html" %}
     <script src="{{ config.ASSETS_ROOT }}/js/argon-dashboard.js?v={{ variables['stats']['uptime'] }}"></script>
+    <script>
+    // Filter the server switcher as you type. Delegated from the document so it
+    // works no matter which page rendered the menu, and costs nothing when the
+    // menu is not on the page.
+    document.addEventListener("input", function (event) {
+      var box = event.target;
+      if (!box.classList || !box.classList.contains("cx-guild-switch-search")) { return; }
+      var menu = box.closest(".cx-guild-switch-menu");
+      if (!menu) { return; }
+      var query = box.value.trim().toLowerCase();
+      menu.querySelectorAll(".cx-guild-switch-item").forEach(function (item) {
+        var name = item.getAttribute("data-name") || "";
+        item.style.display = name.indexOf(query) > -1 ? "" : "none";
+      });
+    });
+    // Typing in the box must not close the menu or trigger the dropdown's own
+    // keyboard handling.
+    document.addEventListener("click", function (event) {
+      if (event.target.classList && event.target.classList.contains("cx-guild-switch-search")) {
+        event.stopPropagation();
+      }
+    });
+    </script>
 
     <!-- Specific JS goes HERE -->
     {% block javascripts %}{% endblock %}

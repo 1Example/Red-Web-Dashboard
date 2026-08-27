@@ -27,7 +27,13 @@ from flask_wtf.file import FileField
 from markupsafe import Markup
 
 from reddash.app.app import app
-from reddash.app.utils import AVAILABLE_COLORS, User, get_result, humanize_timedelta
+from reddash.app.utils import (
+    AVAILABLE_COLORS,
+    User,
+    get_result,
+    get_switchable_guilds,
+    humanize_timedelta,
+)
 
 from . import blueprint
 
@@ -279,7 +285,15 @@ async def get_guild(guild_id: int, for_third_parties: bool = False):
     else:
         leave_guild_form = None
 
-    return {"guild": guild, "leave_guild_form": leave_guild_form}
+    # Every page with a guild header goes through here, so the switcher list is
+    # built once, in one place, rather than in each of the three render sites.
+    switch_guilds = await get_switchable_guilds(app, current_user.id, current_id=guild["id"])
+
+    return {
+        "guild": guild,
+        "leave_guild_form": leave_guild_form,
+        "switch_guilds": switch_guilds,
+    }
 
 
 class PrefixesCheck:
@@ -432,95 +446,6 @@ class MarkdownTextAreaField(wtforms.TextAreaField):
         return super().__call__(**kwargs)
 
 
-class AliasForm(FlaskForm):
-    alias_name: wtforms.StringField = wtforms.StringField(
-        _("Name"),
-        validators=[
-            wtforms.validators.InputRequired(),
-            wtforms.validators.Regexp(r"^[^\s]+$"),
-            wtforms.validators.Length(max=300),
-        ],
-    )
-    command: MarkdownTextAreaField = MarkdownTextAreaField(
-        _("Command"),
-        validators=[wtforms.validators.InputRequired(), wtforms.validators.Length(max=1700)],
-    )
-
-
-class AliasesForm(FlaskForm):
-    def __init__(self, aliases: dict[str, str]) -> None:
-        super().__init__(prefix="aliases_form_")
-        for name, command in aliases.items():
-            self.aliases.append_entry({"alias_name": name, "command": command})
-        self.aliases.default = [
-            entry for entry in self.aliases.entries if entry.csrf_token.data is None
-        ]
-        self.aliases.entries = [
-            entry for entry in self.aliases.entries if entry.csrf_token.data is not None
-        ]
-
-    aliases: wtforms.FieldList = wtforms.FieldList(wtforms.FormField(AliasForm))
-    submit: wtforms.SubmitField = wtforms.SubmitField(_("Save Modifications"))
-
-
-class CustomCommandResponseForm(FlaskForm):
-    response: MarkdownTextAreaField = MarkdownTextAreaField(
-        _("Response"),
-        validators=[wtforms.validators.InputRequired(), wtforms.validators.Length(max=2000)],
-    )
-
-
-class CustomCommandForm(FlaskForm):
-    def __init__(self, *args, **kwargs) -> None:
-        responses = kwargs.pop("responses", {})
-        super().__init__(*args, **kwargs)
-        for response in responses:
-            self.responses.append_entry({"response": response})
-        self.responses.default = [
-            entry
-            for entry in self.responses.entries
-            if entry.response.data and entry.csrf_token.data is None
-        ]
-        self.responses.entries = [
-            entry
-            for entry in self.responses.entries
-            if not entry.response.data or entry.csrf_token.data is not None
-        ]
-
-    command: wtforms.StringField = wtforms.StringField(
-        _("Name"),
-        validators=[
-            wtforms.validators.InputRequired(),
-            wtforms.validators.Regexp(r"^[^\sA-Z]+$"),
-            wtforms.validators.Length(max=300),
-        ],
-    )
-    responses: wtforms.FieldList = wtforms.FieldList(
-        wtforms.FormField(CustomCommandResponseForm), _("Responses"), min_entries=1,
-    )
-
-
-class CustomCommandsForm(FlaskForm):
-    def __init__(self, custom_commands: dict[str, list[str]]) -> None:
-        super().__init__(prefix="custom_commands_form_")
-        for command, responses in custom_commands.items():
-            self.custom_commands.append_entry(
-                {
-                    "command": command,
-                    "responses": [responses] if isinstance(responses, str) else responses,
-                },
-            )
-        self.custom_commands.default = [
-            entry for entry in self.custom_commands.entries if entry.csrf_token.data is None
-        ]
-        self.custom_commands.entries = [
-            entry for entry in self.custom_commands.entries if entry.csrf_token.data is not None
-        ]
-
-    custom_commands: wtforms.FieldList = wtforms.FieldList(wtforms.FormField(CustomCommandForm))
-    submit: wtforms.SubmitField = wtforms.SubmitField(_("Save Modifications"))
-
-
 @blueprint.route("/dashboard/<guild_id>/<page>/<third_party>", methods=("GET", "POST"))
 @blueprint.route("/dashboard/<guild_id>/<page>", methods=("GET", "POST"))
 @blueprint.route("/dashboard/<guild_id>", methods=("GET", "POST"))
@@ -538,86 +463,7 @@ async def dashboard_guild(
     if return_guild["guild"]["status"] == 1:
         return return_guild["guild"]
 
-    requeststr = {
-        "jsonrpc": "2.0",
-        "id": 0,
-        "method": "DASHBOARDRPC_DEFAULTCOGS__GET_ALIASES",
-        "params": [current_user.id, guild_id],
-    }
-    aliases = await get_result(app, requeststr)
-    if aliases["status"] == 0:
-        aliases_form: AliasesForm = AliasesForm(aliases=aliases["aliases"])
-        if aliases_form.validate_on_submit():
-            requeststr = {
-                "jsonrpc": "2.0",
-                "id": 0,
-                "method": "DASHBOARDRPC_DEFAULTCOGS__SET_ALIASES",
-                "params": [
-                    current_user.id,
-                    guild_id,
-                    {alias["alias_name"]: alias["command"] for alias in aliases_form.aliases.data},
-                ],
-            }
-            result = await get_result(app, requeststr)
-            if result["status"] == 0:
-                flash(_("Successfully saved the modifications."), category="success")
-            else:
-                for error in result["errors"]:
-                    flash(error, category="warning")
-                flash(_("Failed to save the modifications."), category="danger")
-            return redirect(request.url)
-        if aliases_form.submit.data and aliases_form.errors:
-            for field_name, error_messages in aliases_form.errors.items():
-                if isinstance(error_messages[0], dict):
-                    for sub_field_name, sub_error_messages in error_messages[0].items():
-                        flash(
-                            f"{field_name}-{sub_field_name}: {' '.join(sub_error_messages)}",
-                            category="warning",
-                        )
-                    continue
-                flash(f"{field_name}: {' '.join(error_messages)}", category="warning")
-    else:
-        aliases_form = None
 
-    requeststr = {
-        "jsonrpc": "2.0",
-        "id": 0,
-        "method": "DASHBOARDRPC_DEFAULTCOGS__GET_CUSTOM_COMMANDS",
-        "params": [current_user.id, guild_id],
-    }
-    custom_commands = await get_result(app, requeststr)
-    if custom_commands["status"] == 0:
-        custom_commands_form: CustomCommandsForm = CustomCommandsForm(
-            custom_commands=custom_commands["custom_commands"],
-        )
-        if custom_commands_form.validate_on_submit():
-            requeststr = {
-                "jsonrpc": "2.0",
-                "id": 0,
-                "method": "DASHBOARDRPC_DEFAULTCOGS__SET_CUSTOM_COMMANDS",
-                "params": [
-                    current_user.id,
-                    guild_id,
-                    {
-                        custom_command["command"]: (
-                            custom_command["responses"][0]["response"]
-                            if len(custom_command["responses"]) == 1
-                            else [response["response"] for response in custom_command["responses"]]
-                        )
-                        for custom_command in custom_commands_form.custom_commands.data
-                    },
-                ],
-            }
-            result = await get_result(app, requeststr)
-            if result["status"] == 0:
-                flash(_("Successfully saved the modifications."), category="success")
-            else:
-                for error in result["errors"]:
-                    flash(error, category="warning")
-                flash(_("Failed to save the modifications."), category="danger")
-            return redirect(request.url)
-    else:
-        custom_commands_form = None
 
     guild_settings_form: GuildSettingsForm = GuildSettingsForm(guild=return_guild["guild"])
     if (
@@ -676,8 +522,6 @@ async def dashboard_guild(
         page=page
         if page is not None and page in ("overview", "settings", "third-parties")
         else "overview",
-        aliases_form=aliases_form,
-        custom_commands_form=custom_commands_form,
         guild_settings_form=guild_settings_form,
         **return_third_parties,
         tab_name=None

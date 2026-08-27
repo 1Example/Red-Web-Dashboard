@@ -22,7 +22,42 @@
                       </div>
                       <div>
                         <h4 class="mb-0 font-weight-bolder d-flex align-items-center">
-                          {{ guild.name }}
+                          {% if switch_guilds and switch_guilds|length > 1 %}
+                            <div class="dropdown cx-guild-switch" style="display: unset;">
+                              <a href="#" class="cx-guild-switch-toggle" role="button"
+                                 id="cxGuildSwitch" data-bs-toggle="dropdown" aria-expanded="false"
+                                 title="{{ _("Switch server") }}">
+                                {{ guild.name }}<i class="fa fa-angle-down cx-guild-switch-caret"></i>
+                              </a>
+                              <div class="dropdown-menu dropdown-menu-start cx-guild-switch-menu"
+                                   aria-labelledby="cxGuildSwitch">
+                                {% if switch_guilds|length > 8 %}
+                                  <div class="px-3 pt-2 pb-1">
+                                    <input type="text" class="form-control form-control-sm cx-guild-switch-search"
+                                           placeholder="{{ _("Search servers...") }}" autocomplete="off" />
+                                  </div>
+                                {% endif %}
+                                <div class="cx-guild-switch-list">
+                                  {% for other in switch_guilds %}
+                                    <a class="dropdown-item d-flex align-items-center gap-2 cx-guild-switch-item{% if other.current %} active{% endif %}"
+                                       data-name="{{ other.name|lower }}"
+                                       href="{{ url_for(request.endpoint, **dict(request.view_args, guild_id=other.id)) }}">
+                                      <img src="{{ other.icon_url }}" alt=""
+                                           style="height:22px;width:22px;border-radius:50%;object-fit:cover;flex:none;" />
+                                      <span class="text-truncate">{{ other.name }}</span>
+                                      {% if other.current %}<i class="fa fa-check ms-auto opacity-7"></i>{% endif %}
+                                    </a>
+                                  {% endfor %}
+                                </div>
+                                <div class="dropdown-divider my-1"></div>
+                                <a class="dropdown-item text-sm" href="{{ url_for("base_blueprint.dashboard") }}">
+                                  <i class="fa fa-list me-2 opacity-7"></i>{{ _("All servers") }}
+                                </a>
+                              </div>
+                            </div>
+                          {% else %}
+                            {{ guild.name }}
+                          {% endif %}
                           <div class="dropdown" style="display: unset;">
                             <a class="nav-link text-lg py-0" role="button" id="guild_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="display: unset; vertical-align: 1px; margin-left: 4px;">
                               <i class="fa fa-ellipsis-v"></i>
@@ -204,102 +239,6 @@
                                             </div>
                                           </div>
                                         </div>
-
-                                        {% if aliases_form %}
-                                            <div id="Alias" class="card">
-                                                <div class="card-header" id="headingAlias">
-                                                    <a class="btn btn-link mb-0" data-toggle="collapse" data-target="#collapseAlias" aria-expanded="true" aria-controls="collapseAlias" style="width: 100%;">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <h4 class="mb-0">{{ _("Alias") }}</h4>
-                                                            <h4><i class="fa fa-arrow-circle-o-down"></i></h4>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div id="collapseAlias" class="collapse card-body" aria-labelledby="headingAlias">
-                                                    <form action="" method="POST" role="form" enctype="multipart/form-data">
-                                                        {{ aliases_form.hidden_tag() }}
-                                                        {% for alias_form in aliases_form.aliases.default %}
-                                                            <div class="row mb-3">
-                                                                {% if loop.index0 > 0 %}
-                                                                    <hr class="horizontal dark" />
-                                                                {% endif %}
-                                                                {{ alias_form.hidden_tag() }}
-                                                                <div class="col-md-5">
-                                                                    <div class="form-group">
-                                                                        {{ alias_form.alias_name(class="form-control form-control-default", placeholder=_("Name")) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-7">
-                                                                    <div class="form-group">
-                                                                        {{ alias_form.command(rows=4, disable_toolbar=True, class="form-control form-control-default", placeholder=_("Command")) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-12 d-flex justify-content-end align-items-center">
-                                                                    <a href="javascript:void(0);" onclick="this.parentElement.parentNode.remove();" class="text-danger mr-3"><i class="fa fa-minus-circle"></i> {{ _("Delete Alias") }}</a>
-                                                                </div>
-                                                            </div>
-                                                        {% endfor %}
-                                                        <a href="javascript:void(0);" onclick="createAlias(this);" class="text-success mr-3"><i class="fa fa-plus-circle"></i> {{ _("Create Alias") }}</a>
-                                                        <div class="text-center">
-                                                            {{ aliases_form.submit(class="btn mb-0 bg-gradient-" + variables["meta"]["color"] + " btn-md w-100 my-4") }}
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if custom_commands_form %}
-                                            <br />
-                                            <div id="CustomCommands" class="card">
-                                                <div class="card-header" id="headingCustomCommands">
-                                                    <a class="btn btn-link mb-0" data-toggle="collapse" data-target="#collapseCustomCommands" aria-expanded="true" aria-controls="collapseCustomCommands" style="width: 100%;">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <h4 class="mb-0">{{ _("CustomCommands") }}</h4>
-                                                            <h4><i class="fa fa-arrow-circle-o-down"></i></h4>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div id="collapseCustomCommands" class="collapse card-body" aria-labelledby="headingCustomCommands">
-                                                    <form action="" method="POST" role="form" enctype="multipart/form-data">
-                                                        {{ custom_commands_form.hidden_tag() }}
-                                                        {% for custom_command_form in custom_commands_form.custom_commands.default %}
-                                                            <div class="row mb-3">
-                                                                {% if loop.index0 > 0 %}
-                                                                    <hr class="horizontal dark" />
-                                                                {% endif %}
-                                                                {{ custom_command_form.hidden_tag() }}
-                                                                <div class="col-md-5">
-                                                                    <div class="form-group">
-                                                                        {{ custom_command_form.command(class="form-control form-control-default", placeholder=_("Command")) }}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-7">
-                                                                    {% for custom_command_response_form in custom_command_form.responses.default %}
-                                                                        <div class="form-group">
-                                                                            {{ custom_command_response_form.hidden_tag() }}
-                                                                            {{ custom_command_response_form.response(rows=3, class="form-control form-control-default", placeholder=_("Response")) }}
-                                                                            {% if loop.index0 != 0 %}
-                                                                                <a href="javascript:void(0);" onclick="this.parentNode.remove();" class="text-danger mr-3">{{ _("Remove Response") }}</a>
-                                                                            {% endif %}
-                                                                        </div>
-                                                                    {% endfor %}
-                                                                </div>
-                                                                <div class="col-md-12 d-flex justify-content-end align-items-center">
-                                                                    <a href="javascript:void(0);" onclick="addCustomCommandResponse(this);" class="text-primary mr-3">{{ _("Add Response") }}</a>
-                                                                </div>
-                                                                <div class="col-md-12 d-flex justify-content-end align-items-center">
-                                                                    <a href="javascript:void(0);" onclick="this.parentElement.parentNode.remove();" class="text-danger mr-3"><i class="fa fa-minus-circle"></i> {{ _("Delete Custom Command") }}</a>
-                                                                </div>
-                                                            </div>
-                                                        {% endfor %}
-                                                        <a href="javascript:void(0);" onclick="createCustomCommand(this);" class="text-success mr-3"><i class="fa fa-plus-circle"></i> {{ _("Create Custom Command") }}</a>
-                                                        <div class="text-center">
-                                                            {{ custom_commands_form.submit(class="btn mb-0 bg-gradient-" + variables["meta"]["color"] + " btn-md w-100 my-4") }}
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        {% endif %}
 
                                     </div>
                                 </div>
@@ -496,92 +435,4 @@
             }
         })
     </script>
-    {% if aliases_form %}
-        <script>
-            var alias_index = {{ aliases_form.aliases.default|length }} - 1;
-            function createAlias(element) {
-                var newRow = document.createElement("div");
-                newRow.classList.add("row", "mb-3");
-                alias_index += 1;
-                if (document.querySelectorAll("#collapseAlias .row").length != 0) {
-                    var horizontal = '<hr class="horizontal dark" />\n';
-                } else {
-                    var horizontal = "";
-                }
-                newRow.innerHTML = horizontal + `
-                    <input id="aliases_form_aliases-${alias_index}-csrf_token" name="aliases_form_aliases-${alias_index}-csrf_token" type="hidden" value="{{ csrf_token() }}">
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <input class="form-control form-control-default" id="aliases_form_aliases-${alias_index}-alias_name" maxlength="300" name="aliases_form_aliases-${alias_index}-alias_name" required type="text" value="" placeholder="{{ _("Name") }}">
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <div class="form-group">
-                            <textarea class="form-control form-control-default markdown-text-area-field markdown-text-area-field-toolbar-disabled" id="aliases_form_aliases-${alias_index}-command" maxlength="1700" name="aliases_form_aliases-${alias_index}-command" required rows="4" placeholder="{{ _("Command") }}"></textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-12 d-flex justify-content-end align-items-center">
-                        <a href="javascript:void(0);" onclick="this.parentElement.parentNode.remove();" class="text-danger mr-3"><i class="fa fa-minus-circle"></i> {{ _("Delete Alias") }}</a>
-                    </div>
-                `
-                element.parentNode.insertBefore(newRow, element);
-                MarkdownField(document.getElementById(`aliases_form_aliases-${alias_index}-command`));
-                document.getElementById(`aliases_form_aliases-${alias_index}-alias_name`).focus();
-            }
-        </script>
-    {% endif %}
-    {% if custom_commands_form %}
-        <script>
-            var custom_command_index = {{ custom_commands_form.custom_commands.default|length }} - 1;
-            function createCustomCommand(element) {
-                var newRow = document.createElement("div");
-                newRow.classList.add("row", "mb-3");
-                custom_command_index += 1;
-                if (document.querySelectorAll("#collapseCustomCommands .row").length != 0) {
-                    var horizontal = '<hr class="horizontal dark" />\n';
-                } else {
-                    var horizontal = "";
-                }
-                newRow.innerHTML = horizontal + `
-                    <input id="custom_commands_form_custom_commands-${custom_command_index}-csrf_token" name="custom_commands_form_custom_commands-${custom_command_index}-csrf_token" type="hidden" value="{{ csrf_token() }}">
-                    <div class="col-md-5">
-                        <div class="form-group">
-                            <input class="form-control form-control-default" id="custom_commands_form_custom_commands-${custom_command_index}-command" maxlength="300" name="custom_commands_form_custom_commands-${custom_command_index}-command" required type="text" value="" placeholder="{{ _("Command") }}">
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <div class="form-group">
-                            <input id="custom_commands_form_custom_commands-${custom_command_index}-responses-1-csrf_token" name="custom_commands_form_custom_commands-${custom_command_index}-responses-1-csrf_token" type="hidden" value="{{ csrf_token() }}">
-                            <textarea class="form-control form-control-default markdown-text-area-field" id="custom_commands_form_custom_commands-${custom_command_index}-responses-1-response" maxlength="2000" name="custom_commands_form_custom_commands-${custom_command_index}-responses-1-response" required rows="3" placeholder="{{ _("Response") }}"></textarea>
-                        </div>
-                    </div>
-                    <div class="col-md-12 d-flex justify-content-end align-items-center">
-                        <a href="javascript:void(0);" onclick="addCustomCommandResponse(this);" class="text-primary mr-3">{{ _("Add Response") }}</a>
-                    </div>
-                    <div class="col-md-12 d-flex justify-content-end align-items-center">
-                        <a href="javascript:void(0);" onclick="this.parentElement.parentNode.remove();" class="text-danger mr-3"><i class="fa fa-minus-circle"></i> {{ _("Delete Custom Command") }}</a>
-                    </div>
-                `
-                element.parentNode.insertBefore(newRow, element);
-                MarkdownField(document.getElementById(`custom_commands_form_custom_commands-${custom_command_index}-responses-1-response`));
-                document.getElementById(`custom_commands_form_custom_commands-${custom_command_index}-command`).focus();
-            }
-            function addCustomCommandResponse(element) {
-                var custom_command_index = element.parentElement.parentElement.querySelector('input[type="hidden"]').id.split("-")[1];
-                var responses = element.parentElement.parentElement.querySelectorAll('.col-md-7 input[type="hidden"]');
-                var response_index = parseInt(responses[responses.length - 1].id.split("-")[3]) + 1;
-                var newRow = document.createElement("div");
-                newRow.classList.add("form-group");
-                newRow.innerHTML = `
-                    <input id="custom_commands_form_custom_commands-${custom_command_index}-responses-${response_index}-csrf_token" name="custom_commands_form_custom_commands-${custom_command_index}-responses-${response_index}-csrf_token" type="hidden" value="{{ csrf_token() }}">
-                    <textarea class="form-control form-control-default markdown-text-area-field" id="custom_commands_form_custom_commands-${custom_command_index}-responses-${response_index}-response" maxlength="2000" name="custom_commands_form_custom_commands-${custom_command_index}-responses-${response_index}-response" required rows="3" placeholder="{{ _("Response") }}"></textarea>
-                    <a href="javascript:void(0);" onclick="this.parentElement.remove();" class="text-danger mr-3">{{ _("Remove Response") }}</a>
-                `
-                element.parentElement.parentElement.querySelector(".col-md-7").appendChild(newRow);
-                var addedElement = document.getElementById(`custom_commands_form_custom_commands-${custom_command_index}-responses-${response_index}-response`);
-                MarkdownField(addedElement);
-                addedElement.nextElementSibling.querySelector(".CodeMirror-code").focus();
-            }
-        </script>
-    {% endif %}
 {% endblock %}

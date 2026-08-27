@@ -789,3 +789,39 @@ def humanize_timedelta(
             strings.append(f"{period_value} {unit}")
 
     return ", ".join(strings)
+
+
+async def get_switchable_guilds(app, user_id: int, current_id: int = None) -> list:
+    """The guilds this user can reach, for the switcher in the guild header.
+
+    The bot caches this per user for a minute, so asking on every guild page is
+    cheap after the first hit. Returns [] on any failure - the switcher is a
+    convenience and must never take a page down with it.
+    """
+    try:
+        result = await get_result(
+            app,
+            {
+                "jsonrpc": "2.0",
+                "id": 0,
+                "method": "DASHBOARDRPC__GET_USER_GUILDS",
+                "params": [user_id, 1000, 1, None, None],
+            },
+        )
+    except Exception:  # noqa: BLE001
+        app.logger.debug("Could not list guilds for the switcher.", exc_info=True)
+        return []
+    if not isinstance(result, dict):
+        return []
+    guilds = result.get("items") or []
+    return [
+        {
+            "id": guild.get("id"),
+            "name": guild.get("name"),
+            "icon_url": guild.get("icon_url"),
+            "user_role": guild.get("user_role"),
+            "current": current_id is not None and str(guild.get("id")) == str(current_id),
+        }
+        for guild in guilds
+        if guild.get("id") is not None
+    ]
