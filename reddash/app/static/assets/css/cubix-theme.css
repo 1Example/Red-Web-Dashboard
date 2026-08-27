@@ -949,8 +949,14 @@ span.flatpickr-weekday {
 
 .cx-gs-menu {
   display: none;
-  position: absolute;
-  top: calc(100% + 8px);
+  /* Fixed, and reparented to <body> when opened. Every ancestor here is a
+     stacking context of some kind - the hero card sets one, `.card-body` sets
+     another - and the cards below are translucent glass
+     (`.card { background: rgba(24, 48, 105, .10) }`), so a menu trapped behind
+     one is visible *through* it with the card's own text painted on top. That
+     is the "transparent menu". With no ancestors, there is nothing to trap it. */
+  position: fixed;
+  top: 0;
   left: 0;
   min-width: 260px;
   max-width: 320px;
@@ -964,7 +970,9 @@ span.flatpickr-weekday {
   font-size: .875rem;
   font-weight: 400;
 }
-.cx-gs.open > .cx-gs-menu { display: block; }
+/* The menu is moved out to <body>, so it can no longer be selected as a
+   child of its trigger; it carries the open state itself. */
+.cx-gs-menu.open { display: block; }
 
 .cx-guild-switch-list { max-height: 320px; overflow-y: auto; overflow-x: hidden; }
 
