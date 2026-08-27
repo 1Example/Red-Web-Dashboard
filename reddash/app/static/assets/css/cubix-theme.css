@@ -940,13 +940,21 @@ span.flatpickr-weekday {
   vertical-align: 1px;
   transition: opacity .15s ease;
 }
-.cx-guild-switch-menu {
+/* Selector matches the theme's `.dropdown:not(.dropdown-hover) .dropdown-menu`
+   for specificity (0,3,0) and comes later in the cascade, so its
+   `margin-top: 40px !important` no longer wins. A bare
+   `.cx-guild-switch-menu` is only (0,1,0) and lost. */
+.dropdown .dropdown-menu.cx-guild-switch-menu {
   min-width: 260px;
   max-width: 320px;
   padding-top: 4px;
   padding-bottom: 4px;
   /* The theme forces `margin-top: 40px !important` on every non-hover
      dropdown menu, which drops this one well clear of its toggle. */
+  /* The theme also pins `top: 0`, which puts the menu over its own
+     toggle - the 40px margin above was compensating for that. Position
+     it properly instead: directly under the toggle, with a small gap. */
+  top: 100% !important;
   margin-top: 8px !important;
   /* Stand on our own rather than inheriting whatever the theme does to
      dropdowns: opaque, unclipped, and tall enough for the whole list plus the
