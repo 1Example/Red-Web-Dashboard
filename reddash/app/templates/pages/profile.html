@@ -71,6 +71,31 @@
                   title="{{ _("Copy ID") }}">{{ profile.id }}</code>
           </div>
 
+
+          <div class="cx-profile-stats">
+            <div class="cx-profile-stat">
+              <b>{{ profile.shared_guilds }}</b><span>{{ _("Servers") }}</span>
+            </div>
+            <div class="cx-profile-stat">
+              <b>{{ profile.owned_guilds }}</b><span>{{ _("Owned") }}</span>
+            </div>
+            <div class="cx-profile-stat">
+              <b>{{ profile.admin_guilds }}</b><span>{{ _("Admin") }}</span>
+            </div>
+            <div class="cx-profile-stat">
+              <b>{{ profile.mod_guilds }}</b><span>{{ _("Mod") }}</span>
+            </div>
+            {% if profile.bank_is_global and profile.global_balance is not none %}
+              <div class="cx-profile-stat">
+                <b>{{ "{:,}".format(profile.global_balance) }}</b><span>{{ profile.currency }}</span>
+              </div>
+            {% elif profile.total_balance %}
+              <div class="cx-profile-stat">
+                <b>{{ "{:,}".format(profile.total_balance) }}</b><span>{{ _("Credits") }}</span>
+              </div>
+            {% endif %}
+          </div>
+
           {% if profile.activity %}
             <div class="cx-activity">
               {% if profile.activity.image %}
@@ -95,55 +120,6 @@
             </div>
           {% endif %}
         </div>
-      </div>
-
-      <!-- ===== Reach ===== -->
-      <div class="cx-ov-grid mb-4">
-        <div class="cx-ov-stat">
-          <i class="ni ni-world-2 cx-ov-ico" style="color:#5aa9ff;"></i>
-          <div>
-            <span class="cx-ov-num">{{ profile.shared_guilds }}</span>
-            <span class="cx-ov-cap">{{ _("Shared servers") }}</span>
-          </div>
-        </div>
-        <div class="cx-ov-stat">
-          <i class="ni ni-trophy cx-ov-ico" style="color:#fbbf24;"></i>
-          <div>
-            <span class="cx-ov-num">{{ profile.owned_guilds }}</span>
-            <span class="cx-ov-cap">{{ _("Owned") }}</span>
-          </div>
-        </div>
-        <div class="cx-ov-stat">
-          <i class="ni ni-badge cx-ov-ico" style="color:#a78bfa;"></i>
-          <div>
-            <span class="cx-ov-num">{{ profile.admin_guilds }}</span>
-            <span class="cx-ov-cap">{{ _("Admin in") }}</span>
-          </div>
-        </div>
-        <div class="cx-ov-stat">
-          <i class="ni ni-lock-circle-open cx-ov-ico" style="color:#3ba55d;"></i>
-          <div>
-            <span class="cx-ov-num">{{ profile.mod_guilds }}</span>
-            <span class="cx-ov-cap">{{ _("Moderator in") }}</span>
-          </div>
-        </div>
-        {% if profile.bank_is_global and profile.global_balance is not none %}
-          <div class="cx-ov-stat">
-            <i class="ni ni-money-coins cx-ov-ico" style="color:#8ea6ff;"></i>
-            <div>
-              <span class="cx-ov-num">{{ "{:,}".format(profile.global_balance) }}</span>
-              <span class="cx-ov-cap">{{ profile.currency }}</span>
-            </div>
-          </div>
-        {% elif profile.total_balance %}
-          <div class="cx-ov-stat">
-            <i class="ni ni-money-coins cx-ov-ico" style="color:#8ea6ff;"></i>
-            <div>
-              <span class="cx-ov-num">{{ "{:,}".format(profile.total_balance) }}</span>
-              <span class="cx-ov-cap">{{ _("Total credits") }}</span>
-            </div>
-          </div>
-        {% endif %}
       </div>
 
       <!-- ===== What you have been up to ===== -->

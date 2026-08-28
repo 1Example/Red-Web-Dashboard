@@ -1118,7 +1118,19 @@ span.flatpickr-weekday {
    Profile
    ========================================================================== */
 
-.cx-profile { position: relative; overflow: hidden; }
+/* Tall enough that the banner keeps a sane aspect. At 170px against ~1900
+   wide it was 11:1, so `cover` zoomed a 2.5:1 banner nearly 2x and showed a
+   sliver; this brings it back to roughly 6:1. The content sits at the bottom,
+   so the top of the card is clean banner. */
+.cx-profile {
+  position: relative;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+@media (max-width: 900px) { .cx-profile { min-height: 0; } }
 
 /* The banner is the card's background. It goes on a pseudo-element because
    `.card` sets `background` with !important, and that shorthand would wipe out
@@ -1151,7 +1163,7 @@ span.flatpickr-weekday {
    is what made this card so tall. */
 .cx-profile-body {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 22px;
   flex-wrap: wrap;
   padding: 22px 28px;
@@ -1398,8 +1410,6 @@ span.flatpickr-weekday {
   display: flex;
   align-items: center;
   gap: 12px;
-  /* Pushed to the far end of the row, so the identity stays left-aligned. */
-  margin-left: auto;
   padding: 11px 14px;
   border-radius: var(--cx-radius, 12px);
   background: rgba(0, 0, 0, .28);
@@ -1478,3 +1488,40 @@ span.flatpickr-weekday {
 .cx-mod-value { font-weight: 700; font-variant-numeric: tabular-nums; }
 .cx-up { color: #38d39f; }
 .cx-down { color: #ff6b6b; }
+
+/* ---------- header stat strip ---------- */
+
+.cx-profile-stats {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  /* Takes the slack, so identity stays left and these sit hard right instead
+     of leaving a void across the middle of the banner. */
+  margin-left: auto;
+}
+.cx-profile-stat {
+  min-width: 84px;
+  padding: 8px 14px;
+  border-radius: 11px;
+  text-align: center;
+  background: rgba(0, 0, 0, .38);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  backdrop-filter: blur(6px);
+}
+.cx-profile-stat b {
+  display: block;
+  font-size: 1.15rem;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+.cx-profile-stat span {
+  font-size: .62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+@media (max-width: 900px) {
+  .cx-profile-stats { margin-left: 0; }
+  .cx-profile-stat { min-width: 70px; padding: 7px 11px; }
+}
