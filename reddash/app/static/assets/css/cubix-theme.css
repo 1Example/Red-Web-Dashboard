@@ -168,7 +168,11 @@ body.g-sidenav-pinned .main-content { margin-left: 0 !important; }
   cursor: pointer;
 }
 .cx-user:hover { background: var(--cx-surface-2); color: var(--cx-text); }
-.cx-user img {
+/* Direct child only. The avatar is wrapped in .cx-av now, and this rule was
+   also catching the decoration inside it - forcing the frame to 26px and
+   rounding it off, which is what made it render as a second blob over the
+   face. The component sizes its own parts. */
+.cx-user > img {
   height: 26px;
   width: 26px;
   border-radius: 50%;
@@ -1114,6 +1118,12 @@ span.flatpickr-weekday {
    Profile
    ========================================================================== */
 
+/* The shell is full-width by design, but a profile stretched across an
+   ultra-wide monitor is mostly gutter - and the banner, which `cover` scales
+   by the container's width, turns to mush at 2000px. Capping the column fixes
+   the emptiness and the blur in one go. */
+.cx-profile-page { max-width: 1500px; margin-inline: auto; }
+
 .cx-profile { overflow: hidden; }
 
 .cx-profile-banner {
@@ -1352,19 +1362,24 @@ span.flatpickr-weekday {
 }
 .cx-av-dot {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 30%;
-  height: 30%;
-  min-width: 9px;
-  min-height: 9px;
+  /* Tucked inside the rim rather than hung off the corner, and sized with the
+     ring included - content-box plus a 30% width made this nearly a third of
+     the avatar again in border alone. */
+  right: 2%;
+  bottom: 2%;
+  width: 26%;
+  height: 26%;
   border-radius: 50%;
-  border: 2px solid var(--cx-bg-elev, #0c1017);
-  box-sizing: content-box;
+  border: 2.5px solid var(--cx-surface, #0e131c);
+  box-sizing: border-box;
 }
-.cx-av-sm { width: 30px; height: 30px; }
-/* The frame overhangs, so the row needs a little air for it. */
-.cx-user .cx-av-sm { margin-right: 4px; }
+
+/* The small size is the topbar's. A decoration overhangs its avatar, so at
+   30px it spills onto the name beside it unless the box is given the room -
+   hence the margin, which matches the overhang exactly. */
+.cx-av-sm { width: 28px; height: 28px; margin: 0 5px; }
+.cx-av-sm .cx-av-deco { width: 132%; height: 132%; }
+.cx-av-sm .cx-av-dot { border-width: 2px; right: 0; bottom: 0; }
 .cx-av-status { display: block; margin-top: 3px; font-size: .68rem; font-weight: 700; }
 .cx-av-status i { font-size: .5rem; vertical-align: 2px; margin-right: 3px; }
 

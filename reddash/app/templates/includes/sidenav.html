@@ -19,9 +19,12 @@
       </li>
     {% endfor %}
     {% if current_user.is_authenticated and "PyLavController" in variables["third_parties"] %}
+      {# Without a guild in the URL the third-party route bounces through the
+         server picker. Carrying one sends the player straight up, and the
+         switcher on the page itself is how you change server from there. #}
       <li>
-        <a class="{{ "active" if request.path.startswith("/third-party/PyLavController") or "/third-party/PyLavController" in request.path else "" }}"
-           href="{{ url_for('third_parties_blueprint.third_party', name='PyLavController') }}"
+        <a class="{{ "active" if "/third-party/PyLavController" in request.path else "" }}"
+           href="{% if current_user.default_guild_id %}{{ url_for('third_parties_blueprint.third_party', name='PyLavController', guild_id=current_user.default_guild_id) }}{% else %}{{ url_for('third_parties_blueprint.third_party', name='PyLavController') }}{% endif %}"
            title="{{ _("Audio") }}">
           <i class="ni ni-headphones"></i>
           <span>{{ _("Audio") }}</span>

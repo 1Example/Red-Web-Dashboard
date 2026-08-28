@@ -133,6 +133,16 @@ class User(UserMixin):
         return (self._access or {}).get("presence_colour") or "#80848e"
 
     @property
+    def default_guild_id(self) -> str:
+        """A server to open when a link needs one and the URL has none.
+
+        The last server actually looked at wins, because that is almost always
+        the one meant; the bot's suggestion (somewhere music is playing, else
+        somewhere with rights) is the fallback for a fresh session.
+        """
+        return session.get("last_guild_id") or (self._access or {}).get("default_guild") or ""
+
+    @property
     def is_active(self) -> bool:
         return not self.is_blacklisted
 
@@ -372,6 +382,14 @@ def register_blueprints(app: Flask) -> None:
         if request.path.startswith(("/static", "/api/")):
             return None
         user = current_user._get_current_object()
+        # Whatever guild this request is for becomes the one that nav links
+        # without a guild of their own will use next.
+        # Numeric only: the guild-picker redirect carries a literal "GUILD_ID"
+        # placeholder in the path, and remembering that would send every later
+        # link straight back to the picker.
+        viewing = str((request.view_args or {}).get("guild_id") or "")
+        if viewing.isdigit():
+            session["last_guild_id"] = viewing
         if user._access is not None and (user._access_time + 120) > time.time():
             return None
         try:
