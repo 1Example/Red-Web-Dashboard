@@ -19,8 +19,10 @@
            {% elif profile.accent_colour %}
              style="--cx-banner:linear-gradient(135deg,{{ profile.accent_colour }},rgba(0,0,0,.7));"
            {% endif %}>
-        {% if profile.banner_url %}<div class="cx-profile-art"></div>{% endif %}
 
+        {# One row, everything level with the avatar: identity, badges, when
+           they joined, and what they are playing. Nothing stacks into a tall
+           column beside the avatar any more. #}
         <div class="cx-profile-body">
           <div class="cx-av cx-profile-avatar">
             <img class="cx-av-img" src="{{ profile.avatar_url }}" alt="{{ profile.name }}" />
@@ -50,48 +52,48 @@
               {% endif %}
             </div>
             <div class="text-secondary text-sm">@{{ profile.username }}</div>
-
-            {% if profile.badges %}
-              <div class="cx-badges">
-                {% for badge in profile.badges %}
-                  <span class="cx-badge-ico" title="{{ badge.label }}" style="color:{{ badge.colour }};">
-                    <i class="fa {{ badge.icon }}"></i>
-                  </span>
-                {% endfor %}
-              </div>
-            {% endif %}
-
-            <div class="cx-profile-meta">
-              <span><i class="fa fa-calendar-o"></i>
-                {{ _("Joined Discord") }} {{ moment(profile.created_at).format("Do MMM YYYY") }}</span>
-              <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
-                    title="{{ _("Copy ID") }}">{{ profile.id }}</code>
-            </div>
-
-            {% if profile.activity %}
-              <div class="cx-activity">
-                {% if profile.activity.image %}
-                  <img class="cx-activity-art" src="{{ profile.activity.image }}" alt=""
-                       onerror="this.remove();" />
-                {% endif %}
-                <div class="cx-activity-txt">
-                  {% if profile.activity.kind == "custom" %}
-                    <span class="cx-activity-verb">{{ _("Status") }}</span>
-                    <span class="cx-activity-name">
-                      {% if profile.activity.emoji %}{{ profile.activity.emoji }} {% endif %}
-                      {{ profile.activity.name }}
-                    </span>
-                  {% else %}
-                    <span class="cx-activity-verb">{{ _(profile.activity.verb) }}</span>
-                    <span class="cx-activity-name">{{ profile.activity.name }}</span>
-                    {% if profile.activity.details %}
-                      <span class="cx-activity-sub">{{ profile.activity.details }}</span>
-                    {% endif %}
-                  {% endif %}
-                </div>
-              </div>
-            {% endif %}
           </div>
+
+          {% if profile.badges %}
+            <div class="cx-badges">
+              {% for badge in profile.badges %}
+                <span class="cx-badge-ico" title="{{ badge.label }}" style="color:{{ badge.colour }};">
+                  <i class="fa {{ badge.icon }}"></i>
+                </span>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="cx-profile-meta">
+            <span><i class="fa fa-calendar-o"></i>
+              {{ moment(profile.created_at).format("Do MMM YYYY") }}</span>
+            <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
+                  title="{{ _("Copy ID") }}">{{ profile.id }}</code>
+          </div>
+
+          {% if profile.activity %}
+            <div class="cx-activity">
+              {% if profile.activity.image %}
+                <img class="cx-activity-art" src="{{ profile.activity.image }}" alt=""
+                     onerror="this.remove();" />
+              {% endif %}
+              <div class="cx-activity-txt">
+                {% if profile.activity.kind == "custom" %}
+                  <span class="cx-activity-verb">{{ _("Status") }}</span>
+                  <span class="cx-activity-name">
+                    {% if profile.activity.emoji %}{{ profile.activity.emoji }} {% endif %}
+                    {{ profile.activity.name }}
+                  </span>
+                {% else %}
+                  <span class="cx-activity-verb">{{ _(profile.activity.verb) }}</span>
+                  <span class="cx-activity-name">{{ profile.activity.name }}</span>
+                  {% if profile.activity.details %}
+                    <span class="cx-activity-sub">{{ profile.activity.details }}</span>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
         </div>
       </div>
 
@@ -261,17 +263,6 @@
             </p>
           {% endif %}
         </div>
-      </div>
-
-      <div class="d-flex flex-wrap gap-2">
-        {% if current_user.can_use_dashboard %}
-          <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.dashboard") }}">
-            <i class="ni ni-settings me-2" style="vertical-align:-1.5px;"></i>{{ _("My servers") }}
-          </a>
-        {% endif %}
-        <a class="btn btn-outline-secondary mb-0 text-danger" href="{{ url_for("login_blueprint.logout") }}">
-          <i class="ni ni-user-run me-2" style="vertical-align:-1.5px;"></i>{{ _("Logout") }}
-        </a>
       </div>
 
     </div>
