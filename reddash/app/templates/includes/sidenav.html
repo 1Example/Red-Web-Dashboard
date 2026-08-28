@@ -52,7 +52,9 @@
             {{ _("Signed in as") }}<br /><b class="text-sm" style="color:var(--cx-text);">{{ current_user.display_name }}</b>
           </li>
           <li><a href="{{ url_for("base_blueprint.profile") }}" class="dropdown-item"><i class="ni ni-single-02" style="width: 1.3em; vertical-align: -2px;"></i> {{ _("Profile") }}</a></li>
-          <li><a href="{{ url_for("base_blueprint.dashboard") }}" class="dropdown-item"><i class="ni ni-settings" style="width: 1.3em; vertical-align: -2px;"></i> {{ _("My servers") }}</a></li>
+          {% if current_user.can_use_dashboard %}
+            <li><a href="{{ url_for("base_blueprint.dashboard") }}" class="dropdown-item"><i class="ni ni-settings" style="width: 1.3em; vertical-align: -2px;"></i> {{ _("My servers") }}</a></li>
+          {% endif %}
           <li><hr class="dropdown-divider" style="border-color:rgba(255,255,255,.08);" /></li>
           <li><a href="{{ url_for("login_blueprint.logout") }}" class="dropdown-item text-danger"><i class="ni ni-user-run" style="width: 1.3em; vertical-align: -2px;"></i> {{ _("Logout") }}</a></li>
         </ul>

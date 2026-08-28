@@ -102,6 +102,23 @@ class User(UserMixin):
     def is_owner(self) -> bool:
         return self.id in app.variables["bot"]["owner_ids"]
 
+    # How many servers this person can actually manage, resolved once per
+    # couple of minutes by `resolve_guild_access` below. `None` means "not
+    # asked yet", which the nav treats as "show the link" so a slow first
+    # request never hides something the user does have.
+    _access: dict | None = None
+    _access_time: float = 0.0
+
+    @property
+    def manageable_guilds(self) -> int | None:
+        if self._access is None:
+            return None
+        return self._access.get("manageable", 0)
+
+    @property
+    def can_use_dashboard(self) -> bool:
+        return self.is_owner or self.manageable_guilds is None or self.manageable_guilds > 0
+
     @property
     def is_active(self) -> bool:
         return not self.is_blacklisted
@@ -329,6 +346,39 @@ def register_blueprints(app: Flask) -> None:
         return render_template(f"errors/{error}.html"), int(error)
 
     @app.before_request
+    async def resolve_guild_access():
+        """Work out whether this person manages anything, before the nav draws.
+
+        Cached on the `User` object, which lives for the process, so this is a
+        round-trip every couple of minutes rather than every page. It must
+        never block a request: if the bot does not answer, the value stays
+        `None` and the nav errs towards showing the link.
+        """
+        if not current_user.is_authenticated:
+            return None
+        if request.path.startswith(("/static", "/api/")):
+            return None
+        user = current_user._get_current_object()
+        if user._access is not None and (user._access_time + 120) > time.time():
+            return None
+        try:
+            result = await get_result(
+                app,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                    "method": "DASHBOARDRPC__GET_USER_ACCESS",
+                    "params": [user.id],
+                },
+            )
+        except Exception:  # noqa: BLE001 - navigation styling is not worth a 500
+            return None
+        if isinstance(result, dict) and result.get("status") == 0:
+            user._access = result
+            user._access_time = time.time()
+        return None
+
+    @app.before_request
     def block_ip():
         request.META = {"HTTP_USER_AGENT": request.headers.get("USER_AGENT", "")}
         request.user_agent = get_user_agent(request)
@@ -401,6 +451,12 @@ def add_constants(app: Flask) -> None:
             if item["session"] is False and current_user.is_authenticated:
                 continue
             if item["owner"] and not (current_user.is_authenticated and current_user.is_owner):
+                continue
+            # Offering "Dashboard" to somebody who manages nothing just sends
+            # them to an empty page; don't offer it.
+            if item["name"] == "builtin-dashboard" and not (
+                current_user.is_authenticated and current_user.can_use_dashboard
+            ):
                 continue
             # Hidden global nav entries: Modules is reached per-guild from the Dashboard
             # page, and Credits/attribution now lives only in the repo, not the UI.

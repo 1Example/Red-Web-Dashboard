@@ -1108,3 +1108,214 @@ span.flatpickr-weekday {
 @media (prefers-reduced-motion: reduce) {
   #toast-container > div { transition: none !important; }
 }
+
+
+/* ==========================================================================
+   Profile
+   ========================================================================== */
+
+.cx-profile { overflow: hidden; }
+
+.cx-profile-banner {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--cx-surface-2, #141b26);
+  /* Fade the banner into the card so the avatar never sits on a hard seam. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+@media (max-width: 640px) { .cx-profile-banner { height: 120px; } }
+
+.cx-profile-body {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 0 28px 24px;
+  margin-top: -52px;
+}
+@media (max-width: 640px) {
+  .cx-profile-body { padding: 0 18px 20px; margin-top: -40px; gap: 14px; }
+}
+
+.cx-profile-avatar { position: relative; flex: none; width: 124px; height: 124px; }
+@media (max-width: 640px) { .cx-profile-avatar { width: 92px; height: 92px; } }
+.cx-profile-avatar > img:first-child {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid var(--cx-bg-elev, #0c1017);
+  background: var(--cx-bg-elev, #0c1017);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
+}
+/* The decoration is drawn on a canvas larger than the avatar it frames, so it
+   overhangs on every side rather than sitting inside the circle. */
+.cx-profile-deco {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 138%;
+  height: 138%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.cx-profile-id { min-width: 0; flex: 1 1 260px; padding-bottom: 4px; }
+.cx-profile-id h1 { font-size: 1.65rem; line-height: 1.2; }
+@media (max-width: 640px) { .cx-profile-id h1 { font-size: 1.3rem; } }
+
+.cx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.cx-pill-owner {
+  color: #ffd97a;
+  background: rgba(251, 191, 36, .14);
+  border: 1px solid rgba(251, 191, 36, .38);
+}
+
+.cx-badges { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+.cx-badge-ico {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: .92rem;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+
+.cx-profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: .78rem;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+.cx-profile-meta i { margin-right: 5px; opacity: .8; }
+
+.cx-count {
+  font-size: .68rem;
+  font-weight: 800;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: var(--cx-text-dim, #9aa4b2);
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+
+/* ---------- server cards ---------- */
+
+.cx-guild-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+}
+
+.cx-guild-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--cx-radius, 12px);
+  background: var(--cx-surface, #0e131c);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  /* The role colour reads down the left edge, so scanning the list for the
+     servers you actually run takes no reading at all. */
+  border-left: 3px solid rgba(255, 255, 255, .10);
+  transition: border-color .15s, background .15s, transform .08s;
+}
+.cx-guild-card:hover { background: var(--cx-surface-2, #141b26); transform: translateY(-1px); }
+.cx-guild-card.cx-role-owner { border-left-color: #fbbf24; }
+.cx-guild-card.cx-role-admin { border-left-color: #a78bfa; }
+.cx-guild-card.cx-role-moderator { border-left-color: #3ba55d; }
+
+.cx-guild-top { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.cx-guild-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  object-fit: cover;
+  flex: none;
+  background: rgba(255, 255, 255, .07);
+}
+.cx-guild-ico-ph {
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+.cx-guild-name { min-width: 0; flex: 1 1 auto; }
+.cx-guild-name b {
+  display: block;
+  font-size: .92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cx-guild-sub {
+  display: block;
+  font-size: .72rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cx-role-tag {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .64rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cx-text-dim, #9aa4b2);
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-role-owner .cx-role-tag { color: #ffd97a; border-color: rgba(251, 191, 36, .35); }
+.cx-role-admin .cx-role-tag { color: #c7b5ff; border-color: rgba(167, 139, 250, .35); }
+.cx-role-moderator .cx-role-tag { color: #86e0a8; border-color: rgba(59, 165, 93, .35); }
+
+.cx-guild-facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.cx-fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  font-size: .72rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cx-fact i { opacity: .85; }
+
+.cx-guild-go {
+  align-self: flex-start;
+  font-size: .76rem;
+  font-weight: 700;
+  color: #8ea6ff;
+  text-decoration: none;
+}
+.cx-guild-go:hover { color: #b7c6ff; text-decoration: underline; }
+.cx-guild-go i { margin-left: 3px; }

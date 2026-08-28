@@ -11,37 +11,62 @@
     <div class="container-fluid py-4">
 
       <!-- ===== Identity ===== -->
-      <div class="card cx-hero mb-4">
-        <div class="card-body p-4">
-          <div class="d-flex flex-wrap align-items-center gap-4">
-            <img src="{{ profile.avatar_url }}" class="cx-hero-avatar" alt="{{ profile.name }}" />
-            <div>
-              <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
-                <h1 class="mb-0 me-1">{{ profile.name }}</h1>
-                {% if profile.is_owner %}
-                  <span class="badge bg-gradient-{{ variables["meta"]["color"] }}">
-                    <i class="fa fa-star me-1"></i>{{ _("Bot Owner") }}
+      <div class="card cx-profile mb-4">
+        <div class="cx-profile-banner"
+             {% if profile.banner_url %}
+               style="background-image:url('{{ profile.banner_url }}');"
+             {% elif profile.accent_colour %}
+               style="background:linear-gradient(135deg,{{ profile.accent_colour }},rgba(0,0,0,.65));"
+             {% endif %}>
+        </div>
+
+        <div class="cx-profile-body">
+          <div class="cx-profile-avatar">
+            <img src="{{ profile.avatar_url }}" alt="{{ profile.name }}" />
+            {% if profile.decoration_url %}
+              {# Discord's avatar decoration: sits over the avatar, same box.
+                 Decoration assets expire, so a dead one removes itself rather
+                 than leaving a broken-image glyph across the face. #}
+              <img class="cx-profile-deco" src="{{ profile.decoration_url }}" alt=""
+                   aria-hidden="true" onerror="this.remove();" />
+            {% endif %}
+          </div>
+
+          <div class="cx-profile-id">
+            <div class="d-flex align-items-center flex-wrap gap-2">
+              <h1 class="mb-0">{{ profile.name }}</h1>
+              {% if profile.is_owner %}
+                <span class="cx-pill cx-pill-owner"><i class="fa fa-star"></i>{{ _("Bot Owner") }}</span>
+              {% endif %}
+            </div>
+            <div class="text-secondary text-sm">@{{ profile.username }}</div>
+
+            {% if profile.badges %}
+              <div class="cx-badges">
+                {% for badge in profile.badges %}
+                  <span class="cx-badge-ico" title="{{ badge.label }}" style="color:{{ badge.colour }};">
+                    <i class="fa {{ badge.icon }}"></i>
                   </span>
-                {% endif %}
+                {% endfor %}
               </div>
-              <div class="text-secondary text-sm">@{{ profile.username }}</div>
-              <div class="text-xs text-secondary mt-2">
-                {{ _("Account created:") }} {{ moment(profile.created_at).format("Do MMM YYYY") }}
-              </div>
-              <div class="mt-3">
-                <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")' title="{{ _("Copy ID") }}">{{ profile.id }}</code>
-              </div>
+            {% endif %}
+
+            <div class="cx-profile-meta">
+              <span><i class="fa fa-calendar-o"></i>
+                {{ _("Joined Discord") }} {{ moment(profile.created_at).format("Do MMM YYYY") }}</span>
+              <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
+                    title="{{ _("Copy ID") }}">{{ profile.id }}</code>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ===== Access ===== -->
+      <!-- ===== Reach ===== -->
       <div class="cx-ov-grid mb-4">
         <div class="cx-ov-stat">
           <i class="ni ni-world-2 cx-ov-ico" style="color:#5aa9ff;"></i>
           <div>
-            <span class="cx-ov-num">{{ number_to_text_with_suffix(profile.shared_guilds) }}</span>
+            <span class="cx-ov-num">{{ profile.shared_guilds }}</span>
             <span class="cx-ov-cap">{{ _("Shared servers") }}</span>
           </div>
         </div>
@@ -66,52 +91,106 @@
             <span class="cx-ov-cap">{{ _("Moderator in") }}</span>
           </div>
         </div>
+        {% if profile.bank_is_global and profile.global_balance is not none %}
+          <div class="cx-ov-stat">
+            <i class="ni ni-money-coins cx-ov-ico" style="color:#8ea6ff;"></i>
+            <div>
+              <span class="cx-ov-num">{{ "{:,}".format(profile.global_balance) }}</span>
+              <span class="cx-ov-cap">{{ profile.currency }}</span>
+            </div>
+          </div>
+        {% elif profile.total_balance %}
+          <div class="cx-ov-stat">
+            <i class="ni ni-money-coins cx-ov-ico" style="color:#8ea6ff;"></i>
+            <div>
+              <span class="cx-ov-num">{{ "{:,}".format(profile.total_balance) }}</span>
+              <span class="cx-ov-cap">{{ _("Total credits") }}</span>
+            </div>
+          </div>
+        {% endif %}
       </div>
 
-      <!-- ===== Economy ===== -->
+      <!-- ===== Servers ===== -->
       <div class="card mb-4">
-        <div class="card-header pb-2">
-          <h5 class="mb-0"><i class="ni ni-money-coins me-2 opacity-8"></i>{{ _("Economy") }}</h5>
+        <div class="card-header pb-2 d-flex align-items-center flex-wrap gap-2">
+          <h5 class="mb-0"><i class="ni ni-world-2 me-2 opacity-8"></i>{{ _("Your servers") }}</h5>
+          <span class="cx-count">{{ profile.guilds|length }}</span>
+          {% if profile.bank_is_global %}
+            <span class="text-xs text-secondary ms-auto">
+              {{ _("This bot uses a global bank, so your balance is shared across every server.") }}
+            </span>
+          {% endif %}
         </div>
         <div class="card-body pt-2">
-          {% if profile.balances %}
-            {% if profile.bank_is_global %}
-              <div class="cx-kv">
-                <span class="cx-kv-label">{{ _("Global balance") }}</span>
-                <span class="cx-kv-value">
-                  {{ "{:,}".format(profile.balances[0].balance) }} {{ profile.currency }}
-                </span>
-              </div>
-              <p class="text-xs text-secondary mt-2 mb-0">
-                {{ _("This bot uses a global bank, so your balance is shared across every server.") }}
-              </p>
-            {% else %}
-              <div class="row">
-                {% for entry in profile.balances %}
-                  <div class="col-md-6 mb-3">
-                    <div class="cx-kv">
-                      <span class="cx-kv-label">{{ entry.guild }}</span>
-                      <span class="cx-kv-value">{{ "{:,}".format(entry.balance) }} {{ entry.currency }}</span>
+          {% if profile.guilds %}
+            <div class="cx-guild-grid">
+              {% for g in profile.guilds %}
+                <div class="cx-guild-card cx-role-{{ g.role|lower }}">
+                  <div class="cx-guild-top">
+                    {% if g.icon %}
+                      <img class="cx-guild-ico" src="{{ g.icon }}" alt="" loading="lazy" />
+                    {% else %}
+                      <span class="cx-guild-ico cx-guild-ico-ph">{{ g.name[:1]|upper }}</span>
+                    {% endif %}
+                    <div class="cx-guild-name">
+                      <b>{{ g.name }}</b>
+                      <span class="cx-guild-sub">
+                        {{ number_to_text_with_suffix(g.members) }} {{ _("members") }}
+                        {% if g.joined_at %}
+                          &middot; {{ _("joined") }} {{ moment(g.joined_at).fromNow() }}
+                        {% endif %}
+                      </span>
                     </div>
+                    <span class="cx-role-tag">{{ _(g.role) }}</span>
                   </div>
-                {% endfor %}
-              </div>
-              <p class="text-xs text-secondary mb-0">
-                {{ _("This bot uses per-server banks, so each server has its own balance.") }}
-              </p>
-            {% endif %}
+
+                  <div class="cx-guild-facts">
+                    {% if g.top_role %}
+                      <span class="cx-fact">
+                        <i class="fa fa-circle" style="font-size:.5rem;vertical-align:2px;
+                           color:{{ g.top_role_colour or '#8b93a7' }};"></i>
+                        {{ g.top_role }}
+                      </span>
+                    {% endif %}
+                    {% if g.balance is not none %}
+                      <span class="cx-fact"><i class="fa fa-diamond"></i>
+                        {{ "{:,}".format(g.balance) }} {{ g.currency }}</span>
+                    {% endif %}
+                    {% if g.level %}
+                      <span class="cx-fact"><i class="fa fa-bar-chart"></i>
+                        {{ _("Level") }} {{ g.level.level }}{% if g.level.prestige %}
+                          &middot; {{ _("Prestige") }} {{ g.level.prestige }}{% endif %}</span>
+                      <span class="cx-fact"><i class="fa fa-comment-o"></i>
+                        {{ number_to_text_with_suffix(g.level.messages) }}</span>
+                      {% if g.level.voice_hours %}
+                        <span class="cx-fact"><i class="fa fa-microphone"></i>
+                          {{ g.level.voice_hours }}h</span>
+                      {% endif %}
+                    {% endif %}
+                  </div>
+
+                  {% if g.can_manage %}
+                    <a class="cx-guild-go" href="{{ url_for("base_blueprint.dashboard_guild", guild_id=g.id) }}">
+                      {{ _("Manage") }} <i class="fa fa-angle-right"></i>
+                    </a>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
           {% else %}
             <p class="text-sm text-secondary mb-0">
-              {{ _("No economy data available. The Economy cog may not be loaded.") }}
+              {{ _("You do not share any server with this bot yet.") }}
             </p>
           {% endif %}
         </div>
       </div>
 
       <div class="d-flex flex-wrap gap-2">
-        <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.dashboard") }}">
-          <i class="ni ni-settings me-2" style="vertical-align:-1.5px;"></i>{{ _("My servers") }}
-        </a>
+        {% if current_user.can_use_dashboard %}
+          <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.dashboard") }}">
+            <i class="ni ni-settings me-2" style="vertical-align:-1.5px;"></i>{{ _("My servers") }}
+          </a>
+        {% endif %}
         <a class="btn btn-outline-secondary mb-0 text-danger" href="{{ url_for("login_blueprint.logout") }}">
           <i class="ni ni-user-run me-2" style="vertical-align:-1.5px;"></i>{{ _("Logout") }}
         </a>

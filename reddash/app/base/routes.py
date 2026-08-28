@@ -143,6 +143,12 @@ async def profile():
         data["created_at"] = datetime.datetime.fromtimestamp(
             data["created_at"], tz=datetime.UTC
         )
+    # Same for each server's join date, which the cards render as "joined N ago".
+    for guild in data.get("guilds") or []:
+        if guild.get("joined_at"):
+            guild["joined_at"] = datetime.datetime.fromtimestamp(
+                guild["joined_at"], tz=datetime.UTC
+            )
     return render_template("pages/profile.html", profile=data)
 
 

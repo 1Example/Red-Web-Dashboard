@@ -47,7 +47,7 @@
                     <i class="fa fa-plus-circle me-2" style="vertical-align: -0.5px;"></i>{{ _("Invite Me!") }}
                   </a>
                 {% endif %}
-                {% if current_user.is_authenticated %}
+                {% if current_user.is_authenticated and current_user.can_use_dashboard %}
                   <a class="btn btn-outline-secondary mb-0" href="{{ url_for("base_blueprint.dashboard") }}">
                     <i class="ni ni-settings me-2" style="vertical-align: -1.5px;"></i>{{ _("Dashboard") }}
                   </a>
