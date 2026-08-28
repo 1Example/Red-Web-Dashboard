@@ -11,14 +11,15 @@
     <div class="container-fluid py-4">
 
       <!-- ===== Identity ===== -->
-      <div class="card cx-profile mb-4">
-        <div class="cx-profile-banner"
-             {% if profile.banner_url %}
-               style="background-image:url('{{ profile.banner_url }}');"
-             {% elif profile.accent_colour %}
-               style="background:linear-gradient(135deg,{{ profile.accent_colour }},rgba(0,0,0,.65));"
-             {% endif %}>
-        </div>
+      {# The banner backs the whole card, so it is passed to the card itself as
+         a custom property; an accent colour stands in when there is no banner. #}
+      <div class="card cx-profile mb-4{% if profile.banner_url or profile.accent_colour %} cx-has-banner{% endif %}"
+           {% if profile.banner_url %}
+             style="--cx-banner:url('{{ profile.banner_url }}');"
+           {% elif profile.accent_colour %}
+             style="--cx-banner:linear-gradient(135deg,{{ profile.accent_colour }},rgba(0,0,0,.7));"
+           {% endif %}>
+        <div class="cx-profile-banner"></div>
 
         <div class="cx-profile-body">
           <div class="cx-av cx-profile-avatar">

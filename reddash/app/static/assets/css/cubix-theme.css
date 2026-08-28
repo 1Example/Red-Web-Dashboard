@@ -1118,30 +1118,42 @@ span.flatpickr-weekday {
    Profile
    ========================================================================== */
 
-.cx-profile { overflow: hidden; }
+.cx-profile { position: relative; overflow: hidden; }
 
-.cx-profile-banner {
-  position: relative;
-  height: 210px;
-  background-size: cover;
-  /* Banners are 2.5:1 and this strip is far wider, so `cover` crops a band out
-     of the middle. Biasing upwards keeps the part people actually framed. */
-  background-position: center 35%;
-  background-color: var(--cx-surface-2, #141b26);
-}
-/* Fade into the card with an opaque overlay rather than a mask. A mask makes
-   the element itself transparent, which punched a hole through the card and
-   let the page background show through the bottom of the banner. */
-.cx-profile-banner::after {
+/* The banner is the whole card's background, not a strip across the top. Same
+   approach as the guild hero: the image goes on a pseudo-element, because
+   `.card` sets `background` with !important and a shorthand like that would
+   blow away any background-image set on the element itself. */
+.cx-profile.cx-has-banner::before,
+.cx-profile.cx-has-banner::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom,
-              rgba(14, 19, 28, 0) 45%,
-              rgba(14, 19, 28, .72) 78%,
-              var(--cx-surface, #0e131c) 100%);
+  border-radius: inherit;
+  z-index: 0;
 }
-@media (max-width: 640px) { .cx-profile-banner { height: 130px; } }
+.cx-profile.cx-has-banner::before {
+  background-image: var(--cx-banner);
+  background-size: cover;
+  /* Banners are 2.5:1 and this card is far wider, so `cover` crops a band out
+     of the middle. Biasing upwards keeps the part people actually framed. */
+  background-position: center 30%;
+}
+/* Scrim: barely there at the top so the banner reads, near-solid by the
+   bottom so the name, badges and activity stay legible over any picture. */
+.cx-profile.cx-has-banner::after {
+  background: linear-gradient(to bottom,
+              rgba(14, 19, 28, .10) 0%,
+              rgba(14, 19, 28, .42) 28%,
+              rgba(14, 19, 28, .86) 62%,
+              rgba(14, 19, 28, .96) 100%);
+}
+.cx-profile > * { position: relative; z-index: 1; }
+
+/* Purely a spacer now: it reserves the clear area at the top of the card that
+   the avatar hangs off the bottom of. */
+.cx-profile-banner { height: 190px; }
+@media (max-width: 640px) { .cx-profile-banner { height: 120px; } }
 
 .cx-profile-body {
   /* The banner is a positioned sibling that comes first in the DOM, so it
@@ -1375,7 +1387,9 @@ span.flatpickr-weekday {
    hence the margin, which matches the overhang exactly. */
 .cx-av-sm { width: 28px; height: 28px; margin: 0 5px; }
 .cx-av-sm .cx-av-deco { width: 132%; height: 132%; }
-.cx-av-sm .cx-av-dot { border-width: 2px; right: 0; bottom: 0; }
+/* Proportionally larger than on the big avatar: at 28px a 20% dot is under
+   6px and reads as a smudge. */
+.cx-av-sm .cx-av-dot { width: 34%; height: 34%; right: 3%; bottom: 3%; border-width: 2px; }
 .cx-av-status { display: block; margin-top: 3px; font-size: .68rem; font-weight: 700; }
 .cx-av-status i { font-size: .5rem; vertical-align: 2px; margin-right: 3px; }
 
