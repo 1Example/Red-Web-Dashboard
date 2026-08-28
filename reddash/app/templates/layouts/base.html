@@ -58,17 +58,10 @@
     <link id="pagestyle" href="{{ config.ASSETS_ROOT }}/css/argon-dashboard.css?v={{ asset_version('assets/css/argon-dashboard.css') }}" rel="stylesheet" />
     <link id="background_theme" href="{{ config.ASSETS_ROOT }}/css/themes/background_theme_{{ variables["meta"]["background_theme"] }}.css" rel="stylesheet" />
     <link id="sidenav_theme" href="{{ config.ASSETS_ROOT }}/css/themes/sidenav_theme_{{ variables["meta"]["sidenav_theme"] }}.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <link id="cubix_stars" href="{{ config.ASSETS_ROOT }}/css/cubix-stars.css?v={{ asset_version('assets/css/cubix-stars.css') }}" rel="stylesheet" />
     <link id="cubix_theme" href="{{ config.ASSETS_ROOT }}/css/cubix-theme.css?v={{ asset_version('assets/css/cubix-theme.css') }}" rel="stylesheet" />
   
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-    <style>
-      body #toast-container > div {
-        opacity: 1;
-        margin-top: 6px;
-        width: 500px !important;
-      }
-    </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" rel="stylesheet" />
     <style>

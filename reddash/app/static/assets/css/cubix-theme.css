@@ -1003,3 +1003,108 @@ span.flatpickr-weekday {
   border-radius: 7px;
 }
 .cx-gs-search:focus { outline: none; border-color: rgba(130, 175, 255, .5); }
+
+
+/* ==========================================================================
+   Notifications (toastr)
+   Loaded after toastr.min.css so these win. toastr paints its own palette and
+   a base64 icon per level; both are replaced here so a notification looks
+   like the rest of the shell instead of like the library's defaults.
+   ========================================================================== */
+
+#toast-container {
+  top: 16px;
+  right: 16px;
+  width: min(380px, calc(100vw - 32px));
+}
+#toast-container > div,
+#toast-container > div:hover {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 34px 12px 42px;
+  margin: 0 0 9px;
+  border: 1px solid var(--cx-border-strong, rgba(255, 255, 255, .14));
+  border-left: 3px solid #6c8cff;
+  border-radius: var(--cx-radius, 12px);
+  background-color: #151a30;
+  background-position: 14px center;
+  background-size: 17px;
+  background-repeat: no-repeat;
+  color: var(--cx-text, #e6e9ef);
+  font-size: .85rem;
+  line-height: 1.4;
+  opacity: 1;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .55);
+}
+#toast-container > div:hover { box-shadow: 0 16px 42px rgba(0, 0, 0, .65); }
+
+/* The library ships the level icons as background images; recolour by
+   swapping them for ones that match this palette. */
+#toast-container > .toast-success {
+  border-left-color: #38d39f;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338d39f'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.4l-4.2-4.2 1.7-1.7 2.5 2.5 5.4-5.4 1.7 1.7-7.1 7.1z'/%3E%3C/svg%3E");
+}
+#toast-container > .toast-error,
+#toast-container > .toast-danger {
+  border-left-color: #ff6b6b;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff6b6b'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm5 13.6L15.6 17 12 13.4 8.4 17 7 15.6 10.6 12 7 8.4 8.4 7 12 10.6 15.6 7 17 8.4 13.4 12 17 15.6z'/%3E%3C/svg%3E");
+}
+#toast-container > .toast-warning {
+  border-left-color: #ffb454;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffb454'%3E%3Cpath d='M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z'/%3E%3C/svg%3E");
+}
+#toast-container > .toast-info {
+  border-left-color: #6c8cff;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c8cff'%3E%3Cpath d='M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z'/%3E%3C/svg%3E");
+}
+
+#toast-container .toast-title { font-weight: 700; margin-bottom: 2px; }
+#toast-container .toast-message { word-break: break-word; }
+#toast-container .toast-message a { color: #b7c6ff; }
+
+#toast-container .toast-close-button {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--cx-text, #e6e9ef);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: center;
+  text-shadow: none;
+  opacity: .45;
+}
+#toast-container .toast-close-button:hover,
+#toast-container .toast-close-button:focus {
+  opacity: 1;
+  color: inherit;
+  background: rgba(255, 255, 255, .10);
+}
+
+#toast-container .toast-progress {
+  height: 2px;
+  background-color: currentColor;
+  opacity: .35;
+  border-radius: 0 0 var(--cx-radius, 12px) var(--cx-radius, 12px);
+}
+
+/* Full width on a phone, where a 380px card would hang off the edge. */
+@media (max-width: 480px) {
+  #toast-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+  #toast-container > div,
+  #toast-container > div:hover { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #toast-container > div { transition: none !important; }
+}

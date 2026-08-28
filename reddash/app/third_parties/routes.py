@@ -289,6 +289,10 @@ async def third_party(name: str, page: str = None, guild_id: str = None):
                 **return_guild,
                 expanded=result["web_content"].get("expanded", False),
                 fullscreen=result["web_content"].get("fullscreen", False),
+                # `bare` goes one step further than `expanded`: no guild hero
+                # and no breadcrumb either, for a page that brings its own
+                # header and wants the card to itself.
+                bare=result["web_content"].get("bare", False),
                 source_content=render_template_string(
                     result["web_content"].pop("source"),
                     name=name,
