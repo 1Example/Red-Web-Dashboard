@@ -1118,12 +1118,6 @@ span.flatpickr-weekday {
    Profile
    ========================================================================== */
 
-/* The shell is full-width by design, but a profile stretched across an
-   ultra-wide monitor is mostly gutter - and the banner, which `cover` scales
-   by the container's width, turns to mush at 2000px. Capping the column fixes
-   the emptiness and the blur in one go. */
-.cx-profile-page { max-width: 1500px; margin-inline: auto; }
-
 .cx-profile { overflow: hidden; }
 
 .cx-profile-banner {
@@ -1362,13 +1356,15 @@ span.flatpickr-weekday {
 }
 .cx-av-dot {
   position: absolute;
-  /* Tucked inside the rim rather than hung off the corner, and sized with the
-     ring included - content-box plus a 30% width made this nearly a third of
-     the avatar again in border alone. */
-  right: 2%;
-  bottom: 2%;
-  width: 26%;
-  height: 26%;
+  /* The avatar is a circle inside a square box, so its lower-right corner is
+     empty space - anchoring there left the dot hanging off the edge, on top
+     of the decoration ring. 7% brings it back onto the circle's own rim.
+     Sized with the ring included; content-box plus 30% made it a third of the
+     face again in border alone. */
+  right: 7%;
+  bottom: 7%;
+  width: 20%;
+  height: 20%;
   border-radius: 50%;
   border: 2.5px solid var(--cx-surface, #0e131c);
   box-sizing: border-box;
