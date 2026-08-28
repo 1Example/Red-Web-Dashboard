@@ -43,13 +43,23 @@
     {% if current_user.is_authenticated %}
       <div class="dropdown">
         <a class="cx-user" href="javascript:void(0);" role="button" id="user_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <img src="{{ current_user.display_avatar }}" alt="{{ current_user.display_name }}" />
+          <span class="cx-av cx-av-sm">
+            <img class="cx-av-img" src="{{ current_user.display_avatar }}" alt="{{ current_user.display_name }}" />
+            {% if current_user.decoration_url %}
+              <img class="cx-av-deco" src="{{ current_user.decoration_url }}" alt=""
+                   aria-hidden="true" onerror="this.remove();" />
+            {% endif %}
+            <span class="cx-av-dot" style="background:{{ current_user.presence_colour }};"></span>
+          </span>
           <span class="d-none d-sm-inline">{{ current_user.display_name }}</span>
           <i class="ni ni-bold-down" style="font-size: 0.6rem;"></i>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="user_dropdown">
           <li class="px-3 py-2 text-xs text-secondary" style="border-bottom:1px solid rgba(255,255,255,.08);">
             {{ _("Signed in as") }}<br /><b class="text-sm" style="color:var(--cx-text);">{{ current_user.display_name }}</b>
+            <span class="cx-av-status" style="color:{{ current_user.presence_colour }};">
+              <i class="fa fa-circle"></i> {{ current_user.presence|capitalize }}
+            </span>
           </li>
           <li><a href="{{ url_for("base_blueprint.profile") }}" class="dropdown-item"><i class="ni ni-single-02" style="width: 1.3em; vertical-align: -2px;"></i> {{ _("Profile") }}</a></li>
           {% if current_user.can_use_dashboard %}

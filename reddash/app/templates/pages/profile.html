@@ -21,14 +21,18 @@
         </div>
 
         <div class="cx-profile-body">
-          <div class="cx-profile-avatar">
-            <img src="{{ profile.avatar_url }}" alt="{{ profile.name }}" />
+          <div class="cx-av cx-profile-avatar">
+            <img class="cx-av-img" src="{{ profile.avatar_url }}" alt="{{ profile.name }}" />
             {% if profile.decoration_url %}
               {# Discord's avatar decoration: sits over the avatar, same box.
                  Decoration assets expire, so a dead one removes itself rather
                  than leaving a broken-image glyph across the face. #}
-              <img class="cx-profile-deco" src="{{ profile.decoration_url }}" alt=""
+              <img class="cx-av-deco" src="{{ profile.decoration_url }}" alt=""
                    aria-hidden="true" onerror="this.remove();" />
+            {% endif %}
+            {% if profile.has_presence %}
+              <span class="cx-av-dot" title="{{ profile.presence_label }}"
+                    style="background:{{ profile.presence_colour }};"></span>
             {% endif %}
           </div>
 
@@ -37,6 +41,11 @@
               <h1 class="mb-0">{{ profile.name }}</h1>
               {% if profile.is_owner %}
                 <span class="cx-pill cx-pill-owner"><i class="fa fa-star"></i>{{ _("Bot Owner") }}</span>
+              {% endif %}
+              {% if profile.has_presence %}
+                <span class="cx-presence" style="color:{{ profile.presence_colour }};">
+                  <i class="fa fa-circle"></i>{{ _(profile.presence_label) }}
+                </span>
               {% endif %}
             </div>
             <div class="text-secondary text-sm">@{{ profile.username }}</div>
@@ -57,6 +66,30 @@
               <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
                     title="{{ _("Copy ID") }}">{{ profile.id }}</code>
             </div>
+
+            {% if profile.activity %}
+              <div class="cx-activity">
+                {% if profile.activity.image %}
+                  <img class="cx-activity-art" src="{{ profile.activity.image }}" alt=""
+                       onerror="this.remove();" />
+                {% endif %}
+                <div class="cx-activity-txt">
+                  {% if profile.activity.kind == "custom" %}
+                    <span class="cx-activity-verb">{{ _("Status") }}</span>
+                    <span class="cx-activity-name">
+                      {% if profile.activity.emoji %}{{ profile.activity.emoji }} {% endif %}
+                      {{ profile.activity.name }}
+                    </span>
+                  {% else %}
+                    <span class="cx-activity-verb">{{ _(profile.activity.verb) }}</span>
+                    <span class="cx-activity-name">{{ profile.activity.name }}</span>
+                    {% if profile.activity.details %}
+                      <span class="cx-activity-sub">{{ profile.activity.details }}</span>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>

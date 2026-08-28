@@ -1117,26 +1117,47 @@ span.flatpickr-weekday {
 .cx-profile { overflow: hidden; }
 
 .cx-profile-banner {
-  height: 180px;
+  position: relative;
+  height: 210px;
   background-size: cover;
-  background-position: center;
+  /* Banners are 2.5:1 and this strip is far wider, so `cover` crops a band out
+     of the middle. Biasing upwards keeps the part people actually framed. */
+  background-position: center 35%;
   background-color: var(--cx-surface-2, #141b26);
-  /* Fade the banner into the card so the avatar never sits on a hard seam. */
-  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
-  mask-image: linear-gradient(to bottom, #000 55%, transparent);
 }
-@media (max-width: 640px) { .cx-profile-banner { height: 120px; } }
+/* Fade into the card with an opaque overlay rather than a mask. A mask makes
+   the element itself transparent, which punched a hole through the card and
+   let the page background show through the bottom of the banner. */
+.cx-profile-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom,
+              rgba(14, 19, 28, 0) 45%,
+              rgba(14, 19, 28, .72) 78%,
+              var(--cx-surface, #0e131c) 100%);
+}
+@media (max-width: 640px) { .cx-profile-banner { height: 130px; } }
 
 .cx-profile-body {
+  /* The banner is a positioned sibling that comes first in the DOM, so it
+     paints above this block and swallowed the name where the two overlap.
+     Positioning the body too puts it back on top. */
+  position: relative;
+  z-index: 1;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 20px;
   flex-wrap: wrap;
+  /* Only the avatar rides up over the banner; the name stays below it, where
+     it is legible whatever the banner happens to be a picture of. */
   padding: 0 28px 24px;
-  margin-top: -52px;
 }
+.cx-profile-avatar { margin-top: -54px; }
+.cx-profile-id { padding-top: 10px; }
 @media (max-width: 640px) {
-  .cx-profile-body { padding: 0 18px 20px; margin-top: -40px; gap: 14px; }
+  .cx-profile-body { padding: 0 18px 20px; gap: 14px; }
+  .cx-profile-avatar { margin-top: -42px; }
 }
 
 .cx-profile-avatar { position: relative; flex: none; width: 124px; height: 124px; }
@@ -1150,18 +1171,6 @@ span.flatpickr-weekday {
   background: var(--cx-bg-elev, #0c1017);
   box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
 }
-/* The decoration is drawn on a canvas larger than the avatar it frames, so it
-   overhangs on every side rather than sitting inside the circle. */
-.cx-profile-deco {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 138%;
-  height: 138%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
 .cx-profile-id { min-width: 0; flex: 1 1 260px; padding-bottom: 4px; }
 .cx-profile-id h1 { font-size: 1.65rem; line-height: 1.2; }
 @media (max-width: 640px) { .cx-profile-id h1 { font-size: 1.3rem; } }
@@ -1319,3 +1328,102 @@ span.flatpickr-weekday {
 }
 .cx-guild-go:hover { color: #b7c6ff; text-decoration: underline; }
 .cx-guild-go i { margin-left: 3px; }
+
+/* ---------- avatar + Discord frame, reusable ---------- */
+
+.cx-av { position: relative; display: inline-block; flex: none; line-height: 0; }
+.cx-av-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--cx-bg-elev, #0c1017);
+}
+/* Decorations are drawn on a canvas wider than the avatar they frame, so the
+   art has to overhang rather than sit inside the circle. */
+.cx-av-deco {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 138%;
+  height: 138%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.cx-av-dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30%;
+  height: 30%;
+  min-width: 9px;
+  min-height: 9px;
+  border-radius: 50%;
+  border: 2px solid var(--cx-bg-elev, #0c1017);
+  box-sizing: content-box;
+}
+.cx-av-sm { width: 30px; height: 30px; }
+/* The frame overhangs, so the row needs a little air for it. */
+.cx-user .cx-av-sm { margin-right: 4px; }
+.cx-av-status { display: block; margin-top: 3px; font-size: .68rem; font-weight: 700; }
+.cx-av-status i { font-size: .5rem; vertical-align: 2px; margin-right: 3px; }
+
+/* ---------- presence + activity on the profile ---------- */
+
+.cx-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-presence i { font-size: .52rem; }
+
+.cx-activity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 11px 14px;
+  border-radius: var(--cx-radius, 12px);
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  max-width: 460px;
+}
+.cx-activity-art {
+  width: 46px;
+  height: 46px;
+  border-radius: 9px;
+  object-fit: cover;
+  flex: none;
+  background: rgba(255, 255, 255, .06);
+}
+.cx-activity-txt { min-width: 0; }
+.cx-activity-verb {
+  display: block;
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+.cx-activity-name {
+  display: block;
+  font-size: .88rem;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cx-activity-sub {
+  display: block;
+  font-size: .75rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

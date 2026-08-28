@@ -120,6 +120,19 @@ class User(UserMixin):
         return self.is_owner or self.manageable_guilds is None or self.manageable_guilds > 0
 
     @property
+    def decoration_url(self) -> str:
+        """The Discord avatar frame, when this account has one."""
+        return (self._access or {}).get("decoration_url") or ""
+
+    @property
+    def presence(self) -> str:
+        return (self._access or {}).get("presence") or "offline"
+
+    @property
+    def presence_colour(self) -> str:
+        return (self._access or {}).get("presence_colour") or "#80848e"
+
+    @property
     def is_active(self) -> bool:
         return not self.is_blacklisted
 
