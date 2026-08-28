@@ -19,7 +19,7 @@
            {% elif profile.accent_colour %}
              style="--cx-banner:linear-gradient(135deg,{{ profile.accent_colour }},rgba(0,0,0,.7));"
            {% endif %}>
-        <div class="cx-profile-banner"></div>
+        {% if profile.banner_url %}<div class="cx-profile-art"></div>{% endif %}
 
         <div class="cx-profile-body">
           <div class="cx-av cx-profile-avatar">
@@ -143,6 +143,50 @@
           </div>
         {% endif %}
       </div>
+
+      <!-- ===== What you have been up to ===== -->
+      {% if profile.cog_stats %}
+        <div class="card mb-4">
+          <div class="card-header pb-2 d-flex align-items-center flex-wrap gap-2">
+            <h5 class="mb-0"><i class="ni ni-chart-bar-32 me-2 opacity-8"></i>{{ _("Your activity") }}</h5>
+            <span class="cx-count">{{ profile.cog_stats|length }}</span>
+            <span class="text-xs text-secondary ms-auto">
+              {{ _("Totalled across every server you share with this bot.") }}
+            </span>
+          </div>
+          <div class="card-body pt-2">
+            <div class="cx-mod-grid">
+              {% for card in profile.cog_stats %}
+                <div class="cx-mod-card">
+                  <div class="cx-mod-head">
+                    <span class="cx-mod-ico" style="color:{{ card.colour }};
+                          background:{{ card.colour }}1f; border-color:{{ card.colour }}44;">
+                      <i class="fa {{ card.icon }}"></i>
+                    </span>
+                    <b>{{ _(card.label) }}</b>
+                  </div>
+                  <div class="cx-mod-rows">
+                    {% for row in card.rows %}
+                      <div class="cx-mod-row">
+                        <span class="cx-mod-label">{{ _(row.label) }}</span>
+                        <span class="cx-mod-value">
+                          {% if row.signed %}
+                            <span class="{{ 'cx-up' if row.value > 0 else 'cx-down' }}">
+                              {{ '+' if row.value > 0 }}{{ "{:,}".format(row.value) }}
+                            </span>
+                          {% else %}
+                            {{ "{:,}".format(row.value) }}
+                          {% endif %}
+                        </span>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
 
       <!-- ===== Servers ===== -->
       <div class="card mb-4">

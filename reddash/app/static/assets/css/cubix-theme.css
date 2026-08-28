@@ -1130,14 +1130,31 @@ span.flatpickr-weekday {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  z-index: 0;
 }
+/* Layers, bottom to top: blurred fill, the banner itself, the scrim, content. */
+.cx-profile.cx-has-banner::before { z-index: 0; }
+.cx-profile.cx-has-banner::after { z-index: 2; }
+/* `cover` had to scale a 2.5:1 banner across a card three times that wide,
+   which zoomed it ~2x and showed a cropped band. Instead the sharp copy is
+   `contain`ed - the whole banner, at its own aspect - and this blurred,
+   over-scaled copy fills the space either side of it. */
 .cx-profile.cx-has-banner::before {
   background-image: var(--cx-banner);
   background-size: cover;
-  /* Banners are 2.5:1 and this card is far wider, so `cover` crops a band out
-     of the middle. Biasing upwards keeps the part people actually framed. */
-  background-position: center 30%;
+  background-position: center;
+  filter: blur(34px) saturate(140%);
+  transform: scale(1.2);
+}
+/* Higher specificity than `.cx-profile > *` below, which would otherwise
+   reset this to position:relative and collapse it to zero height. */
+.cx-profile > .cx-profile-art {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: var(--cx-banner);
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 /* Scrim: barely there at the top so the banner reads, near-solid by the
    bottom so the name, badges and activity stay legible over any picture. */
@@ -1148,12 +1165,9 @@ span.flatpickr-weekday {
               rgba(14, 19, 28, .86) 62%,
               rgba(14, 19, 28, .96) 100%);
 }
-.cx-profile > * { position: relative; z-index: 1; }
+.cx-profile > .cx-profile-body { position: relative; z-index: 3; }
 
-/* Purely a spacer now: it reserves the clear area at the top of the card that
-   the avatar hangs off the bottom of. */
-.cx-profile-banner { height: 190px; }
-@media (max-width: 640px) { .cx-profile-banner { height: 120px; } }
+
 
 .cx-profile-body {
   /* The banner is a positioned sibling that comes first in the DOM, so it
@@ -1167,12 +1181,13 @@ span.flatpickr-weekday {
   flex-wrap: wrap;
   /* Only the avatar rides up over the banner; the name stays below it, where
      it is legible whatever the banner happens to be a picture of. */
-  padding: 0 28px 24px;
+  /* The top padding is the banner area - no empty spacer element for it. */
+  padding: 168px 28px 24px;
 }
 .cx-profile-avatar { margin-top: -54px; }
 .cx-profile-id { padding-top: 10px; }
 @media (max-width: 640px) {
-  .cx-profile-body { padding: 0 18px 20px; gap: 14px; }
+  .cx-profile-body { padding: 118px 18px 20px; gap: 14px; }
   .cx-profile-avatar { margin-top: -42px; }
 }
 
@@ -1452,3 +1467,42 @@ span.flatpickr-weekday {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ---------- per-cog activity ---------- */
+
+.cx-mod-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+.cx-mod-card {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--cx-radius, 12px);
+  background: var(--cx-surface, #0e131c);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-mod-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.cx-mod-head b { font-size: .9rem; }
+.cx-mod-ico {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font-size: .88rem;
+}
+.cx-mod-rows { display: flex; flex-direction: column; gap: 5px; }
+.cx-mod-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: .8rem;
+}
+.cx-mod-label { color: var(--cx-text-dim, #9aa4b2); }
+.cx-mod-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+.cx-up { color: #38d39f; }
+.cx-down { color: #ff6b6b; }
