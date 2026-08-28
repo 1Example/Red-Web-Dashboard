@@ -1163,7 +1163,7 @@ span.flatpickr-weekday {
    is what made this card so tall. */
 .cx-profile-body {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 22px;
   flex-wrap: wrap;
   padding: 22px 28px;
@@ -1185,7 +1185,11 @@ span.flatpickr-weekday {
 }
 /* Sized to its content so the things after it sit right alongside, rather
    than being pushed to the far edge by a greedy column. */
-.cx-profile-id { min-width: 0; flex: 0 1 auto; }
+.cx-profile-id { min-width: 0; flex: 0 1 auto; display: flex; flex-direction: column; gap: 4px; }
+/* Each line is its own baseline: name/pills/badges on one, handle/date/id on
+   the other, so everything on the left reads as aligned columns of text. */
+.cx-id-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cx-id-sub { gap: 14px; }
 .cx-profile-id h1 { font-size: 1.65rem; line-height: 1.2; }
 @media (max-width: 640px) { .cx-profile-id h1 { font-size: 1.3rem; } }
 
@@ -1205,7 +1209,7 @@ span.flatpickr-weekday {
   border: 1px solid rgba(251, 191, 36, .38);
 }
 
-.cx-badges { display: flex; gap: 7px; flex-wrap: wrap; flex: 0 0 auto; }
+.cx-badges { display: inline-flex; gap: 7px; flex-wrap: wrap; flex: 0 0 auto; }
 .cx-badge-ico {
   display: grid;
   place-items: center;
@@ -1218,7 +1222,7 @@ span.flatpickr-weekday {
 }
 
 .cx-profile-meta {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
@@ -1495,11 +1499,15 @@ span.flatpickr-weekday {
   display: flex;
   gap: 9px;
   flex-wrap: wrap;
-  /* Takes the slack, so identity stays left and these sit hard right instead
-     of leaving a void across the middle of the banner. */
-  margin-left: auto;
+  /* Grows into the slack rather than being pushed to the far edge by it.
+     `margin-left:auto` only relocated the gap - the tiles sat hard right and
+     left the middle of the banner as empty as before. */
+  flex: 1 1 auto;
 }
 .cx-profile-stat {
+  /* Each tile takes an equal share of whatever width the strip was given, so
+     the row is filled instead of leaving one large hole. */
+  flex: 1 1 0;
   min-width: 84px;
   padding: 8px 14px;
   border-radius: 11px;
@@ -1522,6 +1530,5 @@ span.flatpickr-weekday {
   color: var(--cx-text-dim, #9aa4b2);
 }
 @media (max-width: 900px) {
-  .cx-profile-stats { margin-left: 0; }
-  .cx-profile-stat { min-width: 70px; padding: 7px 11px; }
+  .cx-profile-stat { flex: 1 1 70px; min-width: 70px; padding: 7px 11px; }
 }

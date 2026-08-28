@@ -39,8 +39,13 @@
             {% endif %}
           </div>
 
+          {# Two aligned lines: name + pills + badges on one, handle + join
+             date + id on the other. These used to be separate items in the
+             outer row, so they bottom-aligned against the two-line identity
+             block and floated level with the handle instead of lining up with
+             anything. #}
           <div class="cx-profile-id">
-            <div class="d-flex align-items-center flex-wrap gap-2">
+            <div class="cx-id-line">
               <h1 class="mb-0">{{ profile.name }}</h1>
               {% if profile.is_owner %}
                 <span class="cx-pill cx-pill-owner"><i class="fa fa-star"></i>{{ _("Bot Owner") }}</span>
@@ -50,27 +55,27 @@
                   <i class="fa fa-circle"></i>{{ _(profile.presence_label) }}
                 </span>
               {% endif %}
-            </div>
-            <div class="text-secondary text-sm">@{{ profile.username }}</div>
-          </div>
-
-          {% if profile.badges %}
-            <div class="cx-badges">
-              {% for badge in profile.badges %}
-                <span class="cx-badge-ico" title="{{ badge.label }}" style="color:{{ badge.colour }};">
-                  <i class="fa {{ badge.icon }}"></i>
+              {% if profile.badges %}
+                <span class="cx-badges">
+                  {% for badge in profile.badges %}
+                    <span class="cx-badge-ico" title="{{ badge.label }}" style="color:{{ badge.colour }};">
+                      <i class="fa {{ badge.icon }}"></i>
+                    </span>
+                  {% endfor %}
                 </span>
-              {% endfor %}
+              {% endif %}
             </div>
-          {% endif %}
 
-          <div class="cx-profile-meta">
-            <span><i class="fa fa-calendar-o"></i>
-              {{ moment(profile.created_at).format("Do MMM YYYY") }}</span>
-            <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
-                  title="{{ _("Copy ID") }}">{{ profile.id }}</code>
+            <div class="cx-id-line cx-id-sub">
+              <span class="text-secondary text-sm">@{{ profile.username }}</span>
+              <span class="cx-profile-meta">
+                <span><i class="fa fa-calendar-o"></i>
+                  {{ moment(profile.created_at).format("Do MMM YYYY") }}</span>
+                <code class="cx-prefix" onclick='copyTextToClipboard("{{ profile.id }}")'
+                      title="{{ _("Copy ID") }}">{{ profile.id }}</code>
+              </span>
+            </div>
           </div>
-
 
           <div class="cx-profile-stats">
             <div class="cx-profile-stat">
