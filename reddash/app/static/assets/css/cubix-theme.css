@@ -388,15 +388,15 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
 .cx-topbar { z-index: 1040; }
 .main-content { position: relative; z-index: 1; }
 
-/* Let the dots show through the page surface. */
+/* Let the background layer show through the page surface. */
 body,
 body.g-sidenav-show {
-  /* Transparent so the fixed .cx-stars layer underneath stays visible. */
+  /* Transparent so the fixed .cx-circuit canvas underneath stays visible. */
   background: transparent !important;
 }
 
 /* Cards: same colour family as the backdrop, translucent, but noticeably more
-   opaque than the star layer so text stays readable over moving stars. */
+   opaque than the background layer so text stays readable over moving traces. */
 .card {
   background: rgba(24, 48, 105, 0.10) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;

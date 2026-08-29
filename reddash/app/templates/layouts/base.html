@@ -59,7 +59,7 @@
     <link id="background_theme" href="{{ config.ASSETS_ROOT }}/css/themes/background_theme_{{ variables["meta"]["background_theme"] }}.css" rel="stylesheet" />
     <link id="sidenav_theme" href="{{ config.ASSETS_ROOT }}/css/themes/sidenav_theme_{{ variables["meta"]["sidenav_theme"] }}.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-    <link id="cubix_stars" href="{{ config.ASSETS_ROOT }}/css/cubix-stars.css?v={{ asset_version('assets/css/cubix-stars.css') }}" rel="stylesheet" />
+    <link id="cubix_circuit" href="{{ config.ASSETS_ROOT }}/css/cubix-circuit.css?v={{ asset_version('assets/css/cubix-circuit.css') }}" rel="stylesheet" />
     <link id="cubix_theme" href="{{ config.ASSETS_ROOT }}/css/cubix-theme.css?v={{ asset_version('assets/css/cubix-theme.css') }}" rel="stylesheet" />
   
     <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" rel="stylesheet" />
@@ -105,12 +105,7 @@
   </head>
 
   <body class="g-sidenav-show bg-gray-100">
-    <div class="cx-stars" aria-hidden="true">
-      <div id="stars"></div>
-      <div id="stars2"></div>
-      <div id="stars3"></div>
-      <div id="stars4"></div>
-    </div>
+    <canvas id="cx-circuit" class="cx-circuit" aria-hidden="true"></canvas>
 
     {% include "includes/navigation.html" %}
 
@@ -124,6 +119,7 @@
     {% include "includes/scripts.html" %}
     <script src="{{ config.ASSETS_ROOT }}/js/argon-dashboard.js?v={{ asset_version('assets/js/argon-dashboard.js') }}"></script>
     <script src="{{ config.ASSETS_ROOT }}/js/cubix-switcher.js?v={{ asset_version('assets/js/cubix-switcher.js') }}"></script>
+    <script src="{{ config.ASSETS_ROOT }}/js/cubix-circuit.js?v={{ asset_version('assets/js/cubix-circuit.js') }}"></script>
 
     <!-- Specific JS goes HERE -->
     {% block javascripts %}{% endblock %}
