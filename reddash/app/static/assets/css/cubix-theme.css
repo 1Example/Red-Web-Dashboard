@@ -1258,7 +1258,7 @@ span.flatpickr-weekday {
   min-width: 0;
   padding: 14px 16px;
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #2453a729);
+  background: var(--cx-surface, #10264d69);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
   /* The role colour reads down the left edge, so scanning the list for the
      servers you actually run takes no reading at all. */
@@ -1465,7 +1465,7 @@ span.flatpickr-weekday {
   min-width: 0;
   padding: 14px 16px;
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #2453a729);
+  background: var(--cx-surface, #10264d69);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
 }
 .cx-mod-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
