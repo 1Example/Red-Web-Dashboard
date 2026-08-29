@@ -403,7 +403,7 @@ body.g-sidenav-show {
 }
 .card .card { background: rgba(34, 62, 125, 0.09) !important; }
 .cx-hero {
-  background: rgba(24, 48, 105, 0.13) !important;
+  background: rgba(0, 16, 135, 0.23) !important;
 }
 
 /* --- colour glitch fixes --- */
@@ -488,7 +488,7 @@ div.card:not(.sidenav, .sidenav *) div.card:not(.sidenav, .sidenav *) {
   background: rgba(34, 62, 125, 0.09) !important;
 }
 div.card.cx-hero:not(.sidenav, .sidenav *) {
-  background: rgba(24, 48, 105, 0.13) !important;
+  background: rgba(0, 16, 135, 0.23) !important;
 }
 /* Card internals stay transparent so the parent's translucency shows through. */
 div.card:not(.sidenav, .sidenav *) > div.card-body,
