@@ -39,7 +39,7 @@
 
   var CONFIG = {
     // palette - background matches --cx-bg so the layer is seamless
-    background: "#000000",
+    background: "#081e11",
     trace: "#8fe3ff", // bright pulse core
     glow: "#2fa8ff", // soft halo under the pulse
     board: "#12405c", // static etched traces
@@ -49,11 +49,11 @@
     maxPop: 70, // live walkers - kept calm, this sits behind a UI
     popPerBirth: 2,
     lifespan: 420, // frames before a walker dies
-    speed: 0.22, // cells advanced per frame
+    speed: 0.12, // cells advanced per frame
     trailCells: 22, // trail length in cells -> also the fade window
     straightBias: 6, // how strongly a walker prefers to carry straight on
     boardAlpha: 0.5, // opacity of the static PCB layer
-    traceWidth: 1.2,
+    traceWidth: 1.4,
     buckets: 14 // alpha quantisation (perf: strokes per frame)
   };
 
