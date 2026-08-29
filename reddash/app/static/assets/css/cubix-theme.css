@@ -398,7 +398,7 @@ body.g-sidenav-show {
 /* Cards: same colour family as the backdrop, translucent, but noticeably more
    opaque than the background layer so text stays readable over moving traces. */
 .card {
-  background: rgba(24, 48, 105, 0.10) !important;
+  background: rgba(0, 16, 135, 0.23) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
 }
 .card .card { background: rgba(34, 62, 125, 0.09) !important; }
@@ -414,7 +414,7 @@ body.g-sidenav-show {
 
 /* Argon's leftover light-theme surfaces. */
 .bg-gray-100, .bg-white { background-color: transparent !important; }
-.card.card-chart { background: rgba(24, 48, 105, 0.10) !important; }
+.card.card-chart { background: rgba(0, 16, 135, 0.23) !important; }
 
 /* Inputs inside cards were picking up the light default. */
 .input-group-text {
@@ -481,7 +481,7 @@ textarea.form-control,
    ========================================================================== */
 
 div.card:not(.sidenav, .sidenav *) {
-  background: rgba(24, 48, 105, 0.10) !important;
+  background: rgba(0, 16, 135, 0.23) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
 }
 div.card:not(.sidenav, .sidenav *) div.card:not(.sidenav, .sidenav *) {
@@ -830,7 +830,7 @@ span.flatpickr-weekday {
    reads as a panel rather than floating loose on the page. */
 #third-parties > .card,
 #third-parties > .card.card-chart {
-  background: rgba(24, 48, 105, 0.10) !important;
+  background: rgba(0, 16, 135, 0.23) !important;
   border: 1px solid rgba(130, 175, 255, 0.16) !important;
   border-radius: 14px !important;
   box-shadow: none !important;
