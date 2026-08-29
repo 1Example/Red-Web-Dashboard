@@ -6,7 +6,7 @@
 :root {
   --cx-bg:            #000000;
   --cx-bg-elev:       #0c1017;
-  --cx-surface:       #0e131c;
+  --cx-surface:       #10264dfa;
   --cx-surface-2:     #141b26;
   --cx-border:        rgba(255, 255, 255, 0.07);
   --cx-border-strong: rgba(255, 255, 255, 0.14);
@@ -966,7 +966,7 @@ span.flatpickr-weekday {
   max-width: 320px;
   padding: 5px 0;
   z-index: 1080;
-  background: #0e131c;
+  background: #10264dfa;
   border: 1px solid rgba(255, 255, 255, .14);
   border-radius: 10px;
   box-shadow: 0 14px 38px rgba(0, 0, 0, .6);
@@ -1258,7 +1258,7 @@ span.flatpickr-weekday {
   min-width: 0;
   padding: 14px 16px;
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #0e131c);
+  background: var(--cx-surface, #2453a729);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
   /* The role colour reads down the left edge, so scanning the list for the
      servers you actually run takes no reading at all. */
@@ -1465,7 +1465,7 @@ span.flatpickr-weekday {
   min-width: 0;
   padding: 14px 16px;
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #0e131c);
+  background: var(--cx-surface, #2453a729);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
 }
 .cx-mod-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
