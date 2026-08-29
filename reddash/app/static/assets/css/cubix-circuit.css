@@ -20,7 +20,7 @@
   z-index: 0;
   pointer-events: none;
   display: block;
-  background: #101010;
+  background: #000000;
   /* Isolate the animated layer so overlapping translucent cards don't force it
      to be re-rasterised together with page content each frame. */
   contain: strict;

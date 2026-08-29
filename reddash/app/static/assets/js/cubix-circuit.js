@@ -39,13 +39,13 @@
 
   var CONFIG = {
     // palette - background matches --cx-bg so the layer is seamless
-    background: "#101010",
+    background: "#000000",
     trace: "#8fe3ff", // bright pulse core
     glow: "#2fa8ff", // soft halo under the pulse
     board: "#12405c", // static etched traces
     pad: "#1d5d80", // solder pads / vias
 
-    cell: 14, // grid pitch in px; everything snaps to this
+    cell: 16, // grid pitch in px; everything snaps to this
     maxPop: 80, // live walkers - kept calm, this sits behind a UI
     popPerBirth: 4,
     lifespan: 420, // frames before a walker dies
