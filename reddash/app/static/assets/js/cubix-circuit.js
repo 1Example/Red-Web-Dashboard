@@ -39,22 +39,22 @@
 
   var CONFIG = {
     // palette - background matches --cx-bg so the layer is seamless
-    background: "#081e11",
+    background: "#101010",
     trace: "#8fe3ff", // bright pulse core
     glow: "#2fa8ff", // soft halo under the pulse
     board: "#12405c", // static etched traces
     pad: "#1d5d80", // solder pads / vias
 
     cell: 14, // grid pitch in px; everything snaps to this
-    maxPop: 70, // live walkers - kept calm, this sits behind a UI
-    popPerBirth: 2,
+    maxPop: 80, // live walkers - kept calm, this sits behind a UI
+    popPerBirth: 4,
     lifespan: 420, // frames before a walker dies
     speed: 0.12, // cells advanced per frame
-    trailCells: 22, // trail length in cells -> also the fade window
-    straightBias: 6, // how strongly a walker prefers to carry straight on
-    boardAlpha: 0.5, // opacity of the static PCB layer
+    trailCells: 24, // trail length in cells -> also the fade window
+    straightBias: 8, // how strongly a walker prefers to carry straight on
+    boardAlpha: 0.8, // opacity of the static PCB layer
     traceWidth: 1.4,
-    buckets: 14 // alpha quantisation (perf: strokes per frame)
+    buckets: 16 // alpha quantisation (perf: strokes per frame)
   };
 
   var DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
