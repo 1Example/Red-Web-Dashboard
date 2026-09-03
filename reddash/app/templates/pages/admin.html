@@ -89,6 +89,11 @@
                                 <i class="fa fa-file-text opacity-10" style="vertical-align: 0px;"></i> {{ _("Custom Pages") }}
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if page and page == "logs" %}show active{% endif %}" id="logs-tab" data-toggle="pill" href="#logs" role="tab" aria-controls="logs" aria-selected="true">
+                                <i class="fa fa-terminal opacity-10" style="vertical-align: 0px;"></i> {{ _("Console") }}
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -371,6 +376,45 @@
                 </div>
             </div>
 
+            <div class="tab-pane fade {% if page and page == "logs" %}show active{% endif %}" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+                <div class="card card-chart">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                            <h2 class="card-title mb-0"><i class="fa fa-terminal me-2 opacity-8"></i>{{ _("Console") }}</h2>
+                            <span class="text-sm text-secondary" id="cx-log-status">{{ _("Connecting...") }}</span>
+                        </div>
+                        <p class="text-sm text-secondary">
+                            {{ _("Live log output from the bot, newest at the bottom. This is a rolling in-memory buffer, not an archive - the bot's log files still hold the full history. Only what the bot's configured verbosity emits shows up here.") }}
+                        </p>
+
+                        <div class="cx-log-bar">
+                            <div class="cx-log-levels" id="cx-log-levels">
+                                <label class="cx-log-lvl" data-level="DEBUG"><input type="checkbox" value="DEBUG" /> DEBUG</label>
+                                <label class="cx-log-lvl" data-level="INFO"><input type="checkbox" value="INFO" checked /> INFO</label>
+                                <label class="cx-log-lvl" data-level="WARNING"><input type="checkbox" value="WARNING" checked /> WARNING</label>
+                                <label class="cx-log-lvl" data-level="ERROR"><input type="checkbox" value="ERROR" checked /> ERROR</label>
+                                <label class="cx-log-lvl" data-level="CRITICAL"><input type="checkbox" value="CRITICAL" checked /> CRITICAL</label>
+                            </div>
+                            <input type="text" class="form-control form-control-sm cx-log-search" id="cx-log-search"
+                                   placeholder="{{ _('Filter by text, logger or traceback...') }}" autocomplete="off" />
+                            <button type="button" class="btn btn-sm btn-outline-secondary mb-0" id="cx-log-pause">
+                                <i class="fa fa-pause"></i> <span>{{ _("Pause") }}</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mb-0" id="cx-log-clear">
+                                <i class="fa fa-eraser"></i> {{ _("Clear") }}
+                            </button>
+                            <label class="cx-log-lvl mb-0" title="{{ _('Follow new lines') }}">
+                                <input type="checkbox" id="cx-log-follow" checked /> {{ _("Follow") }}
+                            </label>
+                        </div>
+
+                        <div class="cx-log-view" id="cx-log-view">
+                            <div class="cx-log-empty" id="cx-log-empty">{{ _("Waiting for log output...") }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -431,6 +475,217 @@
             window.dispatchEvent(resize_event);
         }
     </script>
+    <script>
+        var LOGS_URL         = "{{ url_for('base_blueprint.admin_logs_data') }}";
+        var GAP_TEXT         = "{{ _('earlier lines dropped from the buffer') }}";
+        var TXT_FORBIDDEN    = "{{ _('Not authorised.') }}";
+        var TXT_DISCONNECTED = "{{ _('Bot disconnected.') }}";
+        var TXT_UNAVAILABLE  = "{{ _('Log capture unavailable.') }}";
+        var TXT_BUFFERED     = "{{ _('lines buffered') }}";
+        var TXT_PAUSE        = "{{ _('Pause') }}";
+        var TXT_RESUME       = "{{ _('Resume') }}";
+        var TXT_NO_LEVELS    = "{{ _('No log levels selected.') }}";
+        var TXT_WAITING      = "{{ _('Waiting for log output...') }}";
+    </script>
+    <script>
+    // ---- Owner-only log console -------------------------------------------
+    // Polls /admin/logs/data with the sequence number of the newest record it
+    // has, so each request carries back only what is new. Polling rather than a
+    // socket because the dashboard already talks to the bot over request and
+    // response RPC, and a console that updates once a second is fast enough.
+    (function () {
+        var view = document.getElementById("cx-log-view");
+        if (!view) return;
+        var empty    = document.getElementById("cx-log-empty");
+        var status   = document.getElementById("cx-log-status");
+        var search   = document.getElementById("cx-log-search");
+        var follow   = document.getElementById("cx-log-follow");
+        var pauseBtn = document.getElementById("cx-log-pause");
+        var clearBtn = document.getElementById("cx-log-clear");
+        var levelBox = document.getElementById("cx-log-levels");
+
+        var POLL_MS = 1500;
+        // Hard cap on DOM rows. The server buffer is larger, but a console that
+        // grows without limit takes the tab down with it.
+        var MAX_ROWS = 1500;
+
+        var cursor = 0, paused = false, inFlight = false;
+        var timer = null, searchTimer = null, visible = false;
+
+        function levels() {
+            return Array.prototype.slice
+                .call(levelBox.querySelectorAll("input:checked"))
+                .map(function (i) { return i.value; });
+        }
+
+        function pad(n) { return n < 10 ? "0" + n : "" + n; }
+        function clock(epochSeconds) {
+            var d = new Date(epochSeconds * 1000);
+            return pad(d.getHours()) + ":" + pad(d.getMinutes()) + ":" + pad(d.getSeconds());
+        }
+
+        function atBottom() {
+            return view.scrollHeight - view.scrollTop - view.clientHeight < 40;
+        }
+
+        function trim() {
+            while (view.children.length > MAX_ROWS) view.removeChild(view.firstChild);
+        }
+
+        function showEmpty() {
+            view.innerHTML = "";
+            view.appendChild(empty);
+            empty.style.display = "";
+        }
+
+        function reset() { cursor = 0; showEmpty(); }
+
+        function addGap(text) {
+            var el = document.createElement("div");
+            el.className = "cx-log-gap";
+            el.textContent = text;
+            view.appendChild(el);
+        }
+
+        function addRow(rec) {
+            var row = document.createElement("div");
+            row.className = "cx-log-row lvl-" + rec.level;
+
+            var t = document.createElement("span");
+            t.className = "cx-log-time";
+            t.textContent = clock(rec.time);
+
+            var lvl = document.createElement("span");
+            lvl.className = "cx-log-level";
+            lvl.textContent = rec.level;
+
+            var name = document.createElement("span");
+            name.className = "cx-log-name";
+            name.textContent = rec.logger;
+            name.title = rec.logger;
+
+            // textContent throughout: log lines are arbitrary text from every
+            // server the bot is in and must never be parsed as markup.
+            var msg = document.createElement("span");
+            msg.className = "cx-log-msg";
+            msg.textContent = rec.message;
+
+            row.appendChild(t);
+            row.appendChild(lvl);
+            row.appendChild(name);
+            row.appendChild(msg);
+
+            if (rec.traceback) {
+                var det = document.createElement("details");
+                det.className = "cx-log-tb";
+                var sum = document.createElement("summary");
+                sum.textContent = "traceback";
+                var pre = document.createElement("pre");
+                pre.textContent = rec.traceback;
+                det.appendChild(sum);
+                det.appendChild(pre);
+                row.appendChild(det);
+            }
+            view.appendChild(row);
+        }
+
+        function render(data) {
+            var stick = follow.checked && atBottom();
+            // Either kind of break in the stream: the buffer rolled past this
+            // page's cursor, or this response alone hit the server's limit.
+            if (data.gap || data.truncated) addGap(GAP_TEXT);
+            if (data.records && data.records.length) {
+                if (empty.parentNode === view) view.removeChild(empty);
+                data.records.forEach(addRow);
+                trim();
+            }
+            if (stick) view.scrollTop = view.scrollHeight;
+        }
+
+        function setStatus(text, danger) {
+            status.textContent = text;
+            status.style.color = danger ? "#ff8b8b" : "";
+        }
+
+        function poll() {
+            if (paused || inFlight || !visible) return;
+
+            // No level checked means no rows can match. Sending an empty level
+            // list would read on the server as "no filter" and show everything,
+            // which is the opposite of what unticking them all asks for.
+            var wanted = levels();
+            if (!wanted.length) {
+                showEmpty();
+                empty.textContent = TXT_NO_LEVELS;
+                setStatus(TXT_NO_LEVELS, false);
+                return;
+            }
+            empty.textContent = TXT_WAITING;
+            inFlight = true;
+
+            var params = new URLSearchParams();
+            params.set("after", cursor);
+            wanted.forEach(function (l) { params.append("level", l); });
+            if (search.value.trim()) params.set("q", search.value.trim());
+
+            fetch(LOGS_URL + "?" + params.toString(), { headers: { "Accept": "application/json" } })
+                .then(function (r) {
+                    if (r.status === 403) throw new Error(TXT_FORBIDDEN);
+                    if (!r.ok) throw new Error("HTTP " + r.status);
+                    return r.json();
+                })
+                .then(function (data) {
+                    if (data.disconnected) { setStatus(TXT_DISCONNECTED, true); return; }
+                    if (data.status !== 0) {
+                        setStatus(data.error || TXT_UNAVAILABLE, true);
+                        return;
+                    }
+                    cursor = data.cursor || cursor;
+                    render(data);
+                    setStatus(data.buffered + " / " + data.capacity + " " + TXT_BUFFERED, false);
+                })
+                .catch(function (err) { setStatus(err.message, true); })
+                .then(function () { inFlight = false; });
+        }
+
+        function start() { if (!timer) { poll(); timer = setInterval(poll, POLL_MS); } }
+        function stop()  { if (timer) { clearInterval(timer); timer = null; } }
+
+        pauseBtn.addEventListener("click", function () {
+            paused = !paused;
+            pauseBtn.querySelector("span").textContent = paused ? TXT_RESUME : TXT_PAUSE;
+            pauseBtn.querySelector("i").className = paused ? "fa fa-play" : "fa fa-pause";
+            if (!paused) poll();
+        });
+
+        clearBtn.addEventListener("click", function () {
+            // Clears this view only; the bot's buffer is untouched, so the
+            // cursor stays put and the console picks up from where it was.
+            showEmpty();
+        });
+
+        // A filter change re-asks from the start of the buffer, since records
+        // that were filtered out before may now match.
+        levelBox.addEventListener("change", function () { reset(); poll(); });
+        search.addEventListener("input", function () {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(function () { reset(); poll(); }, 300);
+        });
+
+        // Only poll while the tab is actually on screen, and stop while the
+        // browser tab is in the background.
+        function sync() {
+            var pane = document.getElementById("logs");
+            visible = !!pane && pane.classList.contains("active") && !document.hidden;
+            if (visible) { start(); } else { stop(); }
+        }
+        document.addEventListener("visibilitychange", sync);
+        $('#profile a[data-toggle="pill"]').on("shown.bs.tab", sync);
+        document.addEventListener("DOMContentLoaded", sync);
+        sync();
+    })();
+    </script>
+
     <script>
         function changePage(page) {
             var tab_nav_link = document.querySelector("#" + page + "-tab");

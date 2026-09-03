@@ -16,8 +16,7 @@
         <div class="row">
             {% if guild and not expanded and not fullscreen and not bare %}
             <div class="col-12 mt-4">
-              <div class="card cx-guild-hero{% if guild.banner_url %} cx-has-banner{% endif %}"
-                   {% if guild.banner_url %}style="--cx-banner: url('{{ guild.banner_url }}');"{% endif %}>
+              <div class="card cx-guild-hero">
                 <div class="card-body py-3">
                   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
 

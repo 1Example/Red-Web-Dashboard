@@ -14,6 +14,16 @@
   --cx-text-dim:      #9aa4b2;
   --cx-topbar-h:      56px;
   --cx-radius:        12px;
+
+  /* One surface vocabulary for the whole shell. Every panel is one of these
+     three, so a card, a home tile and a module page all read as the same
+     material instead of each picking its own grey. */
+  --cx-panel:         rgba(0, 16, 135, 0.23);      /* top level: .card       */
+  --cx-panel-bd:      rgba(130, 175, 255, 0.16);
+  --cx-panel-2:       rgba(90, 130, 220, 0.07);    /* nested inside a panel  */
+  --cx-panel-2-bd:    rgba(120, 160, 255, 0.10);
+  --cx-panel-3:       rgba(255, 255, 255, 0.045);  /* smallest tiles / wells */
+  --cx-panel-3-bd:    rgba(255, 255, 255, 0.08);
 }
 
 /* ---------- base surface ---------- */
@@ -739,42 +749,17 @@ span.flatpickr-weekday {
 }
 
 /* Merged guild hero.
-   The banner can't be set as the card's own background: our own
-   `div.card:not(...) { background: ... !important }` rule outranks an inline
-   background-image. So the image is passed in as a custom property (--cx-banner)
-   and painted on a ::before layer, which nothing overrides. */
-/* No `overflow: hidden` here: it kept the banner inside the rounded corners,
-   but it also clipped the server-switcher dropdown to the height of the card,
-   which on a module page is a single row. The banner layers below round
-   themselves off instead, so nothing needs clipping. z-index lifts the card
-   above the ones that follow it, or an open menu paints underneath them. */
+   The hero card also wraps the tab panes, so anything painted on its own
+   background sits behind the entire page, not just the header strip. The
+   server banner used to be layered in here as a ::before, which is why every
+   settings form and module page was reading through a picture of the server.
+   The banner belongs to the Overview tab (`.cx-ov-banner`), where it is a
+   deliberate element rather than wallpaper. */
+/* No `overflow: hidden` here: it would clip the server-switcher dropdown to
+   the height of the card, which on a module page is a single row. z-index
+   lifts the card above the ones that follow it, or an open menu paints
+   underneath them. */
 .cx-guild-hero { position: relative; z-index: 5; }
-.cx-guild-hero.cx-has-banner {
-  border: 1px solid rgba(130, 175, 255, 0.16) !important;
-}
-.cx-guild-hero.cx-has-banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background-image: var(--cx-banner);
-  background-size: cover;
-  background-position: center;
-  opacity: 0.55;
-  z-index: 0;
-}
-/* Readability wash over the banner, strongest on the left where the name sits. */
-.cx-guild-hero.cx-has-banner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(to right,
-    rgba(5, 7, 11, 0.94) 0%,
-    rgba(5, 7, 11, 0.78) 45%,
-    rgba(5, 7, 11, 0.55) 100%);
-  z-index: 0;
-}
 .cx-guild-hero > * { position: relative; z-index: 1; }
 .cx-guild-hero .card-body { background: transparent !important; }
 
@@ -835,6 +820,239 @@ span.flatpickr-weekday {
   border-radius: 14px !important;
   box-shadow: none !important;
   margin: 20px 24px 24px;
+}
+
+/* ==========================================================================
+   Third-party module content
+
+   `source_content` is whatever HTML a cog hands us. Cogs are written against
+   stock Argon (or against nothing at all), so they arrive with light or flat
+   grey surfaces and, often, a narrow centred column sized for a page that had
+   a sidenav. Both look wrong in this shell: a grey slab in a blue translucent
+   stack, floating in the middle of a 1900px page.
+
+   These rules are deliberately broad. They are the shell asserting its own
+   palette and page width over markup it does not control, so a module that
+   nobody has themed still lands on-design.
+   ========================================================================== */
+
+/* Width. Bootstrap's `.container*` caps and any hand-rolled centred wrapper
+   get released, so a module fills the page the way our own tabs do. The
+   horizontal padding stays: `.row` inside a container relies on it to absorb
+   its own negative margins. */
+#third-party-content .container,
+#third-party-content .container-sm,
+#third-party-content .container-md,
+#third-party-content .container-lg,
+#third-party-content .container-xl,
+#third-party-content .container-xxl,
+#third-party-content .container-fluid {
+  max-width: none !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Surfaces. Anything a cog paints as grey/white/dark gets the nested-panel
+   material instead. `.card` is already handled by the specificity guard
+   above; these are the utility classes and generic panel names cogs reach
+   for when they are not using a card. */
+#third-party-content .panel,
+#third-party-content .well,
+#third-party-content .bg-light,
+#third-party-content .bg-white,
+#third-party-content .bg-dark,
+#third-party-content .bg-secondary,
+#third-party-content .bg-gray,
+#third-party-content .bg-gray-100,
+#third-party-content .bg-gray-200,
+#third-party-content .bg-gray-300,
+#third-party-content .list-group-item {
+  background: var(--cx-panel-2) !important;
+  border-color: var(--cx-panel-2-bd) !important;
+  color: var(--cx-text) !important;
+}
+
+/* Card headers inside a module: hairline, not a filled grey band. */
+#third-party-content .card > .card-header,
+#third-party-content .card > .card-footer {
+  background: transparent !important;
+  border-color: var(--cx-panel-2-bd) !important;
+}
+
+/* Read-only text blocks (prompt bodies, transcripts, JSON dumps) are the
+   usual source of a flat grey rectangle. */
+#third-party-content pre,
+#third-party-content code:not(.cx-prefix),
+#third-party-content .form-control[readonly],
+#third-party-content textarea[readonly] {
+  background: var(--cx-panel-3) !important;
+  border: 1px solid var(--cx-panel-3-bd) !important;
+  color: var(--cx-text) !important;
+}
+#third-party-content pre {
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+/* Tables ship light striping and light borders. */
+#third-party-content .table {
+  color: var(--cx-text) !important;
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: rgba(255, 255, 255, .03);
+  --bs-table-striped-color: var(--cx-text);
+  --bs-table-hover-bg: rgba(255, 255, 255, .05);
+  --bs-table-hover-color: var(--cx-text);
+}
+#third-party-content .table > :not(caption) > * > * {
+  border-bottom-color: var(--cx-panel-2-bd) !important;
+  background-color: transparent;
+}
+#third-party-content .table thead th {
+  color: var(--cx-text-dim) !important;
+  border-bottom-color: var(--cx-panel-bd) !important;
+}
+
+/* Modules that lay their own sections out in one column get to use the width
+   they were just handed, on screens wide enough to want it. */
+@media (min-width: 1500px) {
+  #third-party-content .cx-tp-cols {
+    column-count: 2;
+    column-gap: 20px;
+  }
+  #third-party-content .cx-tp-cols > * {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+}
+
+/* ==========================================================================
+   Owner-only log console (/admin/logs)
+   ========================================================================== */
+
+.cx-log-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: var(--cx-panel-2);
+  border: 1px solid var(--cx-panel-2-bd);
+}
+.cx-log-levels { display: flex; gap: 4px; flex-wrap: wrap; }
+.cx-log-lvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  cursor: pointer;
+  color: var(--cx-text-dim);
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
+  user-select: none;
+}
+.cx-log-lvl input { accent-color: #5aa9ff; margin: 0; }
+.cx-log-lvl:hover { color: var(--cx-text); }
+/* The level a row carries is the fastest thing to scan for, so each keeps its
+   colour in the filter bar as well as in the stream. */
+.cx-log-lvl[data-level="WARNING"] { color: #f0aa3c; }
+.cx-log-lvl[data-level="ERROR"],
+.cx-log-lvl[data-level="CRITICAL"] { color: #ff8b8b; }
+.cx-log-search { flex: 1 1 220px; min-width: 160px; max-width: 460px; }
+
+.cx-log-view {
+  height: min(760px, calc(100vh - 330px));
+  min-height: 320px;
+  overflow-y: auto;
+  overflow-x: auto;
+  padding: 8px 0;
+  border-radius: 12px;
+  background: rgba(2, 5, 16, .55);
+  border: 1px solid var(--cx-panel-2-bd);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: .76rem;
+  line-height: 1.5;
+}
+.cx-log-empty { padding: 18px; text-align: center; color: var(--cx-text-dim); }
+
+.cx-log-row {
+  display: grid;
+  grid-template-columns: 74px 68px minmax(90px, 210px) minmax(0, 1fr);
+  gap: 10px;
+  padding: 2px 12px;
+  border-left: 2px solid transparent;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cx-log-row:hover { background: rgba(255, 255, 255, .04); }
+.cx-log-time { color: var(--cx-text-dim); opacity: .7; }
+.cx-log-level { font-weight: 700; letter-spacing: .03em; }
+.cx-log-name { color: #8ea6ff; opacity: .85; overflow: hidden; text-overflow: ellipsis; }
+.cx-log-msg { color: var(--cx-text); }
+
+.cx-log-row.lvl-DEBUG    { color: var(--cx-text-dim); }
+.cx-log-row.lvl-DEBUG .cx-log-level { color: #7f8da3; }
+.cx-log-row.lvl-INFO .cx-log-level { color: #5aa9ff; }
+.cx-log-row.lvl-WARNING  { border-left-color: rgba(240, 170, 60, .7);
+                           background: rgba(240, 170, 60, .05); }
+.cx-log-row.lvl-WARNING .cx-log-level { color: #f0aa3c; }
+.cx-log-row.lvl-ERROR,
+.cx-log-row.lvl-CRITICAL { border-left-color: rgba(255, 90, 90, .75);
+                           background: rgba(255, 90, 90, .07); }
+.cx-log-row.lvl-ERROR .cx-log-level,
+.cx-log-row.lvl-CRITICAL .cx-log-level { color: #ff8b8b; }
+
+/* Tracebacks are folded away: an unfolded one is 20+ lines and would bury the
+   surrounding context, which is usually what you are actually reading. */
+.cx-log-tb { grid-column: 4; margin: 3px 0 5px; }
+.cx-log-tb summary {
+  cursor: pointer;
+  color: #ff8b8b;
+  font-size: .72rem;
+  opacity: .85;
+  list-style: none;
+}
+.cx-log-tb summary::-webkit-details-marker { display: none; }
+.cx-log-tb summary::before { content: "▸ "; }
+.cx-log-tb[open] summary::before { content: "▾ "; }
+.cx-log-tb pre {
+  margin: 5px 0 0;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .38);
+  border: 1px solid rgba(255, 90, 90, .22);
+  color: #ffb3b3;
+  font-size: .72rem;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* A break in the stream: the buffer rolled past where this page had got to. */
+.cx-log-gap {
+  margin: 6px 12px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  text-align: center;
+  font-size: .7rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #f0aa3c;
+  background: rgba(240, 170, 60, .09);
+  border: 1px dashed rgba(240, 170, 60, .38);
+}
+
+@media (max-width: 900px) {
+  /* Four columns do not fit; the logger name is the one worth dropping. */
+  .cx-log-row { grid-template-columns: 66px 60px minmax(0, 1fr); }
+  .cx-log-name { display: none; }
+  .cx-log-tb { grid-column: 3; }
 }
 
 /* Proper back button (replaces the 🔙 emoji in third-party page headings). */
@@ -1514,7 +1732,6 @@ span.flatpickr-weekday {
   text-align: center;
   background: rgba(0, 0, 0, .38);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
-  backdrop-filter: blur(6px);
 }
 .cx-profile-stat b {
   display: block;
@@ -1540,6 +1757,9 @@ span.flatpickr-weekday {
   gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 }
+/* These sit inside the "Your servers" card, so they take the nested-panel
+   surface - not `--cx-surface`, which is 98% opaque and made them read as
+   solid slabs punched into a translucent card. */
 .cx-home-card {
   display: flex;
   flex-direction: column;
@@ -1547,12 +1767,16 @@ span.flatpickr-weekday {
   min-width: 0;
   padding: 14px 16px;
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #0e131c);
-  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  background: var(--cx-panel-2);
+  border: 1px solid var(--cx-panel-2-bd);
   border-left: 3px solid rgba(255, 255, 255, .10);
   transition: background .15s, transform .08s, border-color .15s;
 }
-.cx-home-card:hover { background: var(--cx-surface-2, #141b26); transform: translateY(-1px); }
+.cx-home-card:hover {
+  background: rgba(90, 130, 220, .13);
+  border-color: var(--cx-panel-bd);
+  transform: translateY(-1px);
+}
 /* A server you can actually act on is worth spotting at a glance. */
 .cx-home-card.cx-home-manage { border-left-color: #6c8cff; }
 
@@ -1613,8 +1837,8 @@ span.flatpickr-weekday {
   padding: 7px 4px;
   border-radius: 9px;
   text-align: center;
-  background: rgba(0, 0, 0, .28);
-  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
 }
 .cx-home-stats b {
   display: block;
@@ -1647,10 +1871,8 @@ span.flatpickr-weekday {
    stays a light layer on top rather than a second opaque slab. */
 .cx-botface {
   border-radius: var(--cx-radius, 12px);
-  background: rgba(255, 255, 255, .035);
-  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: var(--cx-panel-2);
+  border: 1px solid var(--cx-panel-2-bd);
   overflow: hidden;
   margin-bottom: 20px;
 }
@@ -1676,10 +1898,12 @@ span.flatpickr-weekday {
 @media (max-width: 900px) { .cx-botface-body { grid-template-columns: minmax(0, 1fr); } }
 
 /* A stand-in for the profile card members see in this server. */
+/* Deliberately the darkest well on the page - it stands in for a Discord
+   profile popout - but tinted into the shell's blue family, not flat black. */
 .cx-botface-card {
   border-radius: var(--cx-radius, 12px);
-  background: rgba(0, 0, 0, .38);
-  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  background: rgba(4, 10, 32, .55);
+  border: 1px solid var(--cx-panel-2-bd);
   overflow: hidden;
 }
 .cx-botface-banner {

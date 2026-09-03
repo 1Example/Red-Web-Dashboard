@@ -925,7 +925,10 @@ class CustomPagesForm(FlaskForm):
 @blueprint.route("/admin", methods=("GET", "POST"))
 @login_required
 async def admin(
-    page: typing.Literal["overview", "dashboard-settings", "bot-settings", "custom_pages"] | None = None,
+    page: typing.Literal[
+        "overview", "dashboard-settings", "bot-settings", "custom_pages", "logs"
+    ]
+    | None = None,
 ):
     if not current_user.is_authenticated or not current_user.is_owner:
         return abort(403, description=_("You're not a bot owner!"))
@@ -1122,7 +1125,7 @@ async def admin(
         "pages/admin.html",
         page=page
         if page is not None
-        and page in ("overview", "dashboard-settings", "bot-settings", "custom-pages")
+        and page in ("overview", "dashboard-settings", "bot-settings", "custom-pages", "logs")
         else "overview",
         uptime_str=uptime_str,
         connection_str=connection_str,
@@ -1132,6 +1135,41 @@ async def admin(
         bot_settings_form=bot_settings_form,
         custom_pages_form=custom_pages_form,
     )
+
+
+@blueprint.route("/admin/logs/data")
+@login_required
+async def admin_logs_data():
+    """Polled by the log console for anything newer than its cursor.
+
+    Owner-only, like the page it feeds: log lines carry member names, channel
+    names, command arguments and tracebacks from every server the bot is in.
+    """
+    if not current_user.is_authenticated or not current_user.is_owner:
+        return abort(403, description=_("You're not a bot owner!"))
+
+    try:
+        after = int(request.args.get("after", 0))
+    except (TypeError, ValueError):
+        after = 0
+    try:
+        limit = int(request.args.get("limit", 400))
+    except (TypeError, ValueError):
+        limit = 400
+
+    levels = [lvl for lvl in request.args.getlist("level") if lvl] or None
+    query = (request.args.get("q") or "").strip() or None
+
+    requeststr = {
+        "jsonrpc": "2.0",
+        "id": 0,
+        "method": "DASHBOARDRPC__GET_LOGS",
+        "params": [current_user.id, after, limit, levels, query],
+    }
+    result = await get_result(app, requeststr)
+    # `get_result` reports a bot that is down as `disconnected`; the console
+    # shows that as a banner instead of silently freezing on a stale cursor.
+    return make_response(jsonify(result))
 
 
 class CogForm(FlaskForm):
