@@ -248,6 +248,74 @@
                     <div class="tab-pane fade {% if page and page == "settings" %}show active{% endif %}" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                         <div class="cx-pane-body">
                                 <div class="row">
+                                    {# How the bot looks in THIS server only.
+                                       Discord keeps a separate avatar, banner
+                                       and bio per member, so none of this
+                                       touches the bot's global profile or any
+                                       other server. #}
+                                    <div class="mt-4">
+                                      <form action="" method="POST" role="form" enctype="multipart/form-data">
+                                        {{ guild_bot_profile_form.hidden_tag() }}
+                                        <div class="cx-botface">
+                                          <div class="cx-botface-head">
+                                            <h5><i class="fa fa-picture-o"></i> {{ _("Bot appearance here") }}</h5>
+                                            <span>{{ _("Only affects this server.") }}</span>
+                                          </div>
+
+                                          <div class="cx-botface-body">
+                                            <div class="cx-botface-preview"
+                                                 {% if bot_profile.banner_url %}
+                                                   style="background-image:url('{{ bot_profile.banner_url }}');"
+                                                 {% endif %}>
+                                              <img src="{{ bot_profile.avatar_url or bot_profile.global_avatar_url }}"
+                                                   alt="" class="cx-botface-avatar" />
+                                              {% if not bot_profile.avatar_url %}
+                                                <span class="cx-botface-tag">{{ _("Global avatar") }}</span>
+                                              {% endif %}
+                                            </div>
+
+                                            <div class="cx-botface-fields">
+                                              <div class="cx-botface-row">
+                                                <label>{{ guild_bot_profile_form.avatar.label.text }}</label>
+                                                {{ guild_bot_profile_form.avatar(class="form-control form-control-default", accept="image/*") }}
+                                                <div class="cx-botface-acts">
+                                                  <button type="submit" class="cx-mini" name="guild_bot_profile_form_avatar_action" value="reset"
+                                                          formnovalidate>{{ _("Use global") }}</button>
+                                                  <button type="submit" class="cx-mini cx-mini-danger" name="guild_bot_profile_form_avatar_action" value="clear"
+                                                          formnovalidate>{{ _("Clear") }}</button>
+                                                </div>
+                                              </div>
+
+                                              <div class="cx-botface-row">
+                                                <label>{{ guild_bot_profile_form.banner.label.text }}</label>
+                                                {{ guild_bot_profile_form.banner(class="form-control form-control-default", accept="image/*") }}
+                                                <div class="cx-botface-acts">
+                                                  <button type="submit" class="cx-mini" name="guild_bot_profile_form_banner_action" value="reset"
+                                                          formnovalidate>{{ _("Use global") }}</button>
+                                                  <button type="submit" class="cx-mini cx-mini-danger" name="guild_bot_profile_form_banner_action" value="clear"
+                                                          formnovalidate>{{ _("Clear") }}</button>
+                                                </div>
+                                              </div>
+
+                                              <div class="cx-botface-row">
+                                                <label>{{ guild_bot_profile_form.bio.label.text }}</label>
+                                                {{ guild_bot_profile_form.bio(class="form-control form-control-default",
+                                                    maxlength=bot_profile.bio_limit or 190,
+                                                    placeholder=_("Something short about the bot in this server")) }}
+                                                <div class="cx-botface-hint">
+                                                  {{ _("Up to") }} {{ bot_profile.bio_limit or 190 }} {{ _("characters.") }}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          <div class="cx-botface-foot">
+                                            {{ guild_bot_profile_form.submit(class="btn bg-gradient-" + variables["meta"]["color"] + " mb-0") }}
+                                          </div>
+                                        </div>
+                                      </form>
+                                    </div>
+
                                     <div class="mt-4">
                                         <form action="" method="POST" role="form" enctype="multipart/form-data">
                                             {{ guild_settings_form.hidden_tag() }}

@@ -170,6 +170,95 @@
 
       </div>
 
+      <!-- ===== Your servers ===== -->
+      {% if home_guilds %}
+        <div class="card mb-4">
+          <div class="card-header pb-2 d-flex align-items-center flex-wrap gap-2">
+            <h5 class="mb-0"><i class="ni ni-world-2 me-2 opacity-8"></i>{{ _("Your servers") }}</h5>
+            <span class="cx-count">{{ home_guilds_total }}</span>
+            <span class="text-xs text-secondary ms-auto">
+              {{ _("Servers you share with this bot.") }}
+            </span>
+          </div>
+          <div class="card-body pt-2">
+            <div class="cx-home-grid">
+              {% for g in home_guilds %}
+                <div class="cx-home-card{% if g.can_manage %} cx-home-manage{% endif %}">
+                  <div class="cx-home-top">
+                    {% if g.icon %}
+                      <img class="cx-home-ico" src="{{ g.icon }}" alt="" loading="lazy" />
+                    {% else %}
+                      <span class="cx-home-ico cx-home-ico-ph">{{ g.name[:1]|upper }}</span>
+                    {% endif %}
+                    <div class="cx-home-name">
+                      <b>{{ g.name }}</b>
+                      <span>
+                        {% if g.is_owner %}{{ _("You own it") }}
+                        {% elif g.owner %}{{ _("Owned by") }} {{ g.owner }}{% endif %}
+                      </span>
+                    </div>
+                    {% if g.boosts %}
+                      <span class="cx-home-boost" title="{{ _("Boosts") }}">
+                        <i class="fa fa-angle-double-up"></i>{{ g.boosts }}
+                      </span>
+                    {% endif %}
+                  </div>
+
+                  <div class="cx-home-stats">
+                    <div>
+                      <b>{{ number_to_text_with_suffix(g.members) }}</b>
+                      <span>{{ _("members") }}</span>
+                    </div>
+                    {% if g.online is not none %}
+                      <div>
+                        <b class="cx-home-online">{{ number_to_text_with_suffix(g.online) }}</b>
+                        <span>{{ _("online") }}</span>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <b>{{ g.text_channels }}</b>
+                      <span>{{ _("text") }}</span>
+                    </div>
+                    <div>
+                      <b>{{ g.voice_channels }}</b>
+                      <span>{{ _("voice") }}</span>
+                    </div>
+                    <div>
+                      <b>{{ g.roles }}</b>
+                      <span>{{ _("roles") }}</span>
+                    </div>
+                    <div>
+                      <b>{{ g.emojis }}</b>
+                      <span>{{ _("emojis") }}</span>
+                    </div>
+                  </div>
+
+                  <div class="cx-home-foot">
+                    {% if g.created_at %}
+                      <span class="text-xs text-secondary">
+                        <i class="fa fa-calendar-o"></i>
+                        {{ _("Created") }} {{ moment(g.created_at).format("MMM YYYY") }}
+                      </span>
+                    {% endif %}
+                    {% if g.can_manage %}
+                      <a class="cx-home-go"
+                         href="{{ url_for("base_blueprint.dashboard_guild", guild_id=g.id) }}">
+                        {{ _("Manage") }} <i class="fa fa-angle-right"></i>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if home_guilds_total > home_guilds|length %}
+              <p class="text-xs text-secondary mt-3 mb-0">
+                {{ _("Showing") }} {{ home_guilds|length }} {{ _("of") }} {{ home_guilds_total }}.
+              </p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
     </div>
   </main>
 {% endblock %}

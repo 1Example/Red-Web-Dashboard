@@ -1532,3 +1532,200 @@ span.flatpickr-weekday {
 @media (max-width: 900px) {
   .cx-profile-stat { flex: 1 1 70px; min-width: 70px; padding: 7px 11px; }
 }
+
+/* ---------- home: your servers ---------- */
+
+.cx-home-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+.cx-home-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: var(--cx-radius, 12px);
+  background: var(--cx-surface, #0e131c);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  border-left: 3px solid rgba(255, 255, 255, .10);
+  transition: background .15s, transform .08s, border-color .15s;
+}
+.cx-home-card:hover { background: var(--cx-surface-2, #141b26); transform: translateY(-1px); }
+/* A server you can actually act on is worth spotting at a glance. */
+.cx-home-card.cx-home-manage { border-left-color: #6c8cff; }
+
+.cx-home-top { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.cx-home-ico {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 12px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, .07);
+}
+.cx-home-ico-ph {
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+.cx-home-name { min-width: 0; flex: 1 1 auto; }
+.cx-home-name b {
+  display: block;
+  font-size: .93rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cx-home-name span {
+  display: block;
+  font-size: .72rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cx-home-boost {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 800;
+  color: #ff8ae2;
+  background: rgba(255, 115, 250, .12);
+  border: 1px solid rgba(255, 115, 250, .32);
+}
+
+/* Three across, so six tiles read as two even rows. auto-fit packed five onto
+   the first row and left the sixth stranded on its own. */
+.cx-home-stats {
+  display: grid;
+  gap: 7px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.cx-home-stats > div {
+  padding: 7px 4px;
+  border-radius: 9px;
+  text-align: center;
+  background: rgba(0, 0, 0, .28);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-home-stats b {
+  display: block;
+  font-size: .92rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.cx-home-stats span {
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cx-text-dim, #9aa4b2);
+}
+.cx-home-online { color: #38d39f; }
+
+.cx-home-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cx-home-foot i { margin-right: 4px; opacity: .8; }
+.cx-home-go { font-size: .76rem; font-weight: 700; color: #8ea6ff; text-decoration: none; }
+.cx-home-go:hover { color: #b7c6ff; text-decoration: underline; }
+
+/* ---------- per-server bot appearance ---------- */
+
+.cx-botface {
+  border-radius: var(--cx-radius, 12px);
+  background: var(--cx-surface, #0e131c);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  overflow: hidden;
+}
+.cx-botface-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-botface-head h5 { margin: 0; font-size: .92rem; font-weight: 750; }
+.cx-botface-head h5 i { margin-right: 7px; opacity: .8; }
+.cx-botface-head span { font-size: .74rem; color: var(--cx-text-dim, #9aa4b2); }
+
+.cx-botface-body {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+}
+@media (max-width: 800px) { .cx-botface-body { grid-template-columns: minmax(0, 1fr); } }
+
+/* A live sample of the two assets together, since a banner and an avatar only
+   really make sense side by side. */
+.cx-botface-preview {
+  position: relative;
+  min-height: 132px;
+  border-radius: var(--cx-radius, 12px);
+  background: var(--cx-surface-2, #141b26) center/cover no-repeat;
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-botface-avatar {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--cx-bg-elev, #0c1017);
+  background: var(--cx-bg-elev, #0c1017);
+}
+.cx-botface-tag {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cx-text-dim, #9aa4b2);
+  background: rgba(0, 0, 0, .55);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+
+.cx-botface-fields { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.cx-botface-row label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.cx-botface-acts { display: flex; gap: 7px; margin-top: 7px; flex-wrap: wrap; }
+.cx-botface-hint { font-size: .72rem; color: var(--cx-text-dim, #9aa4b2); margin-top: 5px; }
+.cx-botface-foot {
+  padding: 0 18px 18px;
+}
+
+.cx-mini {
+  padding: 4px 11px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--cx-text-dim, #9aa4b2);
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-mini:hover { background: rgba(255, 255, 255, .12); color: var(--cx-text, #e6e9ef); }
+.cx-mini-danger:hover { color: #ff9d9d; border-color: rgba(255, 107, 107, .45); }

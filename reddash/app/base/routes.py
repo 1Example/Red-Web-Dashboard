@@ -47,7 +47,29 @@ from reddash.app.pagination import Pagination
 @blueprint.route("/index")
 @blueprint.route("/")
 async def index():
-    return render_template("pages/index.html")
+    # The server card is scoped to servers the visitor is actually in, so an
+    # anonymous visitor is never shown the bot's server list.
+    guilds = []
+    total = 0
+    if current_user.is_authenticated:
+        result = await get_result(
+            app,
+            {
+                "jsonrpc": "2.0",
+                "id": 0,
+                "method": "DASHBOARDRPC__GET_HOME_GUILDS",
+                "params": [current_user.id],
+            },
+        )
+        if isinstance(result, dict) and result.get("status") == 0:
+            guilds = result.get("guilds") or []
+            total = result.get("total") or 0
+            for guild in guilds:
+                if guild.get("created_at"):
+                    guild["created_at"] = datetime.datetime.fromtimestamp(
+                        guild["created_at"], tz=datetime.UTC
+                    )
+    return render_template("pages/index.html", home_guilds=guilds, home_guilds_total=total)
 
 
 @blueprint.route("/setcolor", methods=("POST",))
@@ -350,6 +372,32 @@ class BabelCheck:
         field.data = f"{locale.language}-{locale.territory}"
 
 
+class GuildBotProfileForm(FlaskForm):
+    """How the bot looks in one server.
+
+    Discord's "modify current member" endpoint takes an avatar, a banner and a
+    bio as well as a nickname, so a bot can wear a different face per server -
+    and unlike the global profile, changing it affects nobody else.
+    """
+
+    def __init__(self, profile: dict[str, typing.Any]) -> None:
+        super().__init__(prefix="guild_bot_profile_form_")
+        self.bio.default = profile.get("bio") or ""
+        self.bio.validators = [
+            wtforms.validators.Optional(),
+            wtforms.validators.Length(max=profile.get("bio_limit") or 190),
+        ]
+
+    avatar: FileField = FileField(_("Server avatar:"))
+    # "keep" leaves it alone, "reset" restores the bot's global asset, "clear"
+    # removes it. An uploaded file overrides whichever is set.
+    avatar_action: wtforms.HiddenField = wtforms.HiddenField(default="keep")
+    banner: FileField = FileField(_("Server banner:"))
+    banner_action: wtforms.HiddenField = wtforms.HiddenField(default="keep")
+    bio: wtforms.StringField = wtforms.StringField(_("Server bio:"))
+    submit: wtforms.SubmitField = wtforms.SubmitField(_("Save appearance"))
+
+
 class GuildSettingsForm(FlaskForm):
     def __init__(self, guild: dict[str, typing.Any]) -> None:
         super().__init__(prefix="guild_settings_form_")
@@ -471,6 +519,59 @@ async def dashboard_guild(
 
 
 
+    bot_profile = return_guild["guild"]["settings"].get("bot_profile") or {}
+    guild_bot_profile_form: GuildBotProfileForm = GuildBotProfileForm(profile=bot_profile)
+    if (
+        guild_bot_profile_form.validate_on_submit()
+        and guild_bot_profile_form.submit.data
+        and return_guild["guild"]["settings"]["edit_permission"]
+    ):
+        settings: dict[str, typing.Any] = {}
+
+        def _asset(file_field, action):
+            """An uploaded image as the data URI the endpoint expects."""
+            if file_field.data is not None:
+                raw = file_field.data.read() if hasattr(file_field.data, "read") else file_field.data
+                if raw:
+                    return "data:image/png;base64," + base64.b64encode(raw).decode()
+            if action == "reset":
+                return "reset"
+            if action == "clear":
+                return ""
+            return None
+
+        for name, field, action_field in (
+            ("avatar", guild_bot_profile_form.avatar, guild_bot_profile_form.avatar_action),
+            ("banner", guild_bot_profile_form.banner, guild_bot_profile_form.banner_action),
+        ):
+            value = _asset(field, action_field.data)
+            if value is not None:
+                settings[name] = value
+        if (guild_bot_profile_form.bio.data or "") != (bot_profile.get("bio") or ""):
+            settings["bio"] = guild_bot_profile_form.bio.data or ""
+
+        if not settings:
+            flash(_("Nothing to change."), category="info")
+        else:
+            result = await get_result(
+                app,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                    "method": "DASHBOARDRPC__SET_GUILD_BOT_PROFILE",
+                    "params": [current_user.id, return_guild["guild"]["id"], settings],
+                },
+            )
+            if isinstance(result, dict) and result.get("status") == 0:
+                flash(_("Updated how the bot looks in this server."), category="success")
+            else:
+                flash(
+                    (result or {}).get("message")
+                    or _("Could not update the bot's appearance here."),
+                    category="danger",
+                )
+        return redirect(request.url)
+
     guild_settings_form: GuildSettingsForm = GuildSettingsForm(guild=return_guild["guild"])
     if (
         guild_settings_form.validate_on_submit()
@@ -529,6 +630,8 @@ async def dashboard_guild(
         if page is not None and page in ("overview", "settings", "third-parties")
         else "overview",
         guild_settings_form=guild_settings_form,
+        guild_bot_profile_form=guild_bot_profile_form,
+        bot_profile=bot_profile,
         **return_third_parties,
         tab_name=None
         if third_party is None or third_party not in return_third_parties["third_parties"]
