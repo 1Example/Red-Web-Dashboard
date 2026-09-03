@@ -1643,85 +1643,182 @@ span.flatpickr-weekday {
 
 /* ---------- per-server bot appearance ---------- */
 
+/* This sits inside the guild hero card, which already paints a surface, so it
+   stays a light layer on top rather than a second opaque slab. */
 .cx-botface {
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface, #0e131c);
+  background: rgba(255, 255, 255, .035);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   overflow: hidden;
+  margin-bottom: 20px;
 }
 .cx-botface-head {
   display: flex;
   align-items: baseline;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 14px 18px;
+  padding: 13px 18px;
   border-bottom: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
 }
-.cx-botface-head h5 { margin: 0; font-size: .92rem; font-weight: 750; }
-.cx-botface-head h5 i { margin-right: 7px; opacity: .8; }
-.cx-botface-head span { font-size: .74rem; color: var(--cx-text-dim, #9aa4b2); }
+.cx-botface-head h5 { margin: 0; font-size: .88rem; font-weight: 700; }
+.cx-botface-head h5 i { margin-right: 7px; opacity: .65; }
+.cx-botface-head span { font-size: .73rem; color: var(--cx-text-dim, #9aa4b2); }
 
 .cx-botface-body {
   display: grid;
-  gap: 18px;
+  gap: 20px;
   padding: 18px;
-  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  align-items: start;
+  grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
 }
-@media (max-width: 800px) { .cx-botface-body { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .cx-botface-body { grid-template-columns: minmax(0, 1fr); } }
 
-/* A live sample of the two assets together, since a banner and an avatar only
-   really make sense side by side. */
-.cx-botface-preview {
-  position: relative;
-  min-height: 132px;
+/* A stand-in for the profile card members see in this server. */
+.cx-botface-card {
   border-radius: var(--cx-radius, 12px);
-  background: var(--cx-surface-2, #141b26) center/cover no-repeat;
+  background: rgba(0, 0, 0, .38);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+  overflow: hidden;
 }
-.cx-botface-avatar {
+.cx-botface-banner {
+  position: relative;
+  height: 108px;
+  background: rgba(255, 255, 255, .05) center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cx-botface-empty {
+  font-size: .68rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cx-text-dim, #9aa4b2);
+  opacity: .5;
+}
+.cx-botface-face {
+  position: relative;
+  height: 34px;
+  padding: 0 16px;
+}
+.cx-botface-face img {
   position: absolute;
   left: 16px;
-  bottom: 14px;
-  width: 72px;
-  height: 72px;
+  top: -38px;
+  width: 76px;
+  height: 76px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid var(--cx-bg-elev, #0c1017);
-  background: var(--cx-bg-elev, #0c1017);
+  border: 5px solid #0b0f16;
+  background: #0b0f16;
 }
 .cx-botface-tag {
   position: absolute;
-  right: 10px;
-  top: 10px;
-  padding: 3px 9px;
+  right: 9px;
+  top: 9px;
+  padding: 2px 8px;
   border-radius: 999px;
-  font-size: .62rem;
+  font-size: .6rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .05em;
   color: var(--cx-text-dim, #9aa4b2);
-  background: rgba(0, 0, 0, .55);
+  background: rgba(0, 0, 0, .5);
   border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
 }
-
-.cx-botface-fields { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.cx-botface-row label {
+.cx-botface-meta { padding: 4px 16px 16px; }
+.cx-botface-meta strong { display: block; font-size: .98rem; font-weight: 700; }
+.cx-botface-sub {
   display: block;
-  font-size: .8rem;
-  font-weight: 600;
-  margin-bottom: 5px;
+  font-size: .72rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  margin-top: 1px;
 }
-.cx-botface-acts { display: flex; gap: 7px; margin-top: 7px; flex-wrap: wrap; }
-.cx-botface-hint { font-size: .72rem; color: var(--cx-text-dim, #9aa4b2); margin-top: 5px; }
-.cx-botface-foot {
-  padding: 0 18px 18px;
+.cx-botface-bio {
+  margin: 9px 0 0;
+  font-size: .76rem;
+  line-height: 1.45;
+  color: var(--cx-text-dim, #9aa4b2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.cx-botface-bio:empty { display: none; }
+
+.cx-botface-fields { display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+.cx-botface-assets {
+  display: grid;
+  gap: 15px 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 1250px) {
+  .cx-botface-assets { grid-template-columns: minmax(0, 1fr); }
+}
+.cx-botface-row { min-width: 0; }
+.cx-botface-lbl {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.cx-botface-lbl span { font-size: .8rem; font-weight: 650; }
+.cx-botface-lbl em {
+  font-style: normal;
+  font-size: .69rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  opacity: .8;
+}
+.cx-botface-acts { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+.cx-botface-file {
+  font-size: .69rem;
+  color: var(--cx-text-dim, #9aa4b2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+.cx-botface-input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: .82rem;
+  color: var(--cx-text, #e6e9ef);
+  background: rgba(0, 0, 0, .3);
+  border: 1px solid var(--cx-border, rgba(255, 255, 255, .07));
+}
+.cx-botface-input:focus {
+  outline: none;
+  border-color: var(--cx-border-strong, rgba(255, 255, 255, .14));
+  background: rgba(0, 0, 0, .45);
+}
+
+.cx-botface-foot {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.cx-botface-foot span { font-size: .69rem; color: var(--cx-text-dim, #9aa4b2); opacity: .75; }
+.cx-botface-save {
+  padding: 8px 18px;
+  border-radius: 9px;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--cx-text, #e6e9ef);
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid var(--cx-border-strong, rgba(255, 255, 255, .14));
+}
+.cx-botface-save:hover { background: rgba(255, 255, 255, .17); }
+
+/* Small pill buttons, shared with the file picker label. */
 .cx-mini {
-  padding: 4px 11px;
+  padding: 5px 11px;
   border-radius: 8px;
   font-size: .72rem;
-  font-weight: 700;
+  font-weight: 650;
   cursor: pointer;
   color: var(--cx-text-dim, #9aa4b2);
   background: rgba(255, 255, 255, .05);
@@ -1729,3 +1826,13 @@ span.flatpickr-weekday {
 }
 .cx-mini:hover { background: rgba(255, 255, 255, .12); color: var(--cx-text, #e6e9ef); }
 .cx-mini-danger:hover { color: #ff9d9d; border-color: rgba(255, 107, 107, .45); }
+.cx-mini-file { display: inline-flex; align-items: center; gap: 6px; margin: 0; }
+.cx-mini-file i { opacity: .7; }
+/* The native control is unstyleable, so the label stands in for it. */
+.cx-mini-file input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

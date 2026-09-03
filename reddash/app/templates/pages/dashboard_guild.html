@@ -253,68 +253,206 @@
                                        and bio per member, so none of this
                                        touches the bot's global profile or any
                                        other server. #}
-                                    <div class="mt-4">
-                                      <form action="" method="POST" role="form" enctype="multipart/form-data">
-                                        {{ guild_bot_profile_form.hidden_tag() }}
-                                        <div class="cx-botface">
-                                          <div class="cx-botface-head">
-                                            <h5><i class="fa fa-picture-o"></i> {{ _("Bot appearance here") }}</h5>
-                                            <span>{{ _("Only affects this server.") }}</span>
-                                          </div>
+                                    <form action="" method="POST" role="form"
+                                          enctype="multipart/form-data" class="cx-botface">
+                                      {{ guild_bot_profile_form.hidden_tag() }}
 
-                                          <div class="cx-botface-body">
-                                            <div class="cx-botface-preview"
-                                                 {% if bot_profile.banner_url %}
-                                                   style="background-image:url('{{ bot_profile.banner_url }}');"
-                                                 {% endif %}>
-                                              <img src="{{ bot_profile.avatar_url or bot_profile.global_avatar_url }}"
-                                                   alt="" class="cx-botface-avatar" />
-                                              {% if not bot_profile.avatar_url %}
-                                                <span class="cx-botface-tag">{{ _("Global avatar") }}</span>
+                                      <div class="cx-botface-head">
+                                        <h5><i class="fa fa-id-badge"></i> {{ _("Appearance in this server") }}</h5>
+                                        <span>{{ _("A separate face just for here. The bot looks unchanged everywhere else.") }}</span>
+                                      </div>
+
+                                      <div class="cx-botface-body">
+                                        {# A stand-in for the profile card members
+                                           actually see, so the effect is obvious
+                                           before anything is saved. #}
+                                        <div class="cx-botface-card">
+                                          <div class="cx-botface-banner" id="cx-bf-banner"
+                                               {% if bot_profile.banner_url %}style="background-image:url('{{ bot_profile.banner_url }}');"{% endif %}>
+                                            {% if not bot_profile.banner_url %}
+                                              <span class="cx-botface-empty">{{ _("No banner here") }}</span>
+                                            {% endif %}
+                                            {% if not bot_profile.avatar_url %}
+                                              <span class="cx-botface-tag" id="cx-bf-tag">{{ _("Global avatar") }}</span>
+                                            {% endif %}
+                                          </div>
+                                          <div class="cx-botface-face">
+                                            <img id="cx-bf-avatar" alt=""
+                                                 src="{{ bot_profile.avatar_url or bot_profile.global_avatar_url }}" />
+                                          </div>
+                                          <div class="cx-botface-meta">
+                                            <strong>{{ bot_profile.nickname or variables["bot"]["name"] }}</strong>
+                                            <span class="cx-botface-sub">{{ guild.name }}</span>
+                                            <p id="cx-bf-bio" class="cx-botface-bio">{{ bot_profile.bio }}</p>
+                                          </div>
+                                        </div>
+
+                                        <div class="cx-botface-fields">
+                                         <div class="cx-botface-assets">
+                                          <div class="cx-botface-row">
+                                            <div class="cx-botface-lbl">
+                                              <span>{{ _("Avatar") }}</span>
+                                              {% if bot_profile.avatar_url %}
+                                                <em>{{ _("set for this server") }}</em>
+                                              {% else %}
+                                                <em>{{ _("using the global one") }}</em>
                                               {% endif %}
                                             </div>
-
-                                            <div class="cx-botface-fields">
-                                              <div class="cx-botface-row">
-                                                <label>{{ guild_bot_profile_form.avatar.label.text }}</label>
-                                                {{ guild_bot_profile_form.avatar(class="form-control form-control-default", accept="image/*") }}
-                                                <div class="cx-botface-acts">
-                                                  <button type="submit" class="cx-mini" name="guild_bot_profile_form_avatar_action" value="reset"
-                                                          formnovalidate>{{ _("Use global") }}</button>
-                                                  <button type="submit" class="cx-mini cx-mini-danger" name="guild_bot_profile_form_avatar_action" value="clear"
-                                                          formnovalidate>{{ _("Clear") }}</button>
-                                                </div>
-                                              </div>
-
-                                              <div class="cx-botface-row">
-                                                <label>{{ guild_bot_profile_form.banner.label.text }}</label>
-                                                {{ guild_bot_profile_form.banner(class="form-control form-control-default", accept="image/*") }}
-                                                <div class="cx-botface-acts">
-                                                  <button type="submit" class="cx-mini" name="guild_bot_profile_form_banner_action" value="reset"
-                                                          formnovalidate>{{ _("Use global") }}</button>
-                                                  <button type="submit" class="cx-mini cx-mini-danger" name="guild_bot_profile_form_banner_action" value="clear"
-                                                          formnovalidate>{{ _("Clear") }}</button>
-                                                </div>
-                                              </div>
-
-                                              <div class="cx-botface-row">
-                                                <label>{{ guild_bot_profile_form.bio.label.text }}</label>
-                                                {{ guild_bot_profile_form.bio(class="form-control form-control-default",
-                                                    maxlength=bot_profile.bio_limit or 190,
-                                                    placeholder=_("Something short about the bot in this server")) }}
-                                                <div class="cx-botface-hint">
-                                                  {{ _("Up to") }} {{ bot_profile.bio_limit or 190 }} {{ _("characters.") }}
-                                                </div>
-                                              </div>
+                                            <div class="cx-botface-acts">
+                                              <label class="cx-mini cx-mini-file">
+                                                <i class="fa fa-upload"></i> {{ _("Choose a picture") }}
+                                                {{ guild_bot_profile_form.avatar(accept="image/*",
+                                                    data_target="avatar", data_max="512") }}
+                                              </label>
+                                              <button type="submit" class="cx-mini"
+                                                      name="guild_bot_profile_form_avatar_action"
+                                                      value="reset" formnovalidate>{{ _("Use global") }}</button>
+                                              <button type="submit" class="cx-mini cx-mini-danger"
+                                                      name="guild_bot_profile_form_avatar_action"
+                                                      value="clear" formnovalidate>{{ _("Clear") }}</button>
+                                              <span class="cx-botface-file" id="cx-bf-avatar-name"></span>
                                             </div>
+                                          </div>
+
+                                          <div class="cx-botface-row">
+                                            <div class="cx-botface-lbl">
+                                              <span>{{ _("Banner") }}</span>
+                                              {% if bot_profile.banner_url %}
+                                                <em>{{ _("set for this server") }}</em>
+                                              {% else %}
+                                                <em>{{ _("none") }}</em>
+                                              {% endif %}
+                                            </div>
+                                            <div class="cx-botface-acts">
+                                              <label class="cx-mini cx-mini-file">
+                                                <i class="fa fa-upload"></i> {{ _("Choose a picture") }}
+                                                {{ guild_bot_profile_form.banner(accept="image/*",
+                                                    data_target="banner", data_max="960") }}
+                                              </label>
+                                              <button type="submit" class="cx-mini"
+                                                      name="guild_bot_profile_form_banner_action"
+                                                      value="reset" formnovalidate>{{ _("Use global") }}</button>
+                                              <button type="submit" class="cx-mini cx-mini-danger"
+                                                      name="guild_bot_profile_form_banner_action"
+                                                      value="clear" formnovalidate>{{ _("Clear") }}</button>
+                                              <span class="cx-botface-file" id="cx-bf-banner-name"></span>
+                                            </div>
+                                          </div>
+                                         </div>
+
+                                          <div class="cx-botface-row">
+                                            <div class="cx-botface-lbl">
+                                              <span>{{ _("Bio") }}</span>
+                                              <em id="cx-bf-count">0/{{ bot_profile.bio_limit or 190 }}</em>
+                                            </div>
+                                            {{ guild_bot_profile_form.bio(class="cx-botface-input",
+                                                id="cx-bf-bio-input",
+                                                maxlength=bot_profile.bio_limit or 190,
+                                                placeholder=_("Something short about the bot in this server")) }}
                                           </div>
 
                                           <div class="cx-botface-foot">
-                                            {{ guild_bot_profile_form.submit(class="btn bg-gradient-" + variables["meta"]["color"] + " mb-0") }}
+                                            {{ guild_bot_profile_form.submit(class="cx-botface-save") }}
+                                            <span>{{ _("Pictures are shrunk in your browser before they are sent.") }}</span>
                                           </div>
                                         </div>
-                                      </form>
-                                    </div>
+                                      </div>
+                                    </form>
+
+                                    <script>
+                                    // Shrink the picture here rather than posting the
+                                    // original: a multi-megabyte frame closes the bot's
+                                    // RPC socket, which looks like the bot going offline.
+                                    (function () {
+                                      var form = document.querySelector('.cx-botface');
+                                      if (!form || form.dataset.wired) { return; }
+                                      form.dataset.wired = '1';
+
+                                      var LIMIT = 1400000;  // characters of data URI
+
+                                      function shrink(file, max, done) {
+                                        // A small gif is worth keeping whole so it stays animated.
+                                        if (file.type === 'image/gif' && file.size < 900000) {
+                                          var whole = new FileReader();
+                                          whole.onload = function () { done(whole.result); };
+                                          whole.onerror = function () { done(null); };
+                                          whole.readAsDataURL(file);
+                                          return;
+                                        }
+                                        var reader = new FileReader();
+                                        reader.onload = function () {
+                                          var img = new Image();
+                                          img.onload = function () {
+                                            var scale = Math.min(1, max / Math.max(img.width, img.height));
+                                            var canvas = document.createElement('canvas');
+                                            canvas.width = Math.max(1, Math.round(img.width * scale));
+                                            canvas.height = Math.max(1, Math.round(img.height * scale));
+                                            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                                            var out = canvas.toDataURL('image/png');
+                                            // Photographs blow past the limit as PNG; fall back
+                                            // to jpeg rather than refusing the upload.
+                                            if (out.length > LIMIT) { out = canvas.toDataURL('image/jpeg', 0.86); }
+                                            if (out.length > LIMIT) { out = canvas.toDataURL('image/jpeg', 0.6); }
+                                            done(out.length > LIMIT ? null : out);
+                                          };
+                                          img.onerror = function () { done(null); };
+                                          img.src = reader.result;
+                                        };
+                                        reader.onerror = function () { done(null); };
+                                        reader.readAsDataURL(file);
+                                      }
+
+                                      form.querySelectorAll('input[type=file]').forEach(function (input) {
+                                        input.addEventListener('change', function () {
+                                          var which = input.dataset.target;
+                                          var label = document.getElementById('cx-bf-' + which + '-name');
+                                          var store = form.querySelector('[name$="' + which + '_data"]');
+                                          var file = input.files && input.files[0];
+                                          if (!file) { if (label) { label.textContent = ''; } return; }
+                                          if (label) { label.textContent = 'Working...'; }
+                                          shrink(file, parseInt(input.dataset.max, 10), function (uri) {
+                                            if (!uri) {
+                                              if (label) { label.textContent = 'That picture is too big.'; }
+                                              input.value = '';
+                                              return;
+                                            }
+                                            if (store) { store.value = uri; }
+                                            if (label) {
+                                              label.textContent = file.name + ' (' +
+                                                Math.round(uri.length / 1400) + ' KB)';
+                                            }
+                                            if (which === 'avatar') {
+                                              var av = document.getElementById('cx-bf-avatar');
+                                              if (av) { av.src = uri; }
+                                              var tag = document.getElementById('cx-bf-tag');
+                                              if (tag) { tag.remove(); }
+                                            } else {
+                                              var banner = document.getElementById('cx-bf-banner');
+                                              if (banner) {
+                                                banner.style.backgroundImage = 'url(' + uri + ')';
+                                                banner.innerHTML = '';
+                                              }
+                                            }
+                                          });
+                                        });
+                                      });
+
+                                      var bio = document.getElementById('cx-bf-bio-input');
+                                      var shown = document.getElementById('cx-bf-bio');
+                                      var count = document.getElementById('cx-bf-count');
+                                      if (bio) {
+                                        var echo = function () {
+                                          if (shown) { shown.textContent = bio.value; }
+                                          if (count) {
+                                            count.textContent = bio.value.length + '/' +
+                                              (bio.getAttribute('maxlength') || 190);
+                                          }
+                                        };
+                                        bio.addEventListener('input', echo);
+                                        echo();
+                                      }
+                                    })();
+                                    </script>
 
                                     <div class="mt-4">
                                         <form action="" method="POST" role="form" enctype="multipart/form-data">

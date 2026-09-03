@@ -372,6 +372,12 @@ class BabelCheck:
         field.data = f"{locale.language}-{locale.territory}"
 
 
+# A data URI longer than this is refused rather than sent: the bot's RPC
+# websocket closes on an oversized frame, and a closed socket looks to everyone
+# like the bot went away.
+MAX_ASSET_CHARS = 2 * 1024 * 1024
+
+
 class GuildBotProfileForm(FlaskForm):
     """How the bot looks in one server.
 
@@ -392,8 +398,12 @@ class GuildBotProfileForm(FlaskForm):
     # "keep" leaves it alone, "reset" restores the bot's global asset, "clear"
     # removes it. An uploaded file overrides whichever is set.
     avatar_action: wtforms.HiddenField = wtforms.HiddenField(default="keep")
+    # The page shrinks the picture in the browser and drops the result here.
+    # Sending the original megabytes would overrun the bot's RPC socket.
+    avatar_data: wtforms.HiddenField = wtforms.HiddenField(default="")
     banner: FileField = FileField(_("Server banner:"))
     banner_action: wtforms.HiddenField = wtforms.HiddenField(default="keep")
+    banner_data: wtforms.HiddenField = wtforms.HiddenField(default="")
     bio: wtforms.StringField = wtforms.StringField(_("Server bio:"))
     submit: wtforms.SubmitField = wtforms.SubmitField(_("Save appearance"))
 
@@ -528,25 +538,52 @@ async def dashboard_guild(
     ):
         settings: dict[str, typing.Any] = {}
 
-        def _asset(file_field, action):
-            """An uploaded image as the data URI the endpoint expects."""
+        def _asset(file_field, action, shrunk):
+            """An uploaded image as the data URI the endpoint expects.
+
+            The page normally hands over a picture it has already shrunk. The
+            raw file is the fallback for a browser that could not do it.
+            """
+            if shrunk and shrunk.startswith("data:image/"):
+                return shrunk
             if file_field.data is not None:
                 raw = file_field.data.read() if hasattr(file_field.data, "read") else file_field.data
                 if raw:
-                    return "data:image/png;base64," + base64.b64encode(raw).decode()
+                    kind = getattr(file_field.data, "mimetype", "") or "image/png"
+                    if not kind.startswith("image/"):
+                        kind = "image/png"
+                    return f"data:{kind};base64," + base64.b64encode(raw).decode()
             if action == "reset":
                 return "reset"
             if action == "clear":
                 return ""
             return None
 
-        for name, field, action_field in (
-            ("avatar", guild_bot_profile_form.avatar, guild_bot_profile_form.avatar_action),
-            ("banner", guild_bot_profile_form.banner, guild_bot_profile_form.banner_action),
+        oversized = None
+        for name, field, action_field, data_field in (
+            ("avatar", guild_bot_profile_form.avatar,
+             guild_bot_profile_form.avatar_action, guild_bot_profile_form.avatar_data),
+            ("banner", guild_bot_profile_form.banner,
+             guild_bot_profile_form.banner_action, guild_bot_profile_form.banner_data),
         ):
-            value = _asset(field, action_field.data)
-            if value is not None:
-                settings[name] = value
+            value = _asset(field, action_field.data, data_field.data)
+            if value is None:
+                continue
+            # The bot's RPC socket drops the connection on an oversized frame,
+            # which reads as the dashboard losing the bot. Refuse it here where
+            # we can still say something useful.
+            if len(value) > MAX_ASSET_CHARS:
+                oversized = name
+                continue
+            settings[name] = value
+        if oversized is not None:
+            flash(
+                _("That {what} is too big. Pick one under {size} MB.").format(
+                    what=oversized, size=round(MAX_ASSET_CHARS * 3 / 4 / 1024 / 1024, 1)
+                ),
+                category="warning",
+            )
+            return redirect(request.url)
         if (guild_bot_profile_form.bio.data or "") != (bot_profile.get("bio") or ""):
             settings["bio"] = guild_bot_profile_form.bio.data or ""
 
