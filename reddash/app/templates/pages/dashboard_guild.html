@@ -360,23 +360,22 @@
                                     </form>
 
                                     <script>
-                                    // Shrink the picture here rather than posting the
-                                    // original: a multi-megabyte frame closes the bot's
-                                    // RPC socket, which looks like the bot going offline.
+                                    // Shrink the picture before it is posted. The original went up
+                                    // whole before, which overran both the upload limit and the
+                                    // bot's RPC socket - and the socket closing reads as the bot
+                                    // going offline. The small copy replaces the file in the input
+                                    // rather than riding along beside it.
                                     (function () {
                                       var form = document.querySelector('.cx-botface');
                                       if (!form || form.dataset.wired) { return; }
                                       form.dataset.wired = '1';
 
-                                      var LIMIT = 1400000;  // characters of data URI
+                                      var LIMIT = 1200000;  // bytes of picture we are willing to send
 
                                       function shrink(file, max, done) {
                                         // A small gif is worth keeping whole so it stays animated.
-                                        if (file.type === 'image/gif' && file.size < 900000) {
-                                          var whole = new FileReader();
-                                          whole.onload = function () { done(whole.result); };
-                                          whole.onerror = function () { done(null); };
-                                          whole.readAsDataURL(file);
+                                        if (file.type === 'image/gif' && file.size < LIMIT) {
+                                          done(file);
                                           return;
                                         }
                                         var reader = new FileReader();
@@ -388,12 +387,19 @@
                                             canvas.width = Math.max(1, Math.round(img.width * scale));
                                             canvas.height = Math.max(1, Math.round(img.height * scale));
                                             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                                            var out = canvas.toDataURL('image/png');
-                                            // Photographs blow past the limit as PNG; fall back
-                                            // to jpeg rather than refusing the upload.
-                                            if (out.length > LIMIT) { out = canvas.toDataURL('image/jpeg', 0.86); }
-                                            if (out.length > LIMIT) { out = canvas.toDataURL('image/jpeg', 0.6); }
-                                            done(out.length > LIMIT ? null : out);
+                                            canvas.toBlob(function (png) {
+                                              if (png && png.size <= LIMIT) {
+                                                done(new File([png], 'appearance.png', {type: 'image/png'}));
+                                                return;
+                                              }
+                                              // Photographs blow past the limit as png; fall back to
+                                              // jpeg rather than refusing a perfectly good picture.
+                                              canvas.toBlob(function (jpg) {
+                                                done(jpg && jpg.size <= LIMIT
+                                                  ? new File([jpg], 'appearance.jpg', {type: 'image/jpeg'})
+                                                  : null);
+                                              }, 'image/jpeg', 0.85);
+                                            }, 'image/png');
                                           };
                                           img.onerror = function () { done(null); };
                                           img.src = reader.result;
@@ -402,34 +408,61 @@
                                         reader.readAsDataURL(file);
                                       }
 
+                                      function swapIn(input, file) {
+                                        // Replacing what the picker holds is what keeps the original
+                                        // megabytes out of the post.
+                                        try {
+                                          var box = new DataTransfer();
+                                          box.items.add(file);
+                                          input.files = box.files;
+                                          return true;
+                                        } catch (err) {
+                                          return false;
+                                        }
+                                      }
+
                                       form.querySelectorAll('input[type=file]').forEach(function (input) {
                                         input.addEventListener('change', function () {
                                           var which = input.dataset.target;
                                           var label = document.getElementById('cx-bf-' + which + '-name');
-                                          var store = form.querySelector('[name$="' + which + '_data"]');
                                           var file = input.files && input.files[0];
-                                          if (!file) { if (label) { label.textContent = ''; } return; }
+                                          if (!file || input.dataset.busy) { return; }
+                                          if (file.name === 'appearance.png' || file.name === 'appearance.jpg') {
+                                            return;  // already ours
+                                          }
                                           if (label) { label.textContent = 'Working...'; }
-                                          shrink(file, parseInt(input.dataset.max, 10), function (uri) {
-                                            if (!uri) {
-                                              if (label) { label.textContent = 'That picture is too big.'; }
+                                          input.dataset.busy = '1';
+                                          shrink(file, parseInt(input.dataset.max, 10), function (small) {
+                                            delete input.dataset.busy;
+                                            if (!small || !swapIn(input, small)) {
+                                              // An old browser that will not let us swap the file can
+                                              // still send a picture that was small to begin with.
+                                              if (file.size <= LIMIT) {
+                                                if (label) {
+                                                  label.textContent = file.name + ' (sent as is)';
+                                                }
+                                                return;
+                                              }
                                               input.value = '';
+                                              if (label) {
+                                                label.textContent = 'That picture will not fit. Try a smaller one.';
+                                              }
                                               return;
                                             }
-                                            if (store) { store.value = uri; }
                                             if (label) {
-                                              label.textContent = file.name + ' (' +
-                                                Math.round(uri.length / 1400) + ' KB)';
+                                              label.textContent = file.name + ' → ' +
+                                                Math.round(small.size / 1024) + ' KB';
                                             }
+                                            var seen = URL.createObjectURL(small);
                                             if (which === 'avatar') {
                                               var av = document.getElementById('cx-bf-avatar');
-                                              if (av) { av.src = uri; }
+                                              if (av) { av.src = seen; }
                                               var tag = document.getElementById('cx-bf-tag');
                                               if (tag) { tag.remove(); }
                                             } else {
                                               var banner = document.getElementById('cx-bf-banner');
                                               if (banner) {
-                                                banner.style.backgroundImage = 'url(' + uri + ')';
+                                                banner.style.backgroundImage = 'url(' + seen + ')';
                                                 banner.innerHTML = '';
                                               }
                                             }
