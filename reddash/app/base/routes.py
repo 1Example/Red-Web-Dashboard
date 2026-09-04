@@ -201,18 +201,45 @@ async def profile():
 @blueprint.route("/commands/<cog>")
 @blueprint.route("/commands")
 async def commands(cog: str | None = None):
+    # `PrivilegeLevel` is ordered, and each level implies the ones below it, so
+    # a rank comparison is all the filtering needs.
+    PRIVILEGE_RANK = {"NONE": 0, "MOD": 1, "ADMIN": 2, "GUILD_OWNER": 3, "BOT_OWNER": 4}
+
+    # What this visitor can actually run. `max_privilege` is None only while the
+    # access lookup is still in flight; treating that as full visibility keeps a
+    # slow first request from hiding commands somebody does have.
+    if not current_user.is_authenticated:
+        viewer_rank = PRIVILEGE_RANK["NONE"]
+    else:
+        level = current_user.max_privilege
+        viewer_rank = (
+            PRIVILEGE_RANK["BOT_OWNER"] if level is None
+            else PRIVILEGE_RANK.get(level, 0)
+        )
+
+    # The page doubles as documentation, so anyone can opt back into the full
+    # list; it is the default that changes, not what is reachable.
+    show_all = request.args.get("all") in ("True", "true", "1")
+    if show_all and viewer_rank < PRIVILEGE_RANK["BOT_OWNER"]:
+        # Bot-owner commands stay hidden regardless - that has always been the
+        # rule here and it is the one level that leaks genuinely sensitive
+        # operations.
+        viewer_rank = PRIVILEGE_RANK["GUILD_OWNER"]
+
+    def visible(entry) -> bool:
+        return PRIVILEGE_RANK.get(entry.get("privilege_level") or "NONE", 0) <= viewer_rank
+
     cogs = {}
     commands = deepcopy(app.variables["commands"])
     len_cogs = 0
     len_commands = 0
+    hidden_count = 0
     for _cog, cog_data in commands.items():
-        len_cogs += 1
         _cog_data = cog_data.copy()
         _cog_data["commands"] = []
         for command in cog_data["commands"]:
-            if command["privilege_level"] == "BOT_OWNER" and not (
-                current_user.is_authenticated and current_user.is_owner
-            ):
+            if not visible(command):
+                hidden_count += 1
                 continue
             len_commands += 1
             command_data = command.copy()
@@ -220,9 +247,9 @@ async def commands(cog: str | None = None):
             def check_subs(subs):
                 _subs = []
                 for sub in subs:
-                    if sub["privilege_level"] == "BOT_OWNER" and not (
-                        current_user.is_authenticated and current_user.is_owner
-                    ):
+                    if not visible(sub):
+                        nonlocal hidden_count
+                        hidden_count += 1
                         continue
                     nonlocal len_commands
                     len_commands += 1
@@ -235,6 +262,9 @@ async def commands(cog: str | None = None):
             _cog_data["commands"].append(command_data)
         if not _cog_data["commands"]:
             continue
+        # Counted here rather than at the top of the loop, so a cog whose
+        # commands are all hidden is not counted as one the visitor can see.
+        len_cogs += 1
         cogs[_cog] = _cog_data
     prefixes = app.variables["bot"]["prefixes"]
 
@@ -246,6 +276,9 @@ async def commands(cog: str | None = None):
         len_commands=len_commands,
         tab_name=None if cog is None or cog not in cogs else cog,
         hidden=request.args.get("hidden") in ("True", "true"),
+        hidden_count=hidden_count,
+        show_all=show_all,
+        viewer_rank=viewer_rank,
         # commands.html reads this as `query`; it was passed as `filter_param`,
         # so the template's search branch never triggered and ?query= did nothing.
         query=request.args.get("query"),

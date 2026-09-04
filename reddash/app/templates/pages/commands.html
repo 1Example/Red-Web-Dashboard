@@ -17,6 +17,33 @@
                   <div class="d-flex justify-content-between mb-4">
                       <h1 class="card-title">{{ number_to_text_with_suffix(len_cogs) }} {% if len_cogs != 1 %}{{  _("Cogs") }}{% else %}{{  _("Cog") }}{% endif %} {{ _("with") }} {{ number_to_text_with_suffix(len_commands) }} {% if len_commands != 1 %}{{ _("Commands") }}{% else %}{{ _("Command") }}{% endif %}</h1>
                   </div>
+                  <div class="cx-migrating">
+                    <i class="fa fa-info-circle"></i>
+                    <div>
+                      <b>{{ _("These commands are moving to slash commands.") }}</b>
+                      {{ _("Cogs are being migrated one at a time. Once a cog has moved, its settings live on its Modules page and its remaining commands are used with") }}
+                      <code>/</code>{{ _("instead of a prefix.") }}
+                    </div>
+                  </div>
+
+                  {% if hidden_count %}
+                    <div class="cx-scoped">
+                      <span>
+                        <i class="fa fa-lock"></i>
+                        {{ _("Showing what you can run.") }}
+                        {{ hidden_count }} {{ _("command(s) need higher permissions.") }}
+                      </span>
+                      {% if not show_all %}
+                        <a href="?all=true{% if query %}&query={{ query }}{% endif %}">{{ _("Show all") }}</a>
+                      {% endif %}
+                    </div>
+                  {% elif show_all %}
+                    <div class="cx-scoped">
+                      <span><i class="fa fa-eye"></i> {{ _("Showing every command, including ones you cannot run.") }}</span>
+                      <a href="?{% if query %}query={{ query }}{% endif %}">{{ _("Show mine only") }}</a>
+                    </div>
+                  {% endif %}
+
                   <br />
                   <form action="#" onsubmit="submitSearch(event);" class="input-group">
                     <span class="input-group-text text-body"><i class="fa fa-search" aria-hidden="true"></i></span>

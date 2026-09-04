@@ -2323,3 +2323,51 @@ span.flatpickr-weekday {
   opacity: 0;
   pointer-events: none;
 }
+
+/* ---------- commands page: migration notice and permission scope ----------
+   Both sit above the search box. They use the same translucent surfaces as
+   every other card rather than a solid alert, so they read as part of the page
+   instead of something bolted on top of it. */
+.cx-migrating,
+.cx-scoped {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  font-size: .84rem;
+  line-height: 1.5;
+  color: var(--cx-text, #e6e9ef);
+  background: var(--cx-panel-2, rgba(90, 130, 220, .07));
+  border: 1px solid var(--cx-panel-2-bd, rgba(120, 160, 255, .10));
+}
+.cx-migrating i,
+.cx-scoped i { margin-top: 2px; opacity: .7; flex: none; }
+.cx-migrating b { font-weight: 600; }
+.cx-migrating code {
+  padding: .05em .35em;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .08);
+  font-size: .92em;
+}
+
+/* The scope notice is a quieter, single-line variant with its toggle pushed
+   to the far end. */
+.cx-scoped {
+  align-items: center;
+  justify-content: space-between;
+  color: var(--cx-text-dim, #93a1bd);
+  font-size: .8rem;
+}
+.cx-scoped span { display: inline-flex; align-items: center; gap: 8px; }
+.cx-scoped a {
+  flex: none;
+  margin-left: 12px;
+  white-space: nowrap;
+  color: var(--cx-text, #e6e9ef);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  opacity: .8;
+}
+.cx-scoped a:hover { opacity: 1; }

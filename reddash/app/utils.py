@@ -143,6 +143,20 @@ class User(UserMixin):
         return self._access.get("manageable", 0)
 
     @property
+    def max_privilege(self) -> str:
+        """Highest `PrivilegeLevel` this person holds in any shared server.
+
+        `None` while the access lookup has not answered yet, which callers
+        should treat as "do not know" rather than "nothing" - guessing low
+        would hide commands from someone who can actually run them.
+        """
+        if self.is_owner:
+            return "BOT_OWNER"
+        if self._access is None:
+            return None
+        return self._access.get("max_privilege") or "NONE"
+
+    @property
     def can_use_dashboard(self) -> bool:
         return self.is_owner or self.manageable_guilds is None or self.manageable_guilds > 0
 
