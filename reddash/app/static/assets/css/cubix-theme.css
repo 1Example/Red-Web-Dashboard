@@ -1065,6 +1065,45 @@ span.flatpickr-weekday {
 }
 
 /* Proper back button (replaces the 🔙 emoji in third-party page headings). */
+/* Module page switcher.
+
+   A module with more than one page renders this row so its pages read as one
+   thing. The same rules live in `dashboard_helpers.BASE_CSS` for cogs that
+   emit it, but several (LevelUp) ship their own templates and never include
+   it - navigation chrome is the shell's job, so it is defined here too and
+   works regardless. */
+.dz-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.dz-subnav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: .84rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--cx-text) !important;
+  opacity: .68;
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
+}
+.dz-subnav-item:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, .09);
+  color: var(--cx-text) !important;
+}
+.dz-subnav-item.active {
+  opacity: 1;
+  background: rgba(108, 140, 255, .22);
+  border-color: rgba(130, 175, 255, .40);
+}
+.dz-subnav-item i { opacity: .75; }
+
 /* Module breadcrumb.
 
    The back arrow is a control; the path beside it is text. Previously the
@@ -1868,10 +1907,10 @@ span.flatpickr-weekday {
 .cx-srv-grid {
   display: grid;
   gap: 16px;
-  /* 340 rather than 280: at the old width the server name and its "Since"
-     line had nowhere to go and wrapped onto two lines, which is what threw
-     the icon out of alignment with the text beside it. */
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  /* Wide enough for the icon, the name and a two-up figure row to sit
+     comfortably on one card; below this the name and its date wrap and the
+     whole header goes crooked. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 390px), 1fr));
 }
 
 .cx-srv {
@@ -1937,19 +1976,26 @@ span.flatpickr-weekday {
   /* The icon is lifted over the banner, so centring the row on it dragged the
      name up with it. Align to the top and let the name sit on its own line. */
   align-items: flex-start;
-  gap: 12px;
+  gap: 13px;
   min-width: 0;
-  padding: 12px 16px 0;
+  padding: 11px 18px 0;
 }
 .cx-srv-ico {
-  width: 52px;
-  height: 52px;
+  /* `.cx-srv-banner` is positioned (it carries the badges), and a positioned
+     sibling paints above a static one regardless of document order - which is
+     why the avatar was disappearing behind the banner instead of sitting on
+     top of it. Positioning the avatar too, with a z-index, puts it back in
+     front. */
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
   flex: none;
-  border-radius: 14px;
+  border-radius: 16px;
   object-fit: cover;
-  background: rgba(255, 255, 255, .07);
-  /* Lifted over the banner it overlaps. */
-  margin-top: -32px;
+  background: #0a1020;
+  /* Overlaps the lower third of the banner. */
+  margin-top: -30px;
   border: 3px solid #0a1020;
 }
 .cx-srv-ico-ph {
@@ -1961,7 +2007,7 @@ span.flatpickr-weekday {
 }
 /* Nudged down so the name's baseline lines up with the icon's lower half
    rather than with its lifted top edge. */
-.cx-srv-id { min-width: 0; flex: 1 1 auto; padding-top: 2px; }
+.cx-srv-id { min-width: 0; flex: 1 1 auto; padding-top: 6px; }
 .cx-srv-id b {
   display: block;
   font-size: .95rem;
@@ -1972,17 +2018,21 @@ span.flatpickr-weekday {
 }
 .cx-srv-id span {
   display: block;
-  margin-top: 1px;
-  font-size: .69rem;
+  margin-top: 2px;
+  font-size: .7rem;
   font-weight: 600;
   letter-spacing: .02em;
   color: var(--cx-text-dim);
+  /* One line: "Since" and the date were breaking apart on narrow cards and
+     pushing the header out of square. */
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Two lines, so one wordy server does not make its row taller than the rest. */
 .cx-srv-desc {
-  margin: 9px 16px 0;
+  margin: 10px 18px 0;
   font-size: .74rem;
   line-height: 1.45;
   color: var(--cx-text-dim);
@@ -1998,7 +2048,7 @@ span.flatpickr-weekday {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin: 12px 16px 0;
+  margin: 12px 18px 0;
 }
 .cx-srv-figs span {
   display: flex;
@@ -2042,7 +2092,7 @@ span.flatpickr-weekday {
   align-items: center;
   gap: 8px;
   margin-top: auto;
-  padding: 12px 16px 14px;
+  padding: 13px 18px 15px;
 }
 .cx-srv-btn {
   display: inline-flex;
