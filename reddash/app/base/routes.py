@@ -1003,7 +1003,30 @@ async def admin(
             User.USERS = {
                 user_id: user for user_id, user in User.USERS.items() if not user.is_owner
             }
-            flash(_("Users sessions refreshed."), category="success")
+            # Clearing the in-memory registry only held until the next restart,
+            # after which a revoked cookie would start working again. The
+            # global epoch is the durable half of the same action.
+            result = await get_result(
+                app,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                    "method": "DASHBOARDRPC__BUMP_SESSION_EPOCH",
+                    "params": [current_user.id, "global"],
+                },
+            )
+            if isinstance(result, dict) and result.get("status") == 0:
+                # Keep the local copy in step so the next request already sees
+                # it, rather than waiting for the periodic data refresh.
+                app.data.setdefault("core", {}).setdefault("session_epochs", {})[
+                    "global"
+                ] = result["epoch"]
+                flash(_("Users sessions refreshed."), category="success")
+            else:
+                flash(
+                    _("Sessions were cleared here, but the bot could not record it."),
+                    category="warning",
+                )
         return redirect(request.url)
     if dashboard_actions_form.lock.data and dashboard_actions_form.errors:
         for field_name, error_messages in dashboard_actions_form.errors.items():

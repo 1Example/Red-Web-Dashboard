@@ -13,7 +13,7 @@ from flask_babel import _
 from flask_login import current_user, login_fresh, login_user, logout_user
 
 from reddash.app.app import app
-from reddash.app.utils import User
+from reddash.app.utils import SESSION_LIFETIME, User, get_result
 
 from . import blueprint
 
@@ -143,10 +143,16 @@ async def callback():
                     if new_data["avatar"] is not None
                     else None,
                 )
+                # `duration` only ever applied to the remember cookie, and
+                # `remember=False` meant no such cookie was written - so the
+                # week this asked for was never in effect and the login lived
+                # only as long as the browser stayed open. Marking the session
+                # permanent is what gives the session cookie an expiry at all.
+                session.permanent = True
                 login_user(
                     user=user,
-                    remember=False,
-                    duration=datetime.timedelta(weeks=1),
+                    remember=True,
+                    duration=SESSION_LIFETIME,
                 )
             except KeyError as e:
                 app.logger.error(f"Failed to obtain a user's profile.\n{new_data}", exc_info=e)
@@ -169,11 +175,25 @@ async def callback():
 @blueprint.route("/logout")
 async def logout():
     if current_user.is_authenticated:
+        user_id = current_user.id
         try:
             current_user.devices.remove(session["_user_id"])
         except (KeyError, ValueError):
             pass
         logout_user()
+        # Now that a token survives a restart on its own, dropping it from the
+        # in-memory list is no longer enough to end the session: without this
+        # the same cookie would work again after the next reload. Bumping this
+        # user's epoch revokes their outstanding logins for good.
+        await get_result(
+            app,
+            {
+                "jsonrpc": "2.0",
+                "id": 0,
+                "method": "DASHBOARDRPC__BUMP_SESSION_EPOCH",
+                "params": [user_id, "user"],
+            },
+        )
         flash(_("You have been deconnected with success."), category="success")
     return redirect(url_for("login_blueprint.login"))
 

@@ -1065,19 +1065,37 @@ span.flatpickr-weekday {
 }
 
 /* Proper back button (replaces the 🔙 emoji in third-party page headings). */
+/* Module breadcrumb.
+
+   The back arrow is a control; the path beside it is text. Previously the
+   module name lived *inside* the back button, so a sub-page read as a button
+   welded to a heading, with `/ Settings` trailing off it at the heading's own
+   (much larger) size. Splitting them means one affordance to go back and one
+   plain path that says where you are. */
+.cx-crumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Square, icon-only: it is the only thing on the line that does something. */
 .cx-back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px 5px 11px;
-  border-radius: 10px;
+  justify-content: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--cx-text) !important;
-  font-size: 1.05rem;
-  font-weight: 700;
   text-decoration: none;
-  vertical-align: 3px;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .cx-back:hover {
@@ -1085,32 +1103,31 @@ span.flatpickr-weekday {
   border-color: rgba(130, 175, 255, 0.35);
   color: var(--cx-text) !important;
 }
-.cx-back i { font-size: 1.1rem; opacity: 0.8; }
+.cx-back i { font-size: 1.05rem; opacity: 0.85; }
 
-/* Module breadcrumb.
-
-   The back pill is 1.05rem but the heading it sits in is a plain `h2`, so on a
-   module's sub-page the trailing `/ Settings` rendered at roughly twice the
-   pill's size - a small button stranded beside big text. A module's root page
-   has no trail at all, which is why only the modules with more than one page
-   looked wrong. Giving the whole line the pill's scale fixes the sub-pages and
-   leaves the root pages exactly as they were. */
-.cx-crumb {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.6;
-}
-/* The nudge existed to lift the pill against much larger text. Now that both
-   are the same size it just knocks the pill off the baseline. */
-.cx-crumb .cx-back { vertical-align: baseline; }
-/* The rest of the trail is the same weight as the pill, with the current page
-   carried at full strength and its ancestors dimmed. */
-.cx-crumb > a:not(.cx-back) {
-  color: var(--cx-text-dim);
+/* Ancestors are dimmed links, the current page is plain and full strength. */
+.cx-crumb-link {
+  color: var(--cx-text-dim) !important;
   text-decoration: none;
 }
-.cx-crumb > a:not(.cx-back):hover { color: var(--cx-text); }
+.cx-crumb-link:hover { color: var(--cx-text) !important; }
+.cx-crumb-guild {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.cx-crumb-guild img {
+  height: 24px;
+  width: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.cx-crumb-sep {
+  color: var(--cx-text-dim);
+  opacity: 0.5;
+  font-weight: 400;
+}
+.cx-crumb-now { color: var(--cx-text); }
 
 /* ==========================================================================
    Mobile fixes
@@ -1850,8 +1867,11 @@ span.flatpickr-weekday {
 
 .cx-srv-grid {
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+  /* 340 rather than 280: at the old width the server name and its "Since"
+     line had nowhere to go and wrapped onto two lines, which is what threw
+     the icon out of alignment with the text beside it. */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
 }
 
 .cx-srv {
@@ -1874,7 +1894,7 @@ span.flatpickr-weekday {
 
 .cx-srv-banner {
   position: relative;
-  height: 64px;
+  height: 76px;
   background-size: cover;
   background-position: center;
   border-bottom: 1px solid var(--cx-panel-2-bd);
@@ -1914,20 +1934,22 @@ span.flatpickr-weekday {
 
 .cx-srv-head {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  /* The icon is lifted over the banner, so centring the row on it dragged the
+     name up with it. Align to the top and let the name sit on its own line. */
+  align-items: flex-start;
+  gap: 12px;
   min-width: 0;
-  padding: 11px 14px 0;
+  padding: 12px 16px 0;
 }
 .cx-srv-ico {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   flex: none;
-  border-radius: 12px;
+  border-radius: 14px;
   object-fit: cover;
   background: rgba(255, 255, 255, .07);
   /* Lifted over the banner it overlaps. */
-  margin-top: -26px;
+  margin-top: -32px;
   border: 3px solid #0a1020;
 }
 .cx-srv-ico-ph {
@@ -1937,19 +1959,30 @@ span.flatpickr-weekday {
   font-weight: 800;
   color: var(--cx-text-dim);
 }
-.cx-srv-id { min-width: 0; flex: 1 1 auto; }
+/* Nudged down so the name's baseline lines up with the icon's lower half
+   rather than with its lifted top edge. */
+.cx-srv-id { min-width: 0; flex: 1 1 auto; padding-top: 2px; }
 .cx-srv-id b {
   display: block;
-  font-size: .9rem;
+  font-size: .95rem;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cx-srv-id span { display: block; font-size: .68rem; color: var(--cx-text-dim); }
+.cx-srv-id span {
+  display: block;
+  margin-top: 1px;
+  font-size: .69rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--cx-text-dim);
+  white-space: nowrap;
+}
 
 /* Two lines, so one wordy server does not make its row taller than the rest. */
 .cx-srv-desc {
-  margin: 8px 14px 0;
+  margin: 9px 16px 0;
   font-size: .74rem;
   line-height: 1.45;
   color: var(--cx-text-dim);
@@ -1959,19 +1992,46 @@ span.flatpickr-weekday {
   overflow: hidden;
 }
 
+/* Two labelled tiles rather than a bare "192 ● 14" line, which read as
+   leftovers floating under the description. */
 .cx-srv-figs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 16px 0;
+}
+.cx-srv-figs span {
   display: flex;
-  gap: 14px;
-  padding: 10px 14px 0;
-  font-size: .74rem;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
+}
+.cx-srv-figs b {
+  color: var(--cx-text);
+  font-size: .92rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.cx-srv-figs em {
+  font-style: normal;
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
   color: var(--cx-text-dim);
 }
-.cx-srv-figs span { display: inline-flex; align-items: center; gap: 5px; }
-.cx-srv-figs b { color: var(--cx-text); font-variant-numeric: tabular-nums; }
-.cx-srv-figs i { opacity: .7; }
+/* A server whose presence counts are unavailable gets one full-width tile
+   instead of a lopsided pair. */
+.cx-srv-figs:has(> span:only-child) { grid-template-columns: 1fr; }
 .cx-srv-dot {
+  display: inline-block;
   width: 7px;
   height: 7px;
+  margin-right: 6px;
+  vertical-align: 1px;
   border-radius: 50%;
   background: #38d39f;
   box-shadow: 0 0 0 3px rgba(56, 211, 159, .16);
@@ -1982,7 +2042,7 @@ span.flatpickr-weekday {
   align-items: center;
   gap: 8px;
   margin-top: auto;
-  padding: 12px 14px 13px;
+  padding: 12px 16px 14px;
 }
 .cx-srv-btn {
   display: inline-flex;

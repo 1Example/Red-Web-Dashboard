@@ -247,14 +247,14 @@
                   {% endif %}
 
                   <div class="cx-srv-figs">
-                    <span title="{{ _('Members') }}">
-                      <i class="fa fa-users"></i>
+                    <span>
                       <b>{{ number_to_text_with_suffix(g.members) }}</b>
+                      <em>{{ _("Members") }}</em>
                     </span>
                     {% if g.online is not none %}
-                      <span title="{{ _('Online now') }}">
-                        <i class="cx-srv-dot"></i>
-                        <b>{{ number_to_text_with_suffix(g.online) }}</b>
+                      <span>
+                        <b><i class="cx-srv-dot"></i>{{ number_to_text_with_suffix(g.online) }}</b>
+                        <em>{{ _("Online") }}</em>
                       </span>
                     {% endif %}
                   </div>

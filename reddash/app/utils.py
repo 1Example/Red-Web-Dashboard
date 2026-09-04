@@ -4,6 +4,7 @@ import base64
 import datetime
 import json
 import os
+import secrets
 import time
 from copy import deepcopy
 from importlib import import_module
@@ -57,6 +58,14 @@ WS_EXCEPTIONS = (
 )
 
 
+# How long a Discord login is good for. It bounds three things that have to
+# agree, or the shortest of them silently wins: the JWT in the session cookie,
+# the cookie's own lifetime, and the CSRF token's validity window. Previously
+# they were one day, browser-session, and one hour respectively, which is why
+# signing in never seemed to stick.
+SESSION_LIFETIME = datetime.timedelta(days=30)
+
+
 class User(UserMixin):
     USERS: dict[str, "User"] = {}
 
@@ -77,7 +86,24 @@ class User(UserMixin):
         self.__class__.USERS[self.id] = self
 
     def get_id(self) -> str:
-        token = self.generate_token(action="login", expiration_timedelta=datetime.timedelta(days=1))
+        # The identity travels inside the (signed) token so a session can be
+        # restored after a restart without the in-memory registry, and `iat`
+        # is what the revocation epochs are compared against.
+        token = self.generate_token(
+            action="login",
+            expiration_timedelta=SESSION_LIFETIME,
+            data={
+                "iat": int(time.time()),
+                # Without a nonce the payload is identical for every login in
+                # the same second, so two sessions produce the same token and
+                # `devices` cannot tell them apart - signing out of one would
+                # take the other with it.
+                "jti": secrets.token_urlsafe(9),
+                "name": self.name,
+                "global_name": self.global_name,
+                "avatar_url": self.avatar_url,
+            },
+        )
         self.devices.append(token)
         try:
             self.devices.remove(session["_user_id"])
@@ -173,6 +199,7 @@ class User(UserMixin):
         action: str | None = None,
         unique: bool = True,
         return_data: bool = False,
+        rebuild: bool = False,
     ) -> typing.Union["User", tuple["User", dict[str, typing.Any]]]:
         secret_key = app.config["SECRET_KEY"]
         try:
@@ -188,8 +215,43 @@ class User(UserMixin):
         user_id = data.get("user_id")
         user: User = cls.USERS.get(user_id)
         if user is None:
-            raise jwt.ExpiredSignatureError()
+            # `USERS` is an in-memory registry, so it is empty after a restart
+            # or a cog reload. That used to sign everybody out, because a
+            # perfectly valid token had nobody to attach to. A login token
+            # carries the identity it was minted with, so rebuild from it; the
+            # revocation epochs below are what decide whether it still counts.
+            if not rebuild or "name" not in data:
+                raise jwt.ExpiredSignatureError()
+            user = cls(
+                id=user_id,
+                name=data["name"],
+                global_name=data.get("global_name"),
+                avatar_url=data.get("avatar_url"),
+            )
+            user.devices.append(token)
         return user if not return_data else (user, data)
+
+    @staticmethod
+    def token_is_revoked(data: dict[str, typing.Any]) -> bool:
+        """True if a login token predates the cut-off that applies to it.
+
+        The epochs live in the bot's config, so logging out and "Refresh
+        sessions" still revoke across a restart, while a restart on its own no
+        longer does.
+        """
+        issued = data.get("iat")
+        if issued is None:
+            # Minted before this existed; treat it as revoked so it is
+            # replaced by one that can be reasoned about.
+            return True
+        epochs = (app.data.get("core") or {}).get("session_epochs") or {}
+        for key in ("global", str(data.get("user_id"))):
+            try:
+                if int(issued) < int(epochs.get(key, 0)):
+                    return True
+            except (TypeError, ValueError):
+                continue
+        return False
 
 
 current_user: User
@@ -199,8 +261,23 @@ def register_extensions(_app: Flask) -> None:
     global app
     app = _app
     app.login_manager: LoginManager = LoginManager()
-    app.login_manager.session_protection: str = "strong"
+    # "strong" ties the session to a hash of the client's IP and user agent, so
+    # any change to either - moving between wifi and mobile data, a browser
+    # updating itself - dropped the login on the spot. That is a real
+    # protection against a stolen cookie being replayed elsewhere, but on a
+    # dashboard people keep open across networks it mostly logged them out.
+    # "basic" is Flask-Login's own default; the JWT in the cookie still carries
+    # its own expiry, and the cookie stays HttpOnly and Secure.
+    app.login_manager.session_protection: str = "basic"
     app.config["USE_SESSION_FOR_NEXT"]: bool = False
+    # Without this the session cookie has no expiry and dies with the browser,
+    # which is what made every restart of the browser a fresh Discord
+    # authorization. The remember cookie gets the same window.
+    app.config["PERMANENT_SESSION_LIFETIME"]: datetime.timedelta = SESSION_LIFETIME
+    app.config["REMEMBER_COOKIE_DURATION"]: datetime.timedelta = SESSION_LIFETIME
+    app.config["REMEMBER_COOKIE_HTTPONLY"]: bool = True
+    app.config["SESSION_COOKIE_HTTPONLY"]: bool = True
+    app.config["SESSION_COOKIE_SAMESITE"]: str = "Lax"
     app.login_manager.login_view: str = "login_blueprint.login"
     app.login_manager.login_message: str = _(
         "Please log in to access this page.",
@@ -217,7 +294,9 @@ def register_extensions(_app: Flask) -> None:
     @app.login_manager.user_loader
     def user_loader(token: str) -> None:
         try:
-            user: User = User.get_user_from_token(token=token, action="login", unique=False)
+            user, data = User.get_user_from_token(
+                token=token, action="login", unique=False, return_data=True, rebuild=True,
+            )
         except jwt.ExpiredSignatureError:
             return None
         except jwt.InvalidTokenError:
@@ -226,7 +305,16 @@ def register_extensions(_app: Flask) -> None:
                 return None
             # app.data["core"]["blacklisted_ips"].append(remote_addr)
             return None
-        if not user.is_active or token not in user.devices:
+        if not user.is_active:
+            return None
+        # Revocation now has two layers. `devices` is precise but in-memory, so
+        # it only speaks for sessions minted since the last restart: a token
+        # missing from a *populated* device list was signed out deliberately.
+        # The persisted epochs cover everything else, including across
+        # restarts.
+        if user.devices and token not in user.devices:
+            return None
+        if User.token_is_revoked(data):
             return None
         return user
 
@@ -263,9 +351,18 @@ def register_extensions(_app: Flask) -> None:
     )
 
     app.config["WTF_CSRF_ENABLED"]: bool = True
-    app.config["WTF_CSRF_SECRET_KEY"]: str = base64.urlsafe_b64decode(
-        Fernet.generate_key().decode(),
-    )
+    # This used to be a fresh random key on every app start. The session cookie
+    # is signed with SECRET_KEY, which the bot persists in its config, so a
+    # restart or a `[p]reload dashboard` left everyone logged in while silently
+    # invalidating every CSRF token already handed out - the next form they
+    # submitted failed with "The CSRF token is invalid", because the signature
+    # could no longer be verified. Reusing the persisted key keeps tokens
+    # verifiable for as long as the session they belong to.
+    app.config["WTF_CSRF_SECRET_KEY"] = app.config["SECRET_KEY"]
+    # A dashboard page is something you leave open. The default hour meant a
+    # form rendered before lunch failed on submit after it; tokens now last as
+    # long as the login they were issued under.
+    app.config["WTF_CSRF_TIME_LIMIT"]: int = int(SESSION_LIFETIME.total_seconds())
     app.csrf_protect: CSRFProtect = CSRFProtect()
     app.csrf_protect.init_app(app)
     initial_protect = app.csrf_protect.protect
