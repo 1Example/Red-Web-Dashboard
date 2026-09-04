@@ -853,6 +853,15 @@ span.flatpickr-weekday {
   margin-right: 0 !important;
 }
 
+/* The EmbedUtils editor is inlined here as a self-contained stylesheet scoped
+   to #eu-editor. Its `.container` is a grid cell inside the embed preview, not
+   a Bootstrap page wrapper, so the width release above would stretch the
+   preview. Higher specificity, same !important, so this wins. */
+#third-party-content #eu-editor .container {
+  width: auto !important;
+  max-width: none !important;
+}
+
 /* Surfaces. Anything a cog paints as grey/white/dark gets the nested-panel
    material instead. `.card` is already handled by the specificity guard
    above; these are the utility classes and generic panel names cogs reach
@@ -1077,6 +1086,31 @@ span.flatpickr-weekday {
   color: var(--cx-text) !important;
 }
 .cx-back i { font-size: 1.1rem; opacity: 0.8; }
+
+/* Module breadcrumb.
+
+   The back pill is 1.05rem but the heading it sits in is a plain `h2`, so on a
+   module's sub-page the trailing `/ Settings` rendered at roughly twice the
+   pill's size - a small button stranded beside big text. A module's root page
+   has no trail at all, which is why only the modules with more than one page
+   looked wrong. Giving the whole line the pill's scale fixes the sub-pages and
+   leaves the root pages exactly as they were. */
+.cx-crumb {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+/* The nudge existed to lift the pill against much larger text. Now that both
+   are the same size it just knocks the pill off the baseline. */
+.cx-crumb .cx-back { vertical-align: baseline; }
+/* The rest of the trail is the same weight as the pill, with the current page
+   carried at full strength and its ancestors dimmed. */
+.cx-crumb > a:not(.cx-back) {
+  color: var(--cx-text-dim);
+  text-decoration: none;
+}
+.cx-crumb > a:not(.cx-back):hover { color: var(--cx-text); }
 
 /* ==========================================================================
    Mobile fixes
