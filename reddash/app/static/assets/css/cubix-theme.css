@@ -1752,118 +1752,237 @@ span.flatpickr-weekday {
 
 /* ---------- home: your servers ---------- */
 
-.cx-home-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+/* ==========================================================================
+   Server directory (landing page)
+
+   The bot's own server list, shown to signed-out visitors too. Each entry is a
+   card built around the server's banner and icon, so the grid reads as a
+   directory of places rather than a table of numbers.
+   ========================================================================== */
+
+.cx-srv-sub { font-size: .74rem; color: var(--cx-text-dim); }
+
+.cx-srv-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* All / Mine toggle, only rendered when the viewer shares servers with the bot. */
+.cx-srv-seg {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 9px;
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
 }
-/* These sit inside the "Your servers" card, so they take the nested-panel
-   surface - not `--cx-surface`, which is 98% opaque and made them read as
-   solid slabs punched into a translucent card. */
-.cx-home-card {
+.cx-srv-segbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--cx-text-dim);
+  font-size: .74rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.cx-srv-segbtn:hover { color: var(--cx-text); }
+.cx-srv-segbtn.active {
+  color: #fff;
+  background: rgba(108, 140, 255, .28);
+  box-shadow: inset 0 0 0 1px rgba(130, 175, 255, .35);
+}
+.cx-srv-segcount { opacity: .7; font-size: .68rem; }
+
+.cx-srv-search { position: relative; display: flex; align-items: center; }
+.cx-srv-search i {
+  position: absolute;
+  left: 10px;
+  font-size: .74rem;
+  color: var(--cx-text-dim);
+  pointer-events: none;
+}
+.cx-srv-search input {
+  height: 32px;
+  width: 200px;
+  padding: 0 10px 0 28px;
+  border-radius: 9px;
+  background: var(--cx-panel-3);
+  border: 1px solid var(--cx-panel-3-bd);
+  color: var(--cx-text);
+  font-size: .78rem;
+  outline: none;
+}
+.cx-srv-search input:focus { border-color: var(--cx-panel-bd); }
+
+.cx-srv-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+}
+
+.cx-srv {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   min-width: 0;
-  padding: 14px 16px;
+  overflow: hidden;
   border-radius: var(--cx-radius, 12px);
   background: var(--cx-panel-2);
   border: 1px solid var(--cx-panel-2-bd);
-  border-left: 3px solid rgba(255, 255, 255, .10);
-  transition: background .15s, transform .08s, border-color .15s;
+  transition: transform .1s ease, border-color .15s ease, background .15s ease;
 }
-.cx-home-card:hover {
-  background: rgba(90, 130, 220, .13);
+.cx-srv:hover {
+  transform: translateY(-2px);
+  background: rgba(90, 130, 220, .12);
   border-color: var(--cx-panel-bd);
-  transform: translateY(-1px);
 }
-/* A server you can actually act on is worth spotting at a glance. */
-.cx-home-card.cx-home-manage { border-left-color: #6c8cff; }
+/* A server the viewer is already in. */
+.cx-srv.is-shared { border-color: rgba(108, 140, 255, .38); }
 
-.cx-home-top { display: flex; align-items: center; gap: 11px; min-width: 0; }
-.cx-home-ico {
-  width: 42px;
-  height: 42px;
+.cx-srv-banner {
+  position: relative;
+  height: 64px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--cx-panel-2-bd);
+}
+/* Servers with no banner still need the same silhouette, or the grid jumps. */
+.cx-srv-banner.is-blank {
+  background-image: linear-gradient(135deg, rgba(90, 130, 220, .22), rgba(10, 18, 40, .5));
+}
+.cx-srv-badge,
+.cx-srv-boost {
+  position: absolute;
+  top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.cx-srv-badge {
+  left: 8px;
+  color: #c3d0ff;
+  background: rgba(20, 30, 70, .72);
+  border: 1px solid rgba(130, 175, 255, .45);
+}
+.cx-srv-boost {
+  right: 8px;
+  color: #ff8ae2;
+  background: rgba(40, 12, 40, .66);
+  border: 1px solid rgba(255, 115, 250, .38);
+}
+
+.cx-srv-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px 14px 0;
+}
+.cx-srv-ico {
+  width: 44px;
+  height: 44px;
   flex: none;
   border-radius: 12px;
   object-fit: cover;
   background: rgba(255, 255, 255, .07);
+  /* Lifted over the banner it overlaps. */
+  margin-top: -26px;
+  border: 3px solid #0a1020;
 }
-.cx-home-ico-ph {
+.cx-srv-ico-ph {
   display: grid;
   place-items: center;
   font-size: 1.05rem;
   font-weight: 800;
-  color: var(--cx-text-dim, #9aa4b2);
+  color: var(--cx-text-dim);
 }
-.cx-home-name { min-width: 0; flex: 1 1 auto; }
-.cx-home-name b {
+.cx-srv-id { min-width: 0; flex: 1 1 auto; }
+.cx-srv-id b {
   display: block;
-  font-size: .93rem;
+  font-size: .9rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cx-home-name span {
-  display: block;
-  font-size: .72rem;
-  color: var(--cx-text-dim, #9aa4b2);
+.cx-srv-id span { display: block; font-size: .68rem; color: var(--cx-text-dim); }
+
+/* Two lines, so one wordy server does not make its row taller than the rest. */
+.cx-srv-desc {
+  margin: 8px 14px 0;
+  font-size: .74rem;
+  line-height: 1.45;
+  color: var(--cx-text-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.cx-home-boost {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: .68rem;
-  font-weight: 800;
-  color: #ff8ae2;
-  background: rgba(255, 115, 250, .12);
-  border: 1px solid rgba(255, 115, 250, .32);
 }
 
-/* Three across, so six tiles read as two even rows. auto-fit packed five onto
-   the first row and left the sixth stranded on its own. */
-.cx-home-stats {
-  display: grid;
-  gap: 7px;
-  grid-template-columns: repeat(3, 1fr);
+.cx-srv-figs {
+  display: flex;
+  gap: 14px;
+  padding: 10px 14px 0;
+  font-size: .74rem;
+  color: var(--cx-text-dim);
 }
-.cx-home-stats > div {
-  padding: 7px 4px;
+.cx-srv-figs span { display: inline-flex; align-items: center; gap: 5px; }
+.cx-srv-figs b { color: var(--cx-text); font-variant-numeric: tabular-nums; }
+.cx-srv-figs i { opacity: .7; }
+.cx-srv-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38d39f;
+  box-shadow: 0 0 0 3px rgba(56, 211, 159, .16);
+}
+
+.cx-srv-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding: 12px 14px 13px;
+}
+.cx-srv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
   border-radius: 9px;
-  text-align: center;
+  font-size: .74rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--cx-text) !important;
   background: var(--cx-panel-3);
   border: 1px solid var(--cx-panel-3-bd);
 }
-.cx-home-stats b {
-  display: block;
-  font-size: .92rem;
-  line-height: 1.2;
-  font-variant-numeric: tabular-nums;
+.cx-srv-btn:hover { background: rgba(255, 255, 255, .1); }
+.cx-srv-btn.primary {
+  color: #fff !important;
+  background: rgba(108, 140, 255, .3);
+  border-color: rgba(130, 175, 255, .45);
 }
-.cx-home-stats span {
-  font-size: .6rem;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--cx-text-dim, #9aa4b2);
-}
-.cx-home-online { color: #38d39f; }
+.cx-srv-btn.primary:hover { background: rgba(108, 140, 255, .45); }
 
-.cx-home-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+.cx-srv-none {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--cx-text-dim);
 }
-.cx-home-foot i { margin-right: 4px; opacity: .8; }
-.cx-home-go { font-size: .76rem; font-weight: 700; color: #8ea6ff; text-decoration: none; }
-.cx-home-go:hover { color: #b7c6ff; text-decoration: underline; }
+
+@media (max-width: 575px) {
+  .cx-srv-tools { width: 100%; }
+  .cx-srv-search { flex: 1 1 auto; }
+  .cx-srv-search input { width: 100%; }
+}
 
 /* ---------- per-server bot appearance ---------- */
 

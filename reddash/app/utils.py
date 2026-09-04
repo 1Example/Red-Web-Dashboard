@@ -253,6 +253,13 @@ def register_extensions(_app: Flask) -> None:
         force_https=not allow_unsecure_http_requests,
         session_cookie_secure=not allow_unsecure_http_requests,
         content_security_policy=None,
+        # Stated rather than left to Talisman's default: the dashboard frames
+        # its own pages (the EmbedUtils editor is a standalone document shown
+        # inside a normal module page), and a default of DENY would render
+        # those as an empty box with nothing in the UI to explain why.
+        # Same-origin only - this is not an invitation to embed the dashboard
+        # anywhere else.
+        frame_options="SAMEORIGIN",
     )
 
     app.config["WTF_CSRF_ENABLED"]: bool = True

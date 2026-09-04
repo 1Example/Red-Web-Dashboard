@@ -170,86 +170,114 @@
 
       </div>
 
-      <!-- ===== Your servers ===== -->
+      <!-- ===== Server directory =====
+           The bot's own server list, shown to anonymous visitors as well.
+           When someone is logged in, the servers they are in are pulled to the
+           front and marked, and the ones they can manage get a link. -->
       {% if home_guilds %}
-        <div class="card mb-4">
+        <div class="card mb-4" id="cx-servers">
           <div class="card-header pb-2 d-flex align-items-center flex-wrap gap-2">
-            <h5 class="mb-0"><i class="ni ni-world-2 me-2 opacity-8"></i>{{ _("Your servers") }}</h5>
+            <h5 class="mb-0"><i class="ni ni-world-2 me-2 opacity-8"></i>{{ _("Servers") }}</h5>
             <span class="cx-count">{{ home_guilds_total }}</span>
-            <span class="text-xs text-secondary ms-auto">
-              {{ _("Servers you share with this bot.") }}
-            </span>
+            {% if home_members_total %}
+              <span class="cx-srv-sub">
+                {{ number_to_text_with_suffix(home_members_total) }} {{ _("members in total") }}
+              </span>
+            {% endif %}
+            <div class="cx-srv-tools ms-auto">
+              {% if home_guilds_shared %}
+                <div class="cx-srv-seg" id="cx-srv-seg">
+                  <button type="button" class="cx-srv-segbtn active" data-scope="all">
+                    {{ _("All") }}
+                  </button>
+                  <button type="button" class="cx-srv-segbtn" data-scope="mine">
+                    {{ _("Mine") }} <span class="cx-srv-segcount">{{ home_guilds_shared }}</span>
+                  </button>
+                </div>
+              {% endif %}
+              <div class="cx-srv-search">
+                <i class="fa fa-search"></i>
+                <input type="text" id="cx-srv-q" autocomplete="off"
+                       placeholder="{{ _('Search servers...') }}"
+                       aria-label="{{ _('Search servers') }}" />
+              </div>
+            </div>
           </div>
+
           <div class="card-body pt-2">
-            <div class="cx-home-grid">
+            <div class="cx-srv-grid" id="cx-srv-grid">
               {% for g in home_guilds %}
-                <div class="cx-home-card{% if g.can_manage %} cx-home-manage{% endif %}">
-                  <div class="cx-home-top">
-                    {% if g.icon %}
-                      <img class="cx-home-ico" src="{{ g.icon }}" alt="" loading="lazy" />
-                    {% else %}
-                      <span class="cx-home-ico cx-home-ico-ph">{{ g.name[:1]|upper }}</span>
-                    {% endif %}
-                    <div class="cx-home-name">
-                      <b>{{ g.name }}</b>
-                      <span>
-                        {% if g.is_owner %}{{ _("You own it") }}
-                        {% elif g.owner %}{{ _("Owned by") }} {{ g.owner }}{% endif %}
+                <article class="cx-srv{% if g.shared %} is-shared{% endif %}"
+                         data-name="{{ g.name|lower }}"
+                         data-shared="{{ 1 if g.shared else 0 }}">
+
+                  {# The server's own banner, where it has one. Servers without
+                     fall back to a tinted band so the grid keeps one rhythm. #}
+                  <div class="cx-srv-banner{% if not g.banner %} is-blank{% endif %}"
+                       {% if g.banner %}style="background-image:url('{{ g.banner }}');"{% endif %}>
+                    {% if g.shared %}
+                      <span class="cx-srv-badge" title="{{ _('You are in this server') }}">
+                        <i class="fa fa-check"></i> {{ _("Joined") }}
                       </span>
-                    </div>
+                    {% endif %}
                     {% if g.boosts %}
-                      <span class="cx-home-boost" title="{{ _("Boosts") }}">
+                      <span class="cx-srv-boost" title="{{ _('Boosts') }}">
                         <i class="fa fa-angle-double-up"></i>{{ g.boosts }}
+                        {%- if g.tier %} · T{{ g.tier }}{% endif %}
                       </span>
                     {% endif %}
                   </div>
 
-                  <div class="cx-home-stats">
-                    <div>
+                  <div class="cx-srv-head">
+                    {% if g.icon %}
+                      <img class="cx-srv-ico" src="{{ g.icon }}" alt="" loading="lazy" />
+                    {% else %}
+                      <span class="cx-srv-ico cx-srv-ico-ph">{{ g.name[:1]|upper }}</span>
+                    {% endif %}
+                    <div class="cx-srv-id">
+                      <b title="{{ g.name }}">{{ g.name }}</b>
+                      {% if g.created_at %}
+                        <span>{{ _("Since") }} {{ moment(g.created_at).format("MMM YYYY") }}</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  {% if g.description %}
+                    <p class="cx-srv-desc">{{ g.description }}</p>
+                  {% endif %}
+
+                  <div class="cx-srv-figs">
+                    <span title="{{ _('Members') }}">
+                      <i class="fa fa-users"></i>
                       <b>{{ number_to_text_with_suffix(g.members) }}</b>
-                      <span>{{ _("members") }}</span>
-                    </div>
+                    </span>
                     {% if g.online is not none %}
-                      <div>
-                        <b class="cx-home-online">{{ number_to_text_with_suffix(g.online) }}</b>
-                        <span>{{ _("online") }}</span>
-                      </div>
+                      <span title="{{ _('Online now') }}">
+                        <i class="cx-srv-dot"></i>
+                        <b>{{ number_to_text_with_suffix(g.online) }}</b>
+                      </span>
                     {% endif %}
-                    <div>
-                      <b>{{ g.text_channels }}</b>
-                      <span>{{ _("text") }}</span>
-                    </div>
-                    <div>
-                      <b>{{ g.voice_channels }}</b>
-                      <span>{{ _("voice") }}</span>
-                    </div>
-                    <div>
-                      <b>{{ g.roles }}</b>
-                      <span>{{ _("roles") }}</span>
-                    </div>
-                    <div>
-                      <b>{{ g.emojis }}</b>
-                      <span>{{ _("emojis") }}</span>
-                    </div>
                   </div>
 
-                  <div class="cx-home-foot">
-                    {% if g.created_at %}
-                      <span class="text-xs text-secondary">
-                        <i class="fa fa-calendar-o"></i>
-                        {{ _("Created") }} {{ moment(g.created_at).format("MMM YYYY") }}
-                      </span>
+                  <div class="cx-srv-foot">
+                    {% if g.invite %}
+                      <a class="cx-srv-btn" href="{{ g.invite }}" target="_blank" rel="noopener nofollow">
+                        <i class="fa fa-sign-in"></i> {{ _("Join") }}
+                      </a>
                     {% endif %}
                     {% if g.can_manage %}
-                      <a class="cx-home-go"
+                      <a class="cx-srv-btn primary ms-auto"
                          href="{{ url_for("base_blueprint.dashboard_guild", guild_id=g.id) }}">
                         {{ _("Manage") }} <i class="fa fa-angle-right"></i>
                       </a>
                     {% endif %}
                   </div>
-                </div>
+                </article>
               {% endfor %}
             </div>
+
+            <p class="cx-srv-none" id="cx-srv-none" hidden>{{ _("No servers match that search.") }}</p>
+
             {% if home_guilds_total > home_guilds|length %}
               <p class="text-xs text-secondary mt-3 mb-0">
                 {{ _("Showing") }} {{ home_guilds|length }} {{ _("of") }} {{ home_guilds_total }}.
@@ -263,4 +291,43 @@
   </main>
 {% endblock %}
 
-{% block javascripts %}{% endblock %}
+{% block javascripts %}
+<script>
+// Client-side only: the whole list is already on the page, so filtering is a
+// class toggle rather than another round trip.
+(function () {
+    var grid = document.getElementById("cx-srv-grid");
+    if (!grid) return;
+    var q     = document.getElementById("cx-srv-q");
+    var none  = document.getElementById("cx-srv-none");
+    var seg   = document.getElementById("cx-srv-seg");
+    var cards = Array.prototype.slice.call(grid.querySelectorAll(".cx-srv"));
+    var scope = "all";
+
+    function apply() {
+        var needle = (q.value || "").trim().toLowerCase();
+        var shown = 0;
+        cards.forEach(function (card) {
+            var hit = (!needle || card.dataset.name.indexOf(needle) !== -1)
+                   && (scope !== "mine" || card.dataset.shared === "1");
+            card.hidden = !hit;
+            if (hit) shown++;
+        });
+        none.hidden = shown !== 0;
+    }
+
+    q.addEventListener("input", apply);
+    if (seg) {
+        seg.addEventListener("click", function (e) {
+            var btn = e.target.closest(".cx-srv-segbtn");
+            if (!btn) return;
+            scope = btn.dataset.scope;
+            seg.querySelectorAll(".cx-srv-segbtn").forEach(function (b) {
+                b.classList.toggle("active", b === btn);
+            });
+            apply();
+        });
+    }
+})();
+</script>
+{% endblock %}

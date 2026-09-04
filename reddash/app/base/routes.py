@@ -47,29 +47,49 @@ from reddash.app.pagination import Pagination
 @blueprint.route("/index")
 @blueprint.route("/")
 async def index():
-    # The server card is scoped to servers the visitor is actually in, so an
-    # anonymous visitor is never shown the bot's server list.
+    # The directory is the bot's own server list and is shown to anonymous
+    # visitors too; when someone is logged in it is annotated with which of
+    # them they are in and which they can manage, so their own servers sort
+    # to the front.
     guilds = []
     total = 0
-    if current_user.is_authenticated:
-        result = await get_result(
-            app,
-            {
-                "jsonrpc": "2.0",
-                "id": 0,
-                "method": "DASHBOARDRPC__GET_HOME_GUILDS",
-                "params": [current_user.id],
-            },
+    total_members = 0
+    result = await get_result(
+        app,
+        {
+            "jsonrpc": "2.0",
+            "id": 0,
+            "method": "DASHBOARDRPC__GET_SERVER_LIST",
+            "params": [current_user.id if current_user.is_authenticated else None],
+        },
+    )
+    if isinstance(result, dict) and result.get("status") == 0:
+        guilds = result.get("guilds") or []
+        total = result.get("total") or 0
+        total_members = result.get("total_members") or 0
+        for guild in guilds:
+            if guild.get("created_at"):
+                guild["created_at"] = datetime.datetime.fromtimestamp(
+                    guild["created_at"], tz=datetime.UTC
+                )
+        # Servers the viewer is in lead, then the ones they can manage within
+        # that. The RPC leaves the ordering identical for everybody so its
+        # cache is shared; the personal part happens here.
+        guilds.sort(
+            key=lambda g: (
+                not g.get("shared"),
+                not g.get("can_manage"),
+                -(g.get("members") or 0),
+                (g.get("name") or "").lower(),
+            )
         )
-        if isinstance(result, dict) and result.get("status") == 0:
-            guilds = result.get("guilds") or []
-            total = result.get("total") or 0
-            for guild in guilds:
-                if guild.get("created_at"):
-                    guild["created_at"] = datetime.datetime.fromtimestamp(
-                        guild["created_at"], tz=datetime.UTC
-                    )
-    return render_template("pages/index.html", home_guilds=guilds, home_guilds_total=total)
+    return render_template(
+        "pages/index.html",
+        home_guilds=guilds,
+        home_guilds_total=total,
+        home_members_total=total_members,
+        home_guilds_shared=sum(1 for g in guilds if g.get("shared")),
+    )
 
 
 @blueprint.route("/setcolor", methods=("POST",))
