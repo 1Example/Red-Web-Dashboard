@@ -110,7 +110,7 @@
                                                         {% for command in cogs[cog]["commands"] recursive %}
                                                           <tr data-toggle="collapse" href="#collapse_{{ command.name }}" role="button" aria-expanded="false" aria-controls="collapse_{{ command.name }}">
                                                               <td class="text-{{ variables["meta"]["color"] }}" style="padding-left: {{ loop.depth0 * 40 + 24 }}px" title="{{ command.name }} {{ command.signature }}">
-                                                                <span class="prefix">{{ prefixes[0] }}</span>{{ command.name }}
+                                                                {% if not command.slash %}<span class="prefix">{{ prefixes[0] }}</span>{% endif %}{{ command.name }}
                                                               </td>
                                                               <td style="padding-left: 24px" class="text-wrap">{{ command.short_description|markdown }}</td>
                                                           </tr>
@@ -121,7 +121,7 @@
                                                                   <div class="d-flex card card-body text-wrap">
                                                                     {% if command.signature %}
                                                                       <strong>{{ _("Usage:") }}</strong>
-                                                                      <div class="d-flex"><code>{{ prefixes[0] }}{{ command.name }} {{ command.signature }}</code> <a href="javascript:copyTextToClipboard('{{ prefixes[0] }}{{ command.name }} {{ command.signature }}');" title="{{ _("Copy to clipboard") }}" style="margin-left: 10px;"><i class="far fa-copy me-2"></i></a></div>
+                                                                      <div class="d-flex"><code>{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}</code> <a href="javascript:copyTextToClipboard('{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}');" title="{{ _("Copy to clipboard") }}" style="margin-left: 10px;"><i class="far fa-copy me-2"></i></a></div>
                                                                     {% endif %}
                                                                     <br />
                                                                     {% if command.aliases %}
@@ -182,7 +182,7 @@
                                           {% if (not tab_name or cogs[cog]["name"] == tab_name) and query.lower() in command["name"].lower() %}
                                             <tr data-toggle="collapse" href="#collapse_{{ command.name }}" role="button" aria-expanded="false" aria-controls="collapse_{{ command.name }}">
                                               <td class="text-{{ variables["meta"]["color"] }}" style="padding-left: {{ loop.depth0 * 40 + 24 }}px" title="{{ command.name }} {{ command.signature }}">
-                                                <span class="prefix">{{ prefixes[0] }}</span>{{ command.name }}
+                                                {% if not command.slash %}<span class="prefix">{{ prefixes[0] }}</span>{% endif %}{{ command.name }}
                                               </td>
                                               <td style="padding-left: 24px" class="text-wrap">{{ command.short_description|markdown }}</td>
                                             </tr>
@@ -193,7 +193,7 @@
                                                     <div class="d-flex card card-body text-wrap">
                                                       {% if command.signature %}
                                                         <strong>{{ _("Usage:") }}</strong>
-                                                        <div class="d-flex"><code>{{ prefixes[0] }}{{ command.name }} {{ command.signature }}</code> <a href="javascript:copyTextToClipboard('{{ prefixes[0] }}{{ command.name }} {{ command.signature }}');" title="{{ _("Copy to clipboard") }}" style="margin-left: 10px;"><i class="far fa-copy me-2"></i></a></div>
+                                                        <div class="d-flex"><code>{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}</code> <a href="javascript:copyTextToClipboard('{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}');" title="{{ _("Copy to clipboard") }}" style="margin-left: 10px;"><i class="far fa-copy me-2"></i></a></div>
                                                       {% endif %}
                                                       <br />
                                                       {% if command.aliases %}
