@@ -24,6 +24,7 @@ from flask_moment import Moment
 from flask_sitemapper import Sitemapper
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_wtf.file import FileAllowed, FileField, MultipleFileField
 from fuzzywuzzy import process
 from markdown import Markdown
@@ -260,6 +261,24 @@ current_user: User
 def register_extensions(_app: Flask) -> None:
     global app
     app = _app
+
+    # Behind a reverse proxy (nginx, OVH, Cloudflare) the app is spoken to over
+    # plain HTTP on localhost, so Flask reports `request.scheme` as "http" and
+    # every absolute URL it builds - `request.url`, `url_for(_external=True)` -
+    # comes out as http:// even though the browser is on https://. A page that
+    # then fetches one of those URLs has it blocked as mixed content.
+    #
+    # `X-Forwarded-Proto` and `X-Forwarded-Host` carry the truth; this makes
+    # Flask read them. One hop: the proxy directly in front of us.
+    #
+    # `x_for` stays 0 deliberately. It would rewrite `request.remote_addr` to
+    # the real client IP, and two things below depend on that address still
+    # being the proxy's: the Talisman override treats a loopback/private
+    # `remote_addr` as "already behind something that terminates TLS" and skips
+    # the HTTPS redirect, and the IP blacklist reads `X-Forwarded-For` out of
+    # the environ itself, so it gains nothing here. Leaving it off keeps this
+    # change to the one thing that is broken - the scheme on generated URLs.
+    _app.wsgi_app = ProxyFix(_app.wsgi_app, x_for=0, x_proto=1, x_host=1, x_prefix=1)
     app.login_manager: LoginManager = LoginManager()
     # "strong" ties the session to a hash of the client's IP and user agent, so
     # any change to either - moving between wifi and mobile data, a browser
