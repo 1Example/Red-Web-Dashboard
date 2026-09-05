@@ -1,3 +1,26 @@
+<style>
+  /* A masonry rather than a grid of rows: every card was stretched to the
+     height of the tallest one beside it, and most of them are a name, a line
+     and a button, so each row carried the empty space of its biggest member. */
+  .module-grid {
+    column-count: 3;
+    column-gap: 1.25rem;
+  }
+  @media (max-width: 1399px) { .module-grid { column-count: 2; } }
+  @media (max-width: 767px)  { .module-grid { column-count: 1; } }
+
+  .module-card-wrapper {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+  .module-card-wrapper .card-body { padding: 1rem 1.15rem; }
+  .module-card-desc { line-height: 1.45; }
+  .module-card-desc p:last-child { margin-bottom: 0; }
+  .module-card-pages { margin-top: .85rem; }
+</style>
+
 <div class="card card-chart">
   <div class="card-body">
     <div class="row">
@@ -14,12 +37,12 @@
         <input type="text" class="form-control" id="moduleSearchInput" placeholder="{{ _('Search modules...') }}" oninput="filterModuleCards()">
       </div>
 
-      <div class="row" id="modulesCardGrid">
+      <div id="modulesCardGrid" class="module-grid">
         {% for third_party in third_parties %}
-          <div class="col-lg-4 col-md-6 mb-4 module-card-wrapper"
+          <div class="module-card-wrapper"
                data-module-name="{{ third_party|lower }} {{ third_parties_infos[third_party]['description']|striptags|lower }}">
-            <div class="card h-100 shadow-sm">
-              <div class="card-body d-flex flex-column">
+            <div class="card shadow-sm">
+              <div class="card-body">
 
                 <div class="d-flex align-items-center mb-2">
                   <div class="icon icon-shape icon-sm bg-gradient-{{ variables["meta"]["color"] }} border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
@@ -28,16 +51,11 @@
                   <h5 class="mb-0">{{ third_party }}</h5>
                 </div>
 
-                <p class="text-sm text-secondary mb-2">{{ third_parties_infos[third_party]["description"]|markdown }}</p>
-
-                <div class="text-xs text-secondary mb-3">
-                  <div><b>{{ _("Author(s):") }}</b> {{ third_parties_infos[third_party]["author"] }}</div>
-                  {% if third_parties_infos[third_party]["repo"] != "Unknown" %}
-                    <div class="text-truncate"><b>{{ _("Repo:") }}</b> <a href="{{ third_parties_infos[third_party]["repo"] }}" target="_blank">{{ third_parties_infos[third_party]["repo"] }}</a></div>
-                  {% endif %}
+                <div class="text-sm text-secondary mb-3 module-card-desc">
+                  {{ third_parties_infos[third_party]["description"]|markdown }}
                 </div>
 
-                <div class="mt-auto">
+                <div class="module-card-pages">
                   {% for page in third_parties[third_party] %}
                     <a class="btn btn-sm {% if loop.index == 1 %}bg-gradient-{{ variables["meta"]["color"] }}{% else %}btn-outline-secondary{% endif %} mb-1 me-1"
                        href="{{ third_parties[third_party][page].url }}"
