@@ -322,6 +322,54 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <hr class="horizontal dark" />
+                                    <div class="row mb-1">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form-group-label">{{ bot_settings_form.status_type.label.text }}</label>
+                                                {{ bot_settings_form.status_type(class="form-control form-control-default", id="botStatusType") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="botStatusPresenceGroup">
+                                                <label class="form-group-label">{{ bot_settings_form.status_presence.label.text }}</label>
+                                                {{ bot_settings_form.status_presence(class="form-control form-control-default") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-1">
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="botStatusTextGroup">
+                                                <label class="form-group-label">{{ bot_settings_form.status_text.label.text }}</label>
+                                                {{ bot_settings_form.status_text(class="form-control form-control-default") }}
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group" id="botStatusStreamGroup">
+                                                <label class="form-group-label">{{ bot_settings_form.status_stream_url.label.text }}</label>
+                                                {{ bot_settings_form.status_stream_url(class="form-control form-control-default", placeholder="https://twitch.tv/yourchannel") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-secondary mb-0">
+                                        {{ _("The status is reapplied every time the bot reconnects, so it survives a restart. Leave the activity on \"No activity\" to clear it.") }}
+                                    </p>
+                                    <script>
+                                      // Presence has no meaning while streaming (Discord forces green),
+                                      // and the stream URL has none otherwise.
+                                      (function () {
+                                        var type = document.getElementById("botStatusType");
+                                        if (!type) return;
+                                        function sync() {
+                                          var streaming = type.value === "streaming";
+                                          document.getElementById("botStatusStreamGroup").style.display = streaming ? "" : "none";
+                                          document.getElementById("botStatusPresenceGroup").style.display = streaming ? "none" : "";
+                                          document.getElementById("botStatusTextGroup").style.display = type.value ? "" : "none";
+                                        }
+                                        type.addEventListener("change", sync);
+                                        sync();
+                                      })();
+                                    </script>
                                     <div class="text-center">
                                         {{ bot_settings_form.submit(class="btn mb-0 bg-gradient-" + variables["meta"]["color"] + " btn-md w-100 my-4") }}
                                     </div>

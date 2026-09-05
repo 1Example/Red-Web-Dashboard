@@ -859,6 +859,27 @@ class DashboardSettingsForm(FlaskForm):
     submit: wtforms.SubmitField = wtforms.SubmitField(_("Save Modifications"))
 
 
+# The bot reports which activity kinds and presence states it accepts; these
+# are only the labels for them, so a new kind still shows up unlabelled rather
+# than disappearing.
+STATUS_ACTIVITY_LABELS = {
+    "": _("No activity"),
+    "playing": _("Playing"),
+    "listening": _("Listening to"),
+    "watching": _("Watching"),
+    "competing": _("Competing in"),
+    "streaming": _("Streaming"),
+    "custom": _("Custom"),
+}
+STATUS_PRESENCE_LABELS = {
+    "online": _("Online"),
+    "idle": _("Idle"),
+    "dnd": _("Do not disturb"),
+    "invisible": _("Invisible"),
+    "offline": _("Offline"),
+}
+
+
 class BotSettingsForm(FlaskForm):
     def __init__(self, settings: dict[str, typing.Any]) -> None:
         super().__init__(prefix="bot_settings_form_")
@@ -904,6 +925,19 @@ class BotSettingsForm(FlaskForm):
         self.invite_perms.default = settings["invite_perms"]
         self.locale.default = settings["locale"]
         self.regional_format.default = settings["regional_format"]
+        status = settings.get("status") or {}
+        self.status_type.choices = [
+            (key, STATUS_ACTIVITY_LABELS.get(key, key.title()))
+            for key in [""] + list(settings.get("status_activity_types") or [])
+        ]
+        self.status_type.default = status.get("type") or ""
+        self.status_presence.choices = [
+            (key, STATUS_PRESENCE_LABELS.get(key, key.title()))
+            for key in (settings.get("status_presence_states") or ["online"])
+        ]
+        self.status_presence.default = status.get("presence") or "online"
+        self.status_text.default = status.get("text") or ""
+        self.status_stream_url.default = status.get("stream_url") or ""
 
     prefixes: wtforms.StringField = wtforms.StringField(
         _("Prefixes:"), validators=[wtforms.validators.InputRequired(), PrefixesCheck()],
@@ -943,6 +977,18 @@ class BotSettingsForm(FlaskForm):
     regional_format: wtforms.StringField = wtforms.StringField(
         _("Regional Format:"),
         validators=[wtforms.validators.Optional(), BabelCheck(check_reset=True)],
+    )
+    status_type: wtforms.SelectField = wtforms.SelectField(
+        _("Activity:"), choices=[],
+    )
+    status_presence: wtforms.SelectField = wtforms.SelectField(
+        _("Presence:"), choices=[],
+    )
+    status_text: wtforms.StringField = wtforms.StringField(
+        _("Status Text:"), validators=[wtforms.validators.Length(max=128)],
+    )
+    status_stream_url: wtforms.StringField = wtforms.StringField(
+        _("Stream URL:"), validators=[wtforms.validators.Length(max=511)],
     )
     submit: wtforms.SubmitField = wtforms.SubmitField(_("Save Modifications"))
 
@@ -1146,6 +1192,12 @@ async def admin(
                     "invite_perms": bot_settings_form.invite_perms.data,
                     "locale": bot_settings_form.locale.data,
                     "regional_format": bot_settings_form.regional_format.data.strip() or None,
+                    "status": {
+                        "type": bot_settings_form.status_type.data,
+                        "presence": bot_settings_form.status_presence.data,
+                        "text": bot_settings_form.status_text.data.strip(),
+                        "stream_url": bot_settings_form.status_stream_url.data.strip(),
+                    },
                 },
             ],
         }
@@ -1153,7 +1205,11 @@ async def admin(
         if result["status"] == 0:
             flash(_("Successfully saved the modifications."), category="success")
         else:
-            flash(_("Failed to save the modifications."), category="danger")
+            # The bot validates the presence itself and says why it refused.
+            if result.get("error"):
+                flash(result["error"], category="danger")
+            else:
+                flash(_("Failed to save the modifications."), category="danger")
         return redirect(request.url)
     if bot_settings_form.submit.data and bot_settings_form.errors:
         for field_name, error_messages in bot_settings_form.errors.items():
