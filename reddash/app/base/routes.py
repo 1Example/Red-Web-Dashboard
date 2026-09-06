@@ -824,6 +824,8 @@ class DashboardActionsForm(FlaskForm):
 
     lock: wtforms.SubmitField = wtforms.SubmitField(_("Lock Dashboard"))
     refresh_sessions: wtforms.SubmitField = wtforms.SubmitField(_("Refresh Sessions"))
+    restart: wtforms.SubmitField = wtforms.SubmitField(_("Restart Bot"))
+    shutdown: wtforms.SubmitField = wtforms.SubmitField(_("Shut Down Bot"))
 
 
 class DiscordProfileForm(FlaskForm):
@@ -1106,6 +1108,29 @@ async def admin(
                 flash(_("Dashboard locked."), category="success")
             else:
                 flash(_("Dashboard unlocked."), category="success")
+        elif dashboard_actions_form.restart.data or dashboard_actions_form.shutdown.data:
+            # `[p]restart` and `[p]shutdown` used to be the only way to do this
+            # from Discord. The bot checks owner again on its side.
+            restart = bool(dashboard_actions_form.restart.data)
+            result = await get_result(
+                app,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                    "method": "DASHBOARDRPC__LIFECYCLE",
+                    "params": [current_user.id, "restart" if restart else "shutdown"],
+                },
+            )
+            if isinstance(result, dict) and result.get("status") == 0:
+                flash(
+                    _("Restarting. It will be back shortly, if something is supervising it.")
+                    if restart
+                    else _("Shutting down. Starting it again means going to the host."),
+                    category="warning",
+                )
+            else:
+                flash(_("The bot refused that."), category="danger")
+            return redirect(request.url)
         elif dashboard_actions_form.refresh_sessions.data:
             User.USERS = {
                 user_id: user for user_id, user in User.USERS.items() if not user.is_owner

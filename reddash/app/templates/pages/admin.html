@@ -121,6 +121,11 @@
                                     <p><i>{{ _("This will lock the Dashboard and prevent anyone from accessing control panels. Bot owners will still have access, and users will still be able to login through Discord Open Authentication.") }}</i></p>
                                     {{ dashboard_actions_form.refresh_sessions(class="btn mb-0 bg-gradient-" + variables["meta"]["color"] + " btn-md my-4", onclick="return confirmRefreshSessions(event);") }}
                                     <p><i>{{ _("This will log out all active users and require them to re-authenticate, except bot owners.") }}</i></p>
+                                    <hr />
+                                    {{ dashboard_actions_form.restart(class="btn mb-0 btn-outline-warning btn-md my-4", onclick="return confirmRestart(event);") }}
+                                    <p><i>{{ _("This will restart the bot. It only comes back if something is supervising the process.") }}</i></p>
+                                    {{ dashboard_actions_form.shutdown(class="btn mb-0 btn-outline-danger btn-md my-4", onclick="return confirmShutdown(event);") }}
+                                    <p><i>{{ _("This will stop the bot. Starting it again means going to the machine it runs on.") }}</i></p>
                                 </form>
                             </div>
                         </div>
@@ -792,6 +797,42 @@
                 title: '{{ _("Are you sure you want to change the lock status of Dashboard?") }}',
                 text: '{{ _("You will be able to change it again later.") }}',
                 confirmButtonText: '{{ _("Yes, change it!") }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    confirmationDone = true;
+                    target_button.click();
+                }
+            })
+            return false;
+        }
+        async function confirmRestart(event) {
+            if (confirmationDone) {
+                return true;
+            }
+            let target_button = event.target;
+            event.preventDefault();
+            SwalAlert.fire({
+                title: '{{ _("Restart the bot?") }}',
+                text: '{{ _("It will be offline for a moment, and only comes back if something is supervising the process.") }}',
+                confirmButtonText: '{{ _("Yes, restart it!") }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    confirmationDone = true;
+                    target_button.click();
+                }
+            })
+            return false;
+        }
+        async function confirmShutdown(event) {
+            if (confirmationDone) {
+                return true;
+            }
+            let target_button = event.target;
+            event.preventDefault();
+            SwalAlert.fire({
+                title: '{{ _("Shut the bot down?") }}',
+                text: '{{ _("Nothing here can start it again. That means going to the machine it runs on.") }}',
+                confirmButtonText: '{{ _("Yes, shut it down!") }}'
             }).then((result) => {
                 if (result.isConfirmed) {
                     confirmationDone = true;
