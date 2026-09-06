@@ -893,6 +893,13 @@ def initialize_websocket(app: Flask) -> bool:
 
 
 def check_for_disconnect(app: Flask, result: dict[str, typing.Any]) -> bool:
+    # get_result has already flattened a bot-side failure into
+    # {"status": 1, "error": "<reason>"}. Treating that as a live reply
+    # is how an unanswered sync ends up stored as the synced data.
+    if result.get("status") == 1 and isinstance(result.get("error"), str):
+        app.logger.warning("Sync request failed: %s", result["error"])
+        app.config["RPC_CONNECTED"]: bool = False
+        return False
     if (
         "error" in result
         and isinstance(result["error"], dict)

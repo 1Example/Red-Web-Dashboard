@@ -131,6 +131,14 @@ class FlaskApp(Flask):
         self.task_manager.start_tasks()
 
         # Initialize security.
+        if "core" not in self.data:
+            # The sync above returned nothing usable, so there are no keys to
+            # start with. Both causes look identical from here, so name them.
+            raise RuntimeError(
+                "Could not read the bot's dashboard settings. The bot is either"
+                " not running, or its Dashboard cog failed to load - check the"
+                " bot's console for a load error."
+            )
         # Session encoding.
         fernet_key: str = self.data["core"]["secret_key"]
         secret_key: bytes = base64.urlsafe_b64decode(fernet_key)
