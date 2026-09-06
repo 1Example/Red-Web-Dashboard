@@ -35,25 +35,25 @@ class TaskManager:
                     if method == "DASHBOARDRPC__GET_VARIABLES"
                     else [],
                 }
-                if self.app.cog is None:
+                if self.app.cog is None and not self.app.ws:
                     # This needs to be inside the lock, or both threads will create a websocket.
-                    if not self.app.ws:
-                        initialized = initialize_websocket(self.app)
-                        if not initialized:
-                            continue
-                    result = await get_result(self.app, request, retry=False)
-                    if not result:
+                    if not initialize_websocket(self.app):
+                        if once:
+                            return
+                        await asyncio.sleep(self.app.config["WEBSOCKET_INTERVAL"])
                         continue
-                    connected = check_for_disconnect(self.app, result)
-                    if not connected:
-                        continue
-                else:
-                    result = await get_result(self.app, request, retry=False)
-                    if not result:
-                        continue
-                    connected = check_for_disconnect(self.app, result)
-                    if not connected:
-                        continue
+
+                result = await get_result(self.app, request, retry=False)
+                if not result or not check_for_disconnect(self.app, result):
+                    # Waiting matters: `continue` on its own skips the sleep at
+                    # the bottom of the loop and retries as fast as the event
+                    # loop allows. The one-shot call has to give up instead, or
+                    # create_app never returns and the webserver hangs rather
+                    # than reporting that it could not reach the bot.
+                    if once:
+                        return
+                    await asyncio.sleep(self.app.config["WEBSOCKET_INTERVAL"])
+                    continue
 
                 # if "result" not in result:
                 #     self.app.logger.error(f"RPC websocket returned an unexpected response: {result}")
