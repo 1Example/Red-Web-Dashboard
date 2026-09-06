@@ -457,7 +457,7 @@
                                   <tr>
                                     <td class="text-sm"><b>{{ service.name }}</b></td>
                                     <td class="text-sm">
-                                      {% for key in service.keys %}<code>{{ key }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+                                      {% for key in service.fields %}<code>{{ key }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
                                     </td>
                                     <td class="text-end">
                                       <form action="" method="POST" role="form" class="d-inline">
