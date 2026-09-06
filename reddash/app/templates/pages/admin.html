@@ -90,6 +90,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {% if page and page == "api" %}show active{% endif %}" id="api-tab" data-toggle="pill" href="#api" role="tab" aria-controls="api" aria-selected="true">
+                                <i class="fa fa-key opacity-10" style="vertical-align: 0px;"></i> {{ _("API Keys") }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {% if page and page == "logs" %}show active{% endif %}" id="logs-tab" data-toggle="pill" href="#logs" role="tab" aria-controls="logs" aria-selected="true">
                                 <i class="fa fa-terminal opacity-10" style="vertical-align: 0px;"></i> {{ _("Console") }}
                             </a>
@@ -425,6 +430,89 @@
                                 </form>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade {% if page and page == "api" %}show active{% endif %}" id="api" role="tabpanel" aria-labelledby="api-tab">
+                <div class="card card-chart">
+                    <div class="card-body">
+                        <h2 class="card-title"><i class="fa fa-key me-2 opacity-8"></i>{{ _("API Keys") }}</h2>
+                        <p class="text-sm text-secondary">
+                          {{ _("Keys cogs ask for, like Spotify or Twitch. A stored value is never shown again - only which keys exist.") }}
+                        </p>
+
+                        {% if api_services %}
+                          <div class="table-responsive">
+                            <table class="table align-items-center mb-4">
+                              <thead>
+                                <tr>
+                                  <th class="text-uppercase text-xs">{{ _("Service") }}</th>
+                                  <th class="text-uppercase text-xs">{{ _("Keys") }}</th>
+                                  <th></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for service in api_services %}
+                                  <tr>
+                                    <td class="text-sm"><b>{{ service.name }}</b></td>
+                                    <td class="text-sm">
+                                      {% for key in service.keys %}<code>{{ key }}</code>{% if not loop.last %}, {% endif %}{% endfor %}
+                                    </td>
+                                    <td class="text-end">
+                                      <form action="" method="POST" role="form" class="d-inline">
+                                        <input type="hidden" name="api_action" value="remove" />
+                                        <input type="hidden" name="api_service" value="{{ service.name }}" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger mb-0"
+                                                onclick="return confirm('{{ _('Remove') }} {{ service.name }}?');">
+                                          {{ _("Remove") }}
+                                        </button>
+                                      </form>
+                                    </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        {% else %}
+                          <p class="text-sm text-secondary">{{ _("Nothing set yet.") }}</p>
+                        {% endif %}
+
+                        <hr />
+                        <h5>{{ _("Set keys") }}</h5>
+                        <p class="text-sm text-secondary">
+                          {{ _("An existing service keeps any key you do not name here. Leave a value empty to delete that key.") }}
+                        </p>
+                        <form action="" method="POST" role="form">
+                          <input type="hidden" name="api_action" value="save" />
+                          <div class="row">
+                            <div class="col-md-4 mb-2">
+                              <label class="form-label text-sm">{{ _("Service") }}</label>
+                              <input type="text" name="api_service" class="form-control" required
+                                     placeholder="spotify" autocomplete="off" />
+                            </div>
+                          </div>
+                          <div id="apiKeyRows">
+                            <div class="row api-key-row">
+                              <div class="col-md-4 mb-2">
+                                <label class="form-label text-sm">{{ _("Key") }}</label>
+                                <input type="text" name="api_key_name" class="form-control"
+                                       placeholder="client_id" autocomplete="off" />
+                              </div>
+                              <div class="col-md-6 mb-2">
+                                <label class="form-label text-sm">{{ _("Value") }}</label>
+                                <input type="password" name="api_key_value" class="form-control"
+                                       autocomplete="new-password" />
+                              </div>
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-outline-secondary mb-0" onclick="addApiKeyRow();">
+                            {{ _("Another key") }}
+                          </button>
+                          <button type="submit" class="btn mb-0 bg-gradient-{{ variables["meta"]["color"] }} btn-md my-4">
+                            {{ _("Save") }}
+                          </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -858,6 +946,14 @@
                 }
             })
             return false;
+        }
+    </script>
+    <script>
+        function addApiKeyRow() {
+            var host = document.getElementById("apiKeyRows");
+            var row = host.querySelector(".api-key-row").cloneNode(true);
+            row.querySelectorAll("input").forEach(function (input) { input.value = ""; });
+            host.appendChild(row);
         }
     </script>
     <script>

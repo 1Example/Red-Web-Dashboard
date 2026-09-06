@@ -1055,7 +1055,7 @@ class CustomPagesForm(FlaskForm):
 @login_required
 async def admin(
     page: typing.Literal[
-        "overview", "dashboard-settings", "bot-settings", "custom_pages", "logs"
+        "overview", "dashboard-settings", "bot-settings", "custom_pages", "logs", "api"
     ]
     | None = None,
 ):
@@ -1097,6 +1097,70 @@ async def admin(
     if bot_profile_form.submit.data and bot_profile_form.errors:
         for field_name, error_messages in bot_profile_form.errors.items():
             flash(f"{field_name}: {' '.join(error_messages)}", category="warning")
+
+    # ------------------------------------------------------------ API keys
+    if request.method == "POST" and request.form.get("api_action"):
+        action = request.form["api_action"]
+        if action == "save":
+            service = (request.form.get("api_service") or "").strip()
+            names = request.form.getlist("api_key_name")
+            values = request.form.getlist("api_key_value")
+            tokens = {
+                name.strip(): value
+                for name, value in zip(names, values)
+                if name.strip()
+            }
+            if not service:
+                flash(_("Name the service."), category="warning")
+            elif not tokens:
+                flash(_("Give at least one key."), category="warning")
+            else:
+                result = await get_result(
+                    app,
+                    {
+                        "jsonrpc": "2.0",
+                        "id": 0,
+                        "method": "DASHBOARDRPC__SET_API_TOKENS",
+                        "params": [current_user.id, service, tokens],
+                    },
+                )
+                if isinstance(result, dict) and result.get("status") == 0:
+                    flash(
+                        _("Saved %(count)s key(s) on %(service)s.")
+                        % {"count": result.get("set", 0), "service": service},
+                        category="success",
+                    )
+                else:
+                    flash(_("The bot refused that."), category="danger")
+        elif action == "remove":
+            service = (request.form.get("api_service") or "").strip()
+            result = await get_result(
+                app,
+                {
+                    "jsonrpc": "2.0",
+                    "id": 0,
+                    "method": "DASHBOARDRPC__REMOVE_API_TOKENS",
+                    "params": [current_user.id, [service]],
+                },
+            )
+            if isinstance(result, dict) and result.get("status") == 0:
+                flash(_("Removed %(service)s.") % {"service": service}, category="success")
+            else:
+                flash(_("The bot refused that."), category="danger")
+        return redirect(url_for("base_blueprint.admin", page="api"))
+
+    api_result = await get_result(
+        app,
+        {
+            "jsonrpc": "2.0",
+            "id": 0,
+            "method": "DASHBOARDRPC__GET_API_TOKENS",
+            "params": [current_user.id],
+        },
+    )
+    api_services = (
+        api_result.get("services", []) if isinstance(api_result, dict) else []
+    )
 
     dashboard_actions_form: DashboardActionsForm = DashboardActionsForm()
     if app.locked:
@@ -1316,6 +1380,7 @@ async def admin(
         connection_str=connection_str,
         bot_profile_form=bot_profile_form,
         dashboard_actions_form=dashboard_actions_form,
+        api_services=api_services,
         dashboard_settings_form=dashboard_settings_form,
         bot_settings_form=bot_settings_form,
         custom_pages_form=custom_pages_form,
