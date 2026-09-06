@@ -231,7 +231,6 @@ async def commands(cog: str | None = None):
 
     cogs = {}
     commands = deepcopy(app.variables["commands"])
-    len_cogs = 0
     len_commands = 0
     hidden_count = 0
     for _cog, cog_data in commands.items():
@@ -262,15 +261,17 @@ async def commands(cog: str | None = None):
             _cog_data["commands"].append(command_data)
         if not _cog_data["commands"]:
             continue
-        # Counted here rather than at the top of the loop, so a cog whose
-        # commands are all hidden is not counted as one the visitor can see.
-        len_cogs += 1
         cogs[_cog] = _cog_data
     # One flat stream rather than a table per cog. Roots are ordered across
     # every cog and each one's subcommands follow it, so sorting globally does
     # not separate a group from its children.
     def _sort_key(entry):
         return entry["name"].lstrip("/").lower()
+
+    # A command's name is how you type it. Slash names already carry their
+    # slash; the rest get the bot's first prefix here, so the page itself
+    # has no notion of a prefix.
+    _prefix = (app.variables["bot"]["prefixes"] or [""])[0]
 
     roots = []
     for _cog_name, _cog_data in cogs.items():
@@ -283,7 +284,7 @@ async def commands(cog: str | None = None):
     def _emit(cog_name, entry, depth):
         flat.append(
             {
-                "name": entry["name"],
+                "name": entry["name"] if entry.get("slash") else _prefix + entry["name"],
                 "cog": cog_name,
                 "depth": depth,
                 "slash": entry.get("slash", False),
@@ -298,17 +299,9 @@ async def commands(cog: str | None = None):
     for _cog_name, entry in roots:
         _emit(_cog_name, entry, 0)
 
-    prefixes = app.variables["bot"]["prefixes"]
-
     return render_template(
         "pages/commands.html",
-        cogs=cogs,
         commands_flat=flat,
-        # The prefix picker is only worth showing while something still
-        # needs one.
-        has_prefix_commands=any(not row["slash"] for row in flat),
-        prefixes=sorted(prefixes, key=len),
-        len_cogs=len_cogs,
         len_commands=len_commands,
         hidden=request.args.get("hidden") in ("True", "true"),
         hidden_count=hidden_count,

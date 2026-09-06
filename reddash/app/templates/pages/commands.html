@@ -6,32 +6,18 @@
 
 {% block stylesheets %}
 <style>
-  /* One list, filtered in the browser. The rail of twenty-four cog tabs is
-     gone: every command is in the DOM, and the search hides rows rather than
-     reloading the page. */
+  /* One list, filtered in the browser: every command is in the DOM and the
+     search hides rows rather than reloading the page. */
   .cmdx-head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
   .cmdx-count { font-size: .8rem; opacity: .55; }
 
-  .cmdx-tools {
-    display: flex; gap: .6rem; align-items: center; flex-wrap: wrap;
-    margin: 1rem 0 .35rem;
-  }
-  .cmdx-tools .input-group { flex: 1 1 260px; }
-
-  .cmdx-chips { display: flex; gap: .35rem; }
-  .cmdx-chip {
-    border: 1px solid rgba(255, 255, 255, .14);
-    background: transparent; color: inherit;
-    border-radius: 999px; padding: .28rem .8rem;
-    font-size: .78rem; line-height: 1.2; cursor: pointer;
-  }
-  .cmdx-chip[aria-pressed="true"] { border-color: transparent; }
+  .cmdx-tools { margin: 1rem 0 .35rem; }
 
   .cmdx-list { margin-top: .9rem; }
 
   .cmdx-row {
     display: grid;
-    grid-template-columns: minmax(11rem, 22rem) 1fr auto;
+    grid-template-columns: minmax(11rem, 22rem) 1fr;
     gap: .35rem 1rem;
     align-items: baseline;
     padding: .5rem .7rem;
@@ -45,17 +31,12 @@
     font-family: var(--bs-font-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
     font-size: .86rem;
     overflow-wrap: anywhere;
+    /* A subcommand sits under its parent; depth is set inline per row. */
+    padding-left: calc(var(--cmdx-depth, 0) * 1.15rem);
   }
-  /* A subcommand sits under its parent; depth is set inline per row. */
-  .cmdx-name { padding-left: calc(var(--cmdx-depth, 0) * 1.15rem); }
 
   .cmdx-desc { font-size: .84rem; opacity: .78; }
   .cmdx-desc p { margin: 0; }
-
-  .cmdx-cog {
-    font-size: .68rem; letter-spacing: .03em; text-transform: uppercase;
-    opacity: .45; white-space: nowrap;
-  }
 
   .cmdx-detail {
     padding: .1rem .7rem .8rem calc(.7rem + var(--cmdx-depth, 0) * 1.15rem);
@@ -68,7 +49,6 @@
 
   @media (max-width: 767px) {
     .cmdx-row { grid-template-columns: 1fr; gap: .15rem; }
-    .cmdx-cog { order: -1; }
   }
 </style>
 {% endblock %}
@@ -83,20 +63,8 @@
             {% if commands_flat %}
               <div class="cmdx-head">
                 <h1 class="card-title mb-0">{{ _("Commands") }}</h1>
-                <span class="cmdx-count" id="cmdxCount">
-                  {{ len_commands }} {{ _("across") }} {{ len_cogs }} {{ _("cogs") }}
-                </span>
+                <span class="cmdx-count" id="cmdxCount">{{ len_commands }}</span>
               </div>
-
-              {% if has_prefix_commands %}
-                <div class="cx-migrating">
-                  <i class="fa fa-info-circle"></i>
-                  <div>
-                    <b>{{ _("Everything in a cog is a slash command now.") }}</b>
-                    {{ _("What is left on a prefix is the bot's own core, and it is moving too. A cog's settings live on its Modules page.") }}
-                  </div>
-                </div>
-              {% endif %}
 
               {% if hidden_count %}
                 <div class="cx-scoped">
@@ -123,42 +91,19 @@
                          placeholder="{{ _('Search a command...') }}"
                          value="{% if query %}{{ query }}{% endif %}" />
                 </div>
-                {% if has_prefix_commands %}
-                  <div class="cmdx-chips" role="group" aria-label="{{ _('Filter by kind') }}">
-                    <button type="button" class="cmdx-chip bg-gradient-{{ variables["meta"]["color"] }}"
-                            data-kind="all" aria-pressed="true">{{ _("All") }}</button>
-                    <button type="button" class="cmdx-chip" data-kind="slash" aria-pressed="false">{{ _("Slash") }}</button>
-                    <button type="button" class="cmdx-chip" data-kind="prefix" aria-pressed="false">{{ _("Prefix") }}</button>
-                  </div>
-                  <div class="dropdown show">
-                    <a class="btn btn-sm bg-gradient-{{ variables["meta"]["color"] }} dropdown-toggle mb-0"
-                       href="#" role="button" id="prefixdrop_dropdown" data-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false">{{ _("Prefix") }}</a>
-                    <ul class="dropdown-menu prefixdiv" aria-labelledby="prefixdrop_dropdown">
-                      {% for p in prefixes %}
-                        <li><a class="dropdown-item prefix-option {% if loop.index == 1 %}active{% endif %}">{{ p }}</a></li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                {% endif %}
               </div>
 
               <div class="cmdx-list" id="cmdxList">
                 {% for command in commands_flat %}
                   {% set slug = loop.index0 %}
                   <div class="cmdx-row" style="--cmdx-depth: {{ command.depth }};"
-                       data-search="{{ command.name|lower }} {{ command.cog|lower }} {{ command.short_description|striptags|lower }}"
-                       data-kind="{{ 'slash' if command.slash else 'prefix' }}"
+                       data-search="{{ command.name|lower }} {{ command.short_description|striptags|lower }}"
                        {% if command.signature or command.aliases %}
                          data-toggle="collapse" href="#cmdx_{{ slug }}" role="button"
                          aria-expanded="false" aria-controls="cmdx_{{ slug }}"
                        {% endif %}>
-                    <div class="cmdx-name text-{{ variables["meta"]["color"] }}">
-                      {%- if not command.slash %}<span class="prefix">{{ prefixes[0] }}</span>{% endif -%}
-                      {{ command.name }}
-                    </div>
+                    <div class="cmdx-name text-{{ variables["meta"]["color"] }}">{{ command.name }}</div>
                     <div class="cmdx-desc">{{ command.short_description|markdown }}</div>
-                    <div class="cmdx-cog">{{ command.cog }}</div>
                   </div>
                   {% if command.signature or command.aliases %}
                     <div class="collapse cmdx-detail" id="cmdx_{{ slug }}"
@@ -166,8 +111,8 @@
                       {% if command.signature %}
                         <div>
                           <span class="cmdx-label">{{ _("Usage:") }}</span>
-                          <code>{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}</code>
-                          <a href="javascript:copyTextToClipboard('{% if not command.slash %}{{ prefixes[0] }}{% endif %}{{ command.name }} {{ command.signature }}');"
+                          <code>{{ command.name }} {{ command.signature }}</code>
+                          <a href="javascript:copyTextToClipboard('{{ command.name }} {{ command.signature }}');"
                              title="{{ _('Copy to clipboard') }}" style="margin-left: 8px;"><i class="far fa-copy"></i></a>
                         </div>
                       {% endif %}
@@ -206,7 +151,6 @@
       var empty = document.getElementById("cmdxEmpty");
       var count = document.getElementById("cmdxCount");
       var total = rows.length;
-      var kind = "all";
 
       function detailFor(row) {
         var next = row.nextElementSibling;
@@ -217,9 +161,7 @@
         var q = search.value.trim().toLowerCase();
         var shown = 0;
         rows.forEach(function (row) {
-          var match =
-            (kind === "all" || row.getAttribute("data-kind") === kind) &&
-            (!q || row.getAttribute("data-search").indexOf(q) !== -1);
+          var match = !q || row.getAttribute("data-search").indexOf(q) !== -1;
           row.hidden = !match;
           var detail = detailFor(row);
           if (detail) {
@@ -230,38 +172,11 @@
           if (match) shown++;
         });
         empty.hidden = shown !== 0;
-        count.textContent = shown === total
-          ? "{{ len_commands }} {{ _('across') }} {{ len_cogs }} {{ _('cogs') }}"
-          : shown + " {{ _('of') }} " + total;
+        count.textContent = shown === total ? total : shown + " / " + total;
       }
 
       search.addEventListener("input", apply);
-
-      var chips = Array.prototype.slice.call(document.querySelectorAll(".cmdx-chip"));
-      chips.forEach(function (chip) {
-        chip.addEventListener("click", function () {
-          kind = chip.getAttribute("data-kind");
-          chips.forEach(function (other) {
-            var on = other === chip;
-            other.setAttribute("aria-pressed", on ? "true" : "false");
-            other.classList.toggle("bg-gradient-{{ variables["meta"]["color"] }}", on);
-          });
-          apply();
-        });
-      });
-
       if (search.value.trim()) apply();
     })();
-  </script>
-  <script>
-    $(".prefix-option").click(function () {
-      let prefix = $(this).text();
-      $(".prefix").text(prefix);
-      $(".prefix-option").removeClass("active");
-      let index = $(this).index();
-      $(".prefixdiv").each(function () {
-        $(this).children().eq(index).addClass("active");
-      })
-    })
   </script>
 {% endblock %}
