@@ -266,22 +266,57 @@ async def commands(cog: str | None = None):
         # commands are all hidden is not counted as one the visitor can see.
         len_cogs += 1
         cogs[_cog] = _cog_data
+    # One flat stream rather than a table per cog. Roots are ordered across
+    # every cog and each one's subcommands follow it, so sorting globally does
+    # not separate a group from its children.
+    def _sort_key(entry):
+        return entry["name"].lstrip("/").lower()
+
+    roots = []
+    for _cog_name, _cog_data in cogs.items():
+        for entry in _cog_data["commands"]:
+            roots.append((_cog_name, entry))
+    roots.sort(key=lambda pair: _sort_key(pair[1]))
+
+    flat = []
+
+    def _emit(cog_name, entry, depth):
+        flat.append(
+            {
+                "name": entry["name"],
+                "cog": cog_name,
+                "depth": depth,
+                "slash": entry.get("slash", False),
+                "signature": entry.get("signature") or "",
+                "short_description": entry.get("short_description") or "",
+                "aliases": entry.get("aliases") or [],
+            }
+        )
+        for sub in sorted(entry.get("subs") or [], key=_sort_key):
+            _emit(cog_name, sub, depth + 1)
+
+    for _cog_name, entry in roots:
+        _emit(_cog_name, entry, 0)
+
     prefixes = app.variables["bot"]["prefixes"]
 
     return render_template(
         "pages/commands.html",
         cogs=cogs,
+        commands_flat=flat,
+        # The prefix picker is only worth showing while something still
+        # needs one.
+        has_prefix_commands=any(not row["slash"] for row in flat),
         prefixes=sorted(prefixes, key=len),
         len_cogs=len_cogs,
         len_commands=len_commands,
-        tab_name=None if cog is None or cog not in cogs else cog,
         hidden=request.args.get("hidden") in ("True", "true"),
         hidden_count=hidden_count,
         show_all=show_all,
         viewer_rank=viewer_rank,
-        # commands.html reads this as `query`; it was passed as `filter_param`,
-        # so the template's search branch never triggered and ?query= did nothing.
-        query=request.args.get("query"),
+        # /commands/<cog> used to select a tab. There are no tabs; it seeds
+        # the search box instead, so an old link still lands on that cog.
+        query=request.args.get("query") or (cog if cog in cogs else None),
     )
 
 
