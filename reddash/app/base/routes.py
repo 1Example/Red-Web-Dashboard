@@ -167,6 +167,13 @@ async def credits():
     return render_template("pages/credits.html")
 
 
+# Public on purpose: a data statement nobody can read without an account is
+# not a data statement. /mydata whatdata sends people straight here.
+@blueprint.route("/data")
+async def data_statement():
+    return render_template("pages/data.html")
+
+
 @blueprint.route("/profile")
 @login_required
 async def profile():

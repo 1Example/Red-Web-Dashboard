@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}
+  {{ _("Your Data") }}
+{% endblock %}
+
+{% block stylesheets %}{% endblock %}
+
+{% block content %}
+  <main class="main-content position-relative border-radius-lg">
+    <div class="container-fluid py-4">
+      <div class="col-12">
+        <div class="card card-chart">
+          <div class="card-header">
+            <h1 class="card-category text-gray">{{ _("Your Data") }}</h1>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <p>
+                    {{ _("CUBIX is self-hosted. Everything it stores lives on the server it runs on, under the control of the person who runs it — not with Discord, not with the authors of the software it is built from, and not with any analytics or advertising service. Nothing is sold or shared.") }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("What is stored") }}</h6>
+                  <p>
+                    {{ _("Mostly the ID Discord assigned you. An ID on its own says nothing; it is the key each feature uses to remember what belongs to you. Attached to it, depending on what you actually use:") }}
+                  </p>
+                  <ul>
+                    <li>{{ _("Settings you set for yourself, such as your profile card's background, font and colours.") }}</li>
+                    <li>{{ _("Counters a feature needs to work: experience and level, messages counted, time spent in voice, stars given and received, your balance.") }}</li>
+                    <li>{{ _("Things you created, so the bot knows whose they are — playlists, reminders, and the like.") }}</li>
+                    <li>{{ _("Moderation records, where a server's staff have used those features: warnings, notes, mutes and their reasons.") }}</li>
+                    <li>{{ _("Message content, only where a feature cannot work without it — a logging channel a server has switched on, or a quoted or pinned message.") }}</li>
+                  </ul>
+                  <p>
+                    {{ _("Server settings are stored against the server's ID in the same way, and are set by that server's staff rather than by you.") }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("Why it is stored") }}</h6>
+                  <p>
+                    {{ _("Because the features would not work otherwise. A level card cannot show your level without a level, and a warning that vanishes on restart is not a warning. Nothing here is collected to build a profile of you, and none of it leaves the server the bot runs on.") }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("What you can do about it") }}</h6>
+                  <ul>
+                    <li>{{ _("<code>/mydata getmydata</code> — sends you a copy of what is stored about you.")|safe }}</li>
+                    <li>{{ _("<code>/mydata forgetme</code> — asks the bot to forget you. Some records that exist to prevent abuse, such as moderation history, may be kept; the command tells you which.")|safe }}</li>
+                    <li>{{ _("<code>/mydata thirdparty</code> — the data statement of every module loaded on this instance, in that module's own words.")|safe }}</li>
+                  </ul>
+                  <p>
+                    {{ _("The <a href=\"%(url)s\">Modules</a> page lists what is loaded here and who each module came from.", url=url_for('third_parties_blueprint.third_parties'))|safe }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("This page") }}</h6>
+                  <p>
+                    {{ _("CUBIX is a heavily modified fork of <a href=\"https://github.com/Cog-Creators/Red-DiscordBot\">Red-DiscordBot</a>, maintained by <a href=\"https://discord.com/users/212320651334254593\">1Example</a>. This statement describes this instance, which is why it is here rather than pointing you at Red's own documentation — that document describes unmodified Red, and this is not that.")|safe }}
+                  </p>
+                  <p>
+                    {{ _("Questions about your data on this instance go to <a href=\"https://discord.com/users/212320651334254593\">1Example</a>.")|safe }}
+                  </p>
+                  <sup>{{ _("Individual servers decide which features are switched on, so what is actually stored about you varies from one server to the next.") }}</sup>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
+{% block javascripts %}{% endblock %}

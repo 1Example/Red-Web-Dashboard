@@ -320,6 +320,12 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
 .footer .cx-footer-line .cx-footer-name { font-weight: 700; letter-spacing: 0.02em; }
 .footer .cx-footer-line .fa-code { opacity: 0.65; margin: 0 2px; font-size: 0.82rem; }
 .footer .cx-footer-line a { font-weight: 600; }
+.footer .cx-footer-links {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+}
+.footer .cx-footer-links a { color: var(--cx-text); opacity: 0.78; }
+.footer .cx-footer-links a:hover { opacity: 1; text-decoration: underline; }
 .footer .cx-footer-thanks {
   margin: 4px 0 0;
   font-size: 0.74rem;
