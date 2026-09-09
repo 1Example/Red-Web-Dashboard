@@ -1,18 +1,33 @@
 <footer class="footer pt-3">
   <div class="container-fluid">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-      <ul class="nav nav-footer mb-0">
+      <div class="copyright text-sm text-muted">
+        &copy; {{ current_year }}
+        <span class="font-weight-bold">CUBIX</span> {{ _("by") }}
+        <a href="https://discord.com/users/212320651334254593"
+           class="font-weight-bold text-muted" target="_blank" rel="noopener">1Example</a>
+      </div>
+      <ul class="nav nav-footer mb-0 flex-wrap">
         <li class="nav-item">
-          <a href="https://appseed.us/product/argon-dashboard/flask" class="nav-link text-muted ps-0" target="_blank">{{ _("Flask Dashboard Argon") }}</a>
+          <span class="nav-link text-muted ps-0">{{ _("Special thanks to") }}</span>
         </li>
         <li class="nav-item">
-          <a href="https://github.com/AAA3A-AAA3A" class="nav-link text-muted" target="_blank">{{ _("Adapted for Red-DiscordBot") }}</a>
+          <a href="https://github.com/Cog-Creators/Red-DiscordBot"
+             class="nav-link text-muted" target="_blank" rel="noopener">Red-DiscordBot</a>
+        </li>
+        <li class="nav-item">
+          <a href="https://discord.gg/red" class="nav-link text-muted"
+             target="_blank" rel="noopener">{{ _("Red's Discord") }}</a>
+        </li>
+        <li class="nav-item">
+          <a href="https://github.com/AAA3A-AAA3A" class="nav-link text-muted"
+             target="_blank" rel="noopener">{{ _("Dashboard by AAA3A") }}</a>
+        </li>
+        <li class="nav-item">
+          <a href="https://appseed.us/product/argon-dashboard/flask"
+             class="nav-link text-muted" target="_blank" rel="noopener">{{ _("Template by AppSeed") }}</a>
         </li>
       </ul>
-      <div class="copyright text-sm text-muted">
-        &copy; <a href="https://www.creative-tim.com" class="font-weight-bold text-muted" target="_blank">{{ _("Creative Tim") }}</a>
-        - {{ _("Template created by AppSeed.") }}
-      </div>
     </div>
   </div>
 </footer>

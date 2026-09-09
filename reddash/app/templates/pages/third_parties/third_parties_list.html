@@ -53,6 +53,19 @@
 
                 <div class="text-sm text-secondary mb-3 module-card-desc">
                   {{ third_parties_infos[third_party]["description"]|markdown }}
+                  {% set cog_author = third_parties_infos[third_party]["author"] %}
+                  {% set cog_repo = third_parties_infos[third_party]["repo"] %}
+                  {% if cog_author and cog_author != "Unknown" %}
+                    <div class="text-xs text-muted mt-2">
+                      {{ _("by") }}
+                      {% if cog_repo and cog_repo.startswith("http") %}
+                        <a href="{{ cog_repo }}" class="text-muted" target="_blank"
+                           rel="noopener">{{ cog_author }}</a>
+                      {% else %}
+                        {{ cog_author }}
+                      {% endif %}
+                    </div>
+                  {% endif %}
                 </div>
 
                 <div class="module-card-pages">

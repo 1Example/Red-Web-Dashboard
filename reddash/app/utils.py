@@ -788,6 +788,7 @@ def add_constants(app: Flask) -> None:
         variables.update(**process_meta_tags())
         return {
             "version": "1.0",
+            "current_year": datetime.datetime.now().year,
             "variables": variables,
             "full_login_url": make_login_url(app.login_manager.login_view, next_url=request.url)
             if request.endpoint != "base_blueprint.index" and request.blueprint != "login_blueprint"
