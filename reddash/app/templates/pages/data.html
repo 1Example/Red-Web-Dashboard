@@ -49,10 +49,9 @@
                   <ul>
                     <li>{{ _("<code>/mydata getmydata</code> — sends you a copy of what is stored about you.")|safe }}</li>
                     <li>{{ _("<code>/mydata forgetme</code> — asks the bot to forget you. Some records that exist to prevent abuse, such as moderation history, may be kept; the command tells you which.")|safe }}</li>
-                    <li>{{ _("<code>/mydata thirdparty</code> — the data statement of every module loaded on this instance, in that module's own words.")|safe }}</li>
                   </ul>
                   <p>
-                    {{ _("The <a href=\"%(url)s\">Modules</a> page lists what is loaded here and who each module came from.", url=url_for('third_parties_blueprint.third_parties'))|safe }}
+                    {{ _("The <a href=\"%(url)s\">Modules</a> page lists every part of the bot loaded here, and who each one came from.", url=url_for('third_parties_blueprint.third_parties'))|safe }}
                   </p>
 
                   <br />
