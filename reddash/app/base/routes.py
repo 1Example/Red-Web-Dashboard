@@ -275,11 +275,6 @@ async def commands(cog: str | None = None):
     def _sort_key(entry):
         return entry["name"].lstrip("/").lower()
 
-    # A command's name is how you type it. Slash names already carry their
-    # slash; the rest get the bot's first prefix here, so the page itself
-    # has no notion of a prefix.
-    _prefix = (app.variables["bot"]["prefixes"] or [""])[0]
-
     roots = []
     for _cog_name, _cog_data in cogs.items():
         for entry in _cog_data["commands"]:
@@ -291,7 +286,7 @@ async def commands(cog: str | None = None):
     def _emit(cog_name, entry, depth):
         flat.append(
             {
-                "name": entry["name"] if entry.get("slash") else _prefix + entry["name"],
+                "name": entry["name"],
                 "cog": cog_name,
                 "depth": depth,
                 "slash": entry.get("slash", False),
@@ -412,31 +407,6 @@ async def get_guild(guild_id: int, for_third_parties: bool = False):
     }
 
 
-class PrefixesCheck:
-    def __call__(self, form: FlaskForm, field: wtforms.Field) -> None:
-        if field.data == field.default:
-            return
-        for prefix in field.data.split(";;|;;"):
-            if (
-                not app.variables["constants"]["MIN_PREFIX_LENGTH"]
-                <= len(prefix)
-                <= app.variables["constants"]["MAX_PREFIX_LENGTH"]
-            ):
-                raise wtforms.validators.ValidationError(
-                    _(
-                        "Prefixes must be between %(min)s and %(max)s characters long.",
-                        min=app.variables["constants"]["MIN_PREFIX_LENGTH"],
-                        max=app.variables["constants"]["MAX_PREFIX_LENGTH"],
-                    ),
-                )
-            if prefix.startswith("/"):
-                raise wtforms.validators.ValidationError(
-                    _(
-                        "Prefixes cannot start with `/`, as it conflicts with Discord's slash commands.",
-                    ),
-                )
-
-
 class BabelCheck:
     def __init__(self, check_reset: bool = False) -> None:
         self.check_reset: bool = check_reset
@@ -503,7 +473,6 @@ class GuildSettingsForm(FlaskForm):
             for field in self:
                 field.render_kw = {"disabled": True}
         self.bot_nickname.default = guild["settings"]["bot_nickname"]
-        self.prefixes.default = ";;|;;".join(guild["settings"]["prefixes"])
         self.admin_roles.choices = [
             (str(role["id"]), f"{role['name']} ({role['id']})") for role in guild["roles"][1:]
         ]
@@ -543,9 +512,6 @@ class GuildSettingsForm(FlaskForm):
 
     bot_nickname: wtforms.StringField = wtforms.StringField(
         _("Bot Nickname:"), validators=[wtforms.validators.Length(max=32)],
-    )
-    prefixes: wtforms.StringField = wtforms.StringField(
-        _("Prefixes:"), validators=[wtforms.validators.Optional(), PrefixesCheck()],
     )
     admin_roles: wtforms.SelectMultipleField = wtforms.SelectMultipleField(
         _("Admin Roles:"), choices=[],
@@ -711,11 +677,6 @@ async def dashboard_guild(
                 guild_id,
                 {
                     "bot_nickname": guild_settings_form.bot_nickname.data.strip() or None,
-                    "prefixes": (
-                        prefixes
-                        if (prefixes := guild_settings_form.prefixes.data.split(";;|;;")) != [""]
-                        else []
-                    ),
                     "admin_roles": guild_settings_form.admin_roles.data,
                     "mod_roles": guild_settings_form.mod_roles.data,
                     "ignored": guild_settings_form.ignored.data,
@@ -920,7 +881,6 @@ STATUS_PRESENCE_LABELS = {
 class BotSettingsForm(FlaskForm):
     def __init__(self, settings: dict[str, typing.Any]) -> None:
         super().__init__(prefix="bot_settings_form_")
-        self.prefixes.default = ";;|;;".join(settings["prefixes"])
         self.invoke_error_msg.default = settings["invoke_error_msg"]
         available_commands = []
         all_commands = deepcopy(app.variables["commands"])
@@ -976,9 +936,6 @@ class BotSettingsForm(FlaskForm):
         self.status_text.default = status.get("text") or ""
         self.status_stream_url.default = status.get("stream_url") or ""
 
-    prefixes: wtforms.StringField = wtforms.StringField(
-        _("Prefixes:"), validators=[wtforms.validators.InputRequired(), PrefixesCheck()],
-    )
     invoke_error_msg: wtforms.StringField = wtforms.StringField(
         _("Invoke Error Message:"), validators=[wtforms.validators.Length(max=1000)],
     )
@@ -1296,11 +1253,6 @@ async def admin(
             "params": [
                 current_user.id,
                 {
-                    "prefixes": (
-                        prefixes
-                        if (prefixes := bot_settings_form.prefixes.data.split(";;|;;")) != [""]
-                        else []
-                    ),
                     "invoke_error_msg": bot_settings_form.invoke_error_msg.data.strip() or None,
                     "disabled_commands": bot_settings_form.disabled_commands.data,
                     "disabled_command_msg": bot_settings_form.disabled_command_msg.data.strip()

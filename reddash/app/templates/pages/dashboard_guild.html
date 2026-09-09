@@ -232,16 +232,6 @@
                                                   <a href="https://discord.gg/{{ guild.vanity_url_code }}" target="_blank">discord.gg/{{ guild.vanity_url_code }}</a>
                                                 </div>
                                               {% endif %}
-                                              {% if guild.prefixes %}
-                                                <div class="cx-ov-row">
-                                                  <span><i class="fa fa-terminal me-2 opacity-6"></i>{{ _("Prefixes") }}</span>
-                                                  <span>
-                                                    {% for prefix in guild.prefixes %}
-                                                      <code class="cx-prefix" onclick='copyTextToClipboard("{{ prefix }}")'>{{ prefix }}</code>
-                                                    {% endfor %}
-                                                  </span>
-                                                </div>
-                                              {% endif %}
                                             </div>
                                           </div>
                                         </div>
@@ -500,12 +490,6 @@
                                                 <div class="form-group">
                                                     <label class="form-group-label">{{ guild_settings_form.bot_nickname.label.text }}</label>
                                                     {{ guild_settings_form.bot_nickname(class="form-control form-control-default") }}
-                                                </div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <div class="form-group">
-                                                    <label class="form-group-label">{{ guild_settings_form.prefixes.label.text }}</label>
-                                                    {{ guild_settings_form.prefixes(class="form-control form-control-default select-choices") }}
                                                 </div>
                                             </div>
                                             <div class="mb-3">

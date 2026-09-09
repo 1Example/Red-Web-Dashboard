@@ -32,15 +32,6 @@
                 <div class="text-secondary mb-3 cx-hero-desc">{{ variables["meta"]["description"]|markdown }}</div>
               {% endif %}
 
-              <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-                {% if variables["bot"]["prefixes"] %}
-                  <span class="text-xs text-secondary text-uppercase font-weight-bold me-1">{{ _("Prefixes") }}</span>
-                  {% for prefix in variables["bot"]["prefixes"] %}
-                    <code class="cx-prefix" onclick='copyTextToClipboard("{{ prefix }}")' title="{{ _("Copy ID") }}">{{ prefix }}</code>
-                  {% endfor %}
-                {% endif %}
-              </div>
-
               <div class="d-flex flex-wrap gap-2">
                 {% if variables["bot"]["invite_public"] or (current_user.is_authenticated and current_user.is_owner) %}
                   <a class="btn bg-gradient-{{ variables["meta"]["color"] }} mb-0" href="{{ variables["bot"]["invite_url"] }}" target="_blank">
