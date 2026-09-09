@@ -394,9 +394,13 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
    Animated background + colour-scheme corrections
    ========================================================================== */
 
-/* Everything real sits above the canvas. */
+/* Everything real sits above the canvas. The canvas is position:fixed, so it
+   paints above any static in-flow element no matter the DOM order - anything
+   that has to be seen needs a position and a z-index of its own. The footer
+   lives outside .main-content, so it needs its own. */
 .cx-topbar { z-index: 1040; }
 .main-content { position: relative; z-index: 1; }
+.footer { position: relative; z-index: 1; }
 
 /* Let the background layer show through the page surface. */
 body,
