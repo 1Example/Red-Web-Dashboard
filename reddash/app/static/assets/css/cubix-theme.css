@@ -309,6 +309,39 @@ label, .form-check-label, .form-group-label { color: var(--cx-text-dim); }
 }
 .footer .nav-link { font-size: 0.78rem; }
 
+/* One centred line for CUBIX, the attributions smaller underneath. The strip
+   is full width because the footer sits outside .main-content. */
+.footer.text-center { text-align: center; padding-bottom: 18px !important; }
+.footer .cx-footer-line {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--cx-text);
+}
+.footer .cx-footer-line .cx-footer-name { font-weight: 700; letter-spacing: 0.02em; }
+.footer .cx-footer-line .fa-code { opacity: 0.65; margin: 0 2px; font-size: 0.82rem; }
+.footer .cx-footer-line a { font-weight: 600; }
+.footer .cx-footer-thanks {
+  margin: 4px 0 0;
+  font-size: 0.74rem;
+  opacity: 0.6;
+}
+.footer .cx-footer-thanks a { color: inherit; }
+.footer .cx-footer-thanks a:hover { opacity: 0.9; text-decoration: underline; }
+.footer .cx-footer-dot { margin: 0 5px; opacity: 0.45; }
+
+/* The credit under a module's description: quieter than the body text, but a
+   line of its own rather than something tucked into the paragraph. */
+.cx-card-credit {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--cx-border);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  opacity: 0.62;
+}
+.cx-card-credit a { color: inherit; font-weight: 600; }
+.cx-card-credit a:hover { opacity: 1; text-decoration: underline; }
+
 /* ==========================================================================
    Home page
    ========================================================================== */

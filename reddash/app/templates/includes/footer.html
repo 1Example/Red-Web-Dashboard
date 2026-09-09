@@ -1,33 +1,22 @@
-<footer class="footer pt-3">
-  <div class="container-fluid">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-      <div class="copyright text-sm text-muted">
-        &copy; {{ current_year }}
-        <span class="font-weight-bold">CUBIX</span> {{ _("by") }}
-        <a href="https://discord.com/users/212320651334254593"
-           class="font-weight-bold text-muted" target="_blank" rel="noopener">1Example</a>
-      </div>
-      <ul class="nav nav-footer mb-0 flex-wrap">
-        <li class="nav-item">
-          <span class="nav-link text-muted ps-0">{{ _("Special thanks to") }}</span>
-        </li>
-        <li class="nav-item">
-          <a href="https://github.com/Cog-Creators/Red-DiscordBot"
-             class="nav-link text-muted" target="_blank" rel="noopener">Red-DiscordBot</a>
-        </li>
-        <li class="nav-item">
-          <a href="https://discord.gg/red" class="nav-link text-muted"
-             target="_blank" rel="noopener">{{ _("Red's Discord") }}</a>
-        </li>
-        <li class="nav-item">
-          <a href="https://github.com/AAA3A-AAA3A" class="nav-link text-muted"
-             target="_blank" rel="noopener">{{ _("Dashboard by AAA3A") }}</a>
-        </li>
-        <li class="nav-item">
-          <a href="https://appseed.us/product/argon-dashboard/flask"
-             class="nav-link text-muted" target="_blank" rel="noopener">{{ _("Template by AppSeed") }}</a>
-        </li>
-      </ul>
-    </div>
-  </div>
+<footer class="footer text-center">
+  <p class="cx-footer-line">
+    &copy; {{ current_year }} <span class="cx-footer-name">CUBIX</span>
+    <i class="fa fa-code" aria-hidden="true"></i>
+    {{ _("by") }}
+    <a href="https://discord.com/users/212320651334254593"
+       target="_blank" rel="noopener">1Example</a>
+  </p>
+  <p class="cx-footer-thanks">
+    {{ _("Special thanks to") }}
+    <a href="https://github.com/Cog-Creators/Red-DiscordBot"
+       target="_blank" rel="noopener">Red-DiscordBot</a>
+    <span class="cx-footer-dot">&middot;</span>
+    <a href="https://discord.gg/red" target="_blank" rel="noopener">{{ _("Red's Discord") }}</a>
+    <span class="cx-footer-dot">&middot;</span>
+    <a href="https://github.com/AAA3A-AAA3A" target="_blank"
+       rel="noopener">{{ _("Dashboard by AAA3A") }}</a>
+    <span class="cx-footer-dot">&middot;</span>
+    <a href="https://appseed.us/product/argon-dashboard/flask" target="_blank"
+       rel="noopener">{{ _("Template by AppSeed") }}</a>
+  </p>
 </footer>

@@ -56,13 +56,13 @@
                   {% set cog_author = third_parties_infos[third_party]["author"] %}
                   {% set cog_repo = third_parties_infos[third_party]["repo"] %}
                   {% if cog_author and cog_author != "Unknown" %}
-                    <div class="text-xs text-muted mt-2">
-                      {{ _("by") }}
+                    <div class="cx-card-credit">
+                      {{ _("Credits to") }}
                       {% if cog_repo and cog_repo.startswith("http") %}
-                        <a href="{{ cog_repo }}" class="text-muted" target="_blank"
+                        <a href="{{ cog_repo }}" target="_blank"
                            rel="noopener">{{ cog_author }}</a>
                       {% else %}
-                        {{ cog_author }}
+                        <span>{{ cog_author }}</span>
                       {% endif %}
                     </div>
                   {% endif %}
