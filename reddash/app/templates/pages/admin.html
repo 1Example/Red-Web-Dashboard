@@ -461,6 +461,7 @@
                                     </td>
                                     <td class="text-end">
                                       <form action="" method="POST" role="form" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                                         <input type="hidden" name="api_action" value="remove" />
                                         <input type="hidden" name="api_service" value="{{ service.name }}" />
                                         <button type="submit" class="btn btn-sm btn-outline-danger mb-0"
@@ -484,6 +485,7 @@
                           {{ _("An existing service keeps any key you do not name here. Leave a value empty to delete that key.") }}
                         </p>
                         <form action="" method="POST" role="form">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                           <input type="hidden" name="api_action" value="save" />
                           <div class="row">
                             <div class="col-md-4 mb-2">
