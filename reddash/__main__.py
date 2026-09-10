@@ -25,6 +25,12 @@ logging.basicConfig(
     style="{",
     handlers=[rich_logging.RichHandler(console=rich_console, rich_tracebacks=True)],
 )
+# waitress warns as soon as a single request waits for a worker, which with ten
+# threads is what a page with a few assets on it looks like. It is a warning
+# about nothing and it drowns out the ones that matter; a real backlog still
+# shows up as a slow dashboard.
+logging.getLogger("waitress.queue").setLevel(logging.ERROR)
+
 rich_console.push_theme(
     Theme(
         {
