@@ -29,7 +29,7 @@
                   </p>
                   <ul>
                     <li>{{ _("Settings you set for yourself, such as your profile card's background, font and colours.") }}</li>
-                    <li>{{ _("Counters a feature needs to work: experience and level, messages counted, time spent in voice, stars given and received, your balance.") }}</li>
+                    <li>{{ _("Counters a feature needs to work: experience and level, messages counted, time spent in voice, your balance.") }}</li>
                     <li>{{ _("Things you created, so the bot knows whose they are — playlists, reminders, and the like.") }}</li>
                     <li>{{ _("Moderation records, where a server's staff have used those features: warnings, notes, mutes and their reasons.") }}</li>
                     <li>{{ _("Message content, only where a feature cannot work without it — a logging channel a server has switched on, or a quoted or pinned message.") }}</li>
@@ -52,6 +52,20 @@
                   </ul>
                   <p>
                     {{ _("The <a href=\"%(url)s\">Modules</a> page lists every part of the bot loaded here, and who each one came from.", url=url_for('third_parties_blueprint.third_parties'))|safe }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("Cookies") }}</h6>
+                  <p>
+                    {{ _("This dashboard sets no advertising or analytics cookies, and there is nothing here to track you across other sites. What it does set:") }}
+                  </p>
+                  <ul>
+                    <li>{{ _("A session cookie, so the site knows you are signed in. It is readable only by the server, is not sent with requests from other sites, and goes when you sign out.") }}</li>
+                    <li>{{ _("A sign-in cookie, if you ask to stay signed in. Same protections, and it expires on its own.") }}</li>
+                    <li>{{ _("Three appearance cookies — your accent colour, background and sidebar theme — kept for a year so the site looks the same when you come back. They hold nothing but the look you picked, and are only written when you change one from its default.") }}</li>
+                  </ul>
+                  <p>
+                    {{ _("Clearing them in your browser costs you nothing but your theme and another sign-in.") }}
                   </p>
 
                   <br />

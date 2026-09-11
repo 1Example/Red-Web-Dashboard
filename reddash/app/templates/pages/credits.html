@@ -18,26 +18,70 @@
             <div class="col-md-12">
               <div class="card">
                 <div class="card-body">
+
                   <p>
-                    {{ _('The base template for this Dashboard was created by <a href="https://github.com/timcreative/freebies/blob/master/LICENSE.md">MIT License</a>.')|safe }}<br />
-                    {{ _('The Dashboard was edited and recoded to work with Red-DiscordBot by <a href="https://github.com/NeuroAssassin">Neuro Assassin#4779</a> and <a href="https://github.com/AAA3A-AAA3A">AAA3A</a>, licensed under <a href="https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/LICENSE">Affero General Public License v3.0</a>.')|safe }}<br />
-                    {{ _('An important part of internal Python RPC logic was coded by <a href="https://github.com/NeuroAssassin">Neuro Assassin#4779</a>, licensed under <a href="https://github.com/Cog-Creators/Red-Dashboard/blob/master/LICENSE">Affero General Public License v3.0</a>.')|safe }}<br />
-                    {{ _('This Dashboard was made for <a href="https://github.com/Cog-Creators/Red-DiscordBot">Red Discord Bot</a>, a multifunctional, fully modular Discord bot, created by Twentysix, made great by many. Red Discord Bot is licensed under <a href="https://github.com/Cog-Creators/Red-DiscordBot/blob/V3/develop/LICENSE">GNU General Public License v3.0</a>.')|safe }}
+                    {{ _("CUBIX is built and maintained by 1Example. The bot, this dashboard and
+                    the modules behind them have been rewritten far past what they started as:
+                    every command is a slash command, the settings live here rather than in chat,
+                    and most of the modules are either heavily reworked or written from scratch.") }}
                   </p>
+                  <p>
+                    {{ _("It began as a fork, and the projects below are why there was something
+                    to fork. They are credited here because they earned it, and because their
+                    licences require it - not because they run CUBIX or support it. Anything
+                    broken here is ours, so please do not take it to them.") }}
+                  </p>
+
                   <br />
-                  <h6 class="card-category text-gray">{{ _('Policies and Disclaimers') }}</h6>
-                  <ul>
+                  <h6 class="card-category text-gray">{{ _("Standing on") }}</h6>
+                  <ul class="cx-credits">
                     <li>
-                      {{ _("Privacy Policy:") }} <a href="https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Privacy%20Policy.md">https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Privacy%20Policy.md</a>
+                      <b><a href="https://github.com/Cog-Creators/Red-DiscordBot"
+                            target="_blank" rel="noopener">Red-DiscordBot</a></b>
+                      &mdash;
+                      {{ _("the modular Discord bot CUBIX is forked from, created by Twentysix
+                      and made great by many. Licensed GNU GPL v3.0.") }}
                     </li>
                     <li>
-                      {{ _("Cookie Policy:") }} <a href="https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Cookie%20Policy.md">https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Cookie%20Policy.md</a>
+                      <b><a href="https://github.com/AAA3A-AAA3A/Red-Web-Dashboard"
+                            target="_blank" rel="noopener">Red-Web-Dashboard</a></b>
+                      &mdash;
+                      {{ _("the dashboard this one grew out of, by AAA3A and Neuro Assassin,
+                      who also wrote the internal RPC logic it still talks over.
+                      Licensed GNU AGPL v3.0.") }}
                     </li>
                     <li>
-                      {{ _("Third Parties Disclaimer:") }} <a href="https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Third%20Parties%20Disclaimer.md">https://github.com/AAA3A-AAA3A/Red-Web-Dashboard/blob/main/documents/Third%20Parties%20Disclaimer.md</a>
+                      <b><a href="https://appseed.us/product/argon-dashboard/flask"
+                            target="_blank" rel="noopener">Argon Dashboard</a></b>
+                      &mdash;
+                      {{ _("the Flask template the layout began with, by AppSeed and
+                      Creative Tim. Licensed MIT.") }}
+                    </li>
+                    <li>
+                      <b><a href="https://github.com/PyLav/PyLav"
+                            target="_blank" rel="noopener">PyLav</a></b>
+                      &mdash;
+                      {{ _("the audio engine behind the player, by Draper.
+                      Licensed GNU AGPL v3.0.") }}
                     </li>
                   </ul>
-                  <sup>{{ _("The above policies and disclaimers only apply on unmodified distributions of Red-Web-Dashboard. Copyright holder makes no guarantee that the documents are accurate on public distributions of Red-Web-Dashboard.") }}</sup>
+                  <p>
+                    {{ _("Individual modules carry their own notices in their source, including
+                    work by AAA3A, NeuroAssassin, TrustyJAID and the Cog-Creators organisation.
+                    CUBIX is licensed GNU GPL v3.0; run /bot licenseinfo for the full text and
+                    what it entitles you to.") }}
+                  </p>
+
+                  <br />
+                  <h6 class="card-category text-gray">{{ _("Policies") }}</h6>
+                  <p>
+                    {{ _("What CUBIX stores about you, why, how long for, cookies, and how to
+                    have it deleted, are all on one page of our own:") }}
+                    <a href="{{ url_for('base_blueprint.data_statement') }}">{{ _("Your data") }}</a>.
+                    {{ _("It describes this bot, not the projects above - their documents cover
+                    their own distributions and say nothing about what runs here.") }}
+                  </p>
+
                 </div>
               </div>
             </div>
